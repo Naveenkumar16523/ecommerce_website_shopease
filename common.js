@@ -315,8 +315,9 @@ async function placeOrder(name, email, extraDetails = {}) {
       body: JSON.stringify(orderData)
     });
 
+    const data = await response.json();
+
     if (response.ok) {
-      const data = await response.json();
       // Show success message more reliably
       const btn = document.querySelector('button[onclick="submitOrder()"]');
       if (btn) {
