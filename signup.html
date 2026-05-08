@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Sign Up - SHOP EASE</title>
   <script src="common.js" defer></script>
-  <script src="https://cdn.tailwindcss.com"></script><script>if(window.tailwind){window.tailwind.config={theme:{extend:{}}}}</script>
+  <script>console.warn = (function(oldWarn){ return function(msg){ if(typeof msg === \"string\" && msg.includes(\"tailwindcss\")) return; oldWarn.apply(console, arguments); } })(console.warn);</script><script src=\"https://cdn.tailwindcss.com\"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'DM Sans', sans-serif; }
