@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - SHOP EASE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="common.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
+    body { font-family: 'DM Sans', sans-serif; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; }
+  </style>
+</head>
+
+<body class="bg-[#F2F0F1]">
+
+<nav class="flex items-center px-6 md:px-12 py-4 bg-white border-b sticky top-0 z-50">
+  <a href="index.html" class="text-xl font-black hero-title">SHOP EASE</a>
+</nav>
+
+<div class="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8">
+
+ 
+  <div class="md:col-span-2 space-y-8">
+    
+   
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <h2 class="text-lg font-bold mb-5">Shipping Address</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <input id="ship-name" type="text" placeholder="Enter Your Name" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
+        <input id="ship-phone" type="text" placeholder="Enter Your Phone" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
+        <input id="ship-address" type="text" placeholder="Enter Your Address" class="w-full border rounded-xl px-4 py-3 text-sm md:col-span-2 focus:border-black outline-none bg-gray-50">
+        <input id="ship-city" type="text" placeholder="Enter Your City" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
+        <input id="ship-pincode" type="text" placeholder="Enter Your Pincode" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
+      </div>
+    </div>
+
+    
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <h2 class="text-lg font-bold mb-5">Payment Method</h2>
+      <div class="space-y-3">
+        
+        <label class="flex items-center justify-between p-4 border rounded-xl cursor-not-allowed opacity-50 bg-gray-50">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymentMethod" value="UPI" disabled class="w-4 h-4 accent-black">
+            <span class="text-sm font-medium">UPI</span>
+          </div>
+          <span class="text-[10px] text-gray-400">GPay / PhonePe (Coming Soon)</span>
+        </label>
+
+        <label class="flex items-center justify-between p-4 border rounded-xl cursor-not-allowed opacity-50 bg-gray-50">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymentMethod" value="Card" disabled class="w-4 h-4 accent-black">
+            <span class="text-sm font-medium">Card</span>
+          </div>
+          <span class="text-[10px] text-gray-400">Visa / MasterCard (Coming Soon)</span>
+        </label>
+
+        <label onclick="showQRModal()" class="flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:border-black transition bg-gray-50">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymentMethod" value="QR Code" class="w-4 h-4 accent-black">
+            <span class="text-sm font-medium">QR Payment</span>
+          </div>
+          <span class="text-[10px] text-gray-400">Scan & Pay</span>
+        </label>
+
+        <label class="flex items-center justify-between p-4 border-2 border-black bg-gray-50 rounded-xl cursor-pointer">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymentMethod" value="Cash on Delivery" checked class="w-4 h-4 accent-black">
+            <span class="text-sm font-medium">Cash on Delivery</span>
+          </div>
+        </label>
+
+        <label class="flex items-center justify-between p-4 border rounded-xl cursor-not-allowed opacity-50 bg-gray-50">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymentMethod" value="Pay Later" disabled class="w-4 h-4 accent-black">
+            <span class="text-sm font-medium">Pay Later</span>
+          </div>
+          <span class="text-[10px] text-gray-400">(Coming Soon)</span>
+        </label>
+
+      </div>
+    </div>
+
+  </div>
+
+ 
+  <div class="space-y-6">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
+      <h2 class="text-lg font-bold mb-5">Order Summary</h2>
+      
+      <div class="space-y-3 text-sm mb-5">
+        <div class="flex justify-between text-gray-500">
+          <span>Subtotal</span>
+          <span id="summary-subtotal">$0</span>
+        </div>
+        <div class="flex justify-between text-red-500">
+          <span>Discount (-20%)</span>
+          <span id="summary-discount">-$0</span>
+        </div>
+        <div class="flex justify-between text-gray-500">
+          <span>Delivery Fee</span>
+          <span id="summary-delivery">$15</span>
+        </div>
+      </div>
+
+      <hr class="mb-5">
+
+      <div class="flex justify-between font-bold text-lg mb-6">
+        <span>Total</span>
+        <span id="summary-total">$0</span>
+      </div>
+
+      <button onclick="submitOrder()" class="w-full bg-black text-white py-4 rounded-full font-bold hover:bg-gray-800 transition flex items-center justify-center gap-2">
+        Place Order <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M3 12h18"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function updateSummary() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let subtotal = 0;
+    cart.forEach(item => subtotal += (item.price * item.qty));
+    
+    const discount = Math.round(subtotal * 0.2);
+    const delivery = subtotal > 0 ? 15 : 0;
+    const total = subtotal - discount + delivery;
+
+    document.getElementById('summary-subtotal').innerText = '$' + subtotal;
+    document.getElementById('summary-discount').innerText = '-$' + discount;
+    document.getElementById('summary-delivery').innerText = '$' + delivery;
+    document.getElementById('summary-total').innerText = '$' + total;
+  }
+
+  async function submitOrder() {
+    const name = document.getElementById('ship-name').value;
+    const phone = document.getElementById('ship-phone').value;
+    const address = document.getElementById('ship-address').value;
+    const city = document.getElementById('ship-city').value;
+    const pincode = document.getElementById('ship-pincode').value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+    if (!name || !address || !phone) {
+      alert('Please fill in your shipping details!');
+      return;
+    }
+
+    const extraDetails = { phone, address, city, pincode, paymentMethod };
+    await placeOrder(name, "Customer", extraDetails); 
+  }
+
+  window.onload = updateSummary;
+
+  function showQRModal() {
+    document.getElementById('qrModal').classList.remove('hidden');
+    document.getElementById('qrModal').classList.add('flex');
+  }
+
+  function hideQRModal() {
+    document.getElementById('qrModal').classList.add('hidden');
+    document.getElementById('qrModal').classList.remove('flex');
+  }
+</script>
+
+<!-- QR Modal -->
+<div id="qrModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-6">
+  <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform transition-all">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold">Scan to Pay</h3>
+      <button onclick="hideQRModal()" class="text-gray-400 hover:text-black transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    
+    <div class="bg-gray-50 p-6 rounded-2xl mb-6 flex justify-center">
+      <!-- Dummy QR Code -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ShopEasePayment" alt="QR Code" class="w-48 h-48 mix-blend-multiply">
+    </div>
+    
+    <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+      Please scan the QR code above with any UPI app to complete your payment. Once done, click the button below.
+    </p>
+    
+    <button onclick="hideQRModal()" class="w-full bg-black text-white py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
+      I've Paid
+    </button>
+  </div>
+</div>
+
+</body>
+</html>

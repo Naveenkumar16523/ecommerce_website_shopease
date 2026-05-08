@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us – SHOP EASE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; }
+    #mobileSidebar { transition: transform 0.3s ease-in-out; }
+  </style>
+  <script src="common.js" defer></script>
+</head>
+<body class="bg-white text-black overflow-x-hidden">
+
+  
+  <nav class="flex items-center justify-between px-6 md:px-12 py-4 border-b border-gray-100 sticky top-0 bg-white z-50">
+    <div class="flex items-center gap-4 md:gap-8">
+      <button onclick="toggleMobileMenu()" class="md:hidden p-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <a href="index.html" class="hero-title text-2xl font-black">SHOP EASE</a>
+      <div class="hidden md:flex gap-6 text-sm font-medium">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="casual-category.html" class="hover:underline">Shop</a>
+        <a href="new-arrivals.html" class="hover:underline">New Arrivals</a>
+        <a href="#" class="hover:underline">Brands</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 md:gap-5">
+      <a href="cart.html" class="relative">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+        <span id="cartBadge" class="absolute -top-1.5 -right-1.5 bg-black text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">0</span>
+      </a>
+    </div>
+  </nav>
+
+  
+  <section class="bg-[#F0EEED] py-20 px-6 md:px-12 text-center">
+    <h1 class="hero-title text-5xl md:text-7xl font-black mb-6">OUR STORY</h1>
+    <p class="max-w-2xl mx-auto text-gray-600 text-lg">
+      At SHOP EASE, we believe that fashion is more than just clothes. It's a way to express who you are and how you feel.
+    </p>
+  </section>
+
+ 
+  <section class="py-20 px-6 md:px-12 max-w-4xl mx-auto space-y-12">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="hero-title text-3xl font-bold mb-4">WHO WE ARE</h2>
+        <p class="text-gray-500 leading-relaxed">
+          Founded in 2025, SHOP EASE started with a simple mission: to provide high-quality, stylish, and affordable clothing for everyone. We carefully curate our collections to ensure that every piece meets our standards of comfort and style.
+        </p>
+      </div>
+      <div class="rounded-3xl overflow-hidden shadow-2xl">
+        <img src="https://images.unsplash.com/photo-1521335629791-ce4aec67dd16?w=800&q=80" class="w-full h-full object-cover" alt="Fashion Image">
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center md:flex-row-reverse">
+      <div class="md:order-2">
+        <h2 class="hero-title text-3xl font-bold mb-4">OUR MISSION</h2>
+        <p class="text-gray-500 leading-relaxed">
+          Our mission is to empower individuals through fashion. Whether you're dressing for a casual day out, a formal event, or a session at the gym, we have something that will make you look and feel your best.
+        </p>
+      </div>
+      <div class="rounded-3xl overflow-hidden shadow-2xl md:order-1">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" class="w-full h-full object-cover" alt="Fashion Store">
+      </div>
+    </div>
+  </section>
+
+  
+  <footer class="bg-[#F0EEED] px-6 md:px-16 pt-12 pb-6">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-10">
+      <div class="col-span-2 md:col-span-1">
+        <div class="hero-title text-2xl font-black mb-3">SHOP EASE</div>
+        <p class="text-xs text-gray-500 leading-relaxed">© 2025–2026, All Rights Reserved</p>
+      </div>
+      <div>
+        <div class="font-bold text-sm mb-4">COMPANY</div>
+        <ul class="space-y-2 text-xs text-gray-500">
+          <li><a href="about.html" class="hover:text-black">About</a></li>
+          <li><a href="#" class="hover:text-black">Features</a></li>
+          <li><a href="#" class="hover:text-black">Works</a></li>
+          <li><a href="#" class="hover:text-black">Career</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-bold text-sm mb-4">HELP</div>
+        <ul class="space-y-2 text-xs text-gray-500">
+          <li><a href="support.html" class="hover:text-black">Customer Support</a></li>
+          <li><a href="#" class="hover:text-black">Delivery Details</a></li>
+          <li><a href="terms.html" class="hover:text-black">Terms & Conditions</a></li>
+          <li><a href="privacy.html" class="hover:text-black">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  
+  <div id="mobileSidebar" class="fixed inset-0 z-[60] -translate-x-full">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
+    <div class="absolute left-0 top-0 bottom-0 w-4/5 max-w-xs bg-white p-6 shadow-2xl">
+      <span class="hero-title text-xl font-black">SHOP EASE</span>
+      <nav class="flex flex-col gap-5 mt-10">
+        <a href="index.html">Home</a>
+        <a href="casual-category.html">Shop</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </div>
+
+</body>
+</html>

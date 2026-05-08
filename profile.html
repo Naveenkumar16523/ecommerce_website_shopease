@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> My Profile - SHOP EASE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="common.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
+    body { font-family: 'DM Sans', sans-serif; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; }
+  </style>
+</head>
+<body class="bg-[#F2F0F1]">
+
+  <header class="bg-white sticky top-0 z-50 shadow-sm">
+    <!-- Top Tier -->
+    <div class="max-w-[1440px] mx-auto px-6 md:px-12 py-3 flex items-center justify-between gap-8 border-b border-gray-50">
+      <!-- Left: Mobile Menu & Primary Links -->
+      <div class="flex items-center gap-4 md:gap-6 text-[15px] font-semibold">
+        <!-- Mobile Hamburger -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-1 text-gray-600 hover:text-black">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <a href="index.html" class="text-2xl font-black hero-title mr-4 hidden sm:block">SHOP EASE</a>
+        
+        <div class="hidden lg:flex items-center gap-6">
+          <!-- Women Mega Menu -->
+          <div class="group relative py-4">
+            <a href="womens.html" class="text-gray-800 hover:text-black transition cursor-pointer">Women</a>
+            <div class="absolute top-full left-0 w-[800px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-4 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
+              <div>
+                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
+                <ul class="space-y-2 text-sm text-gray-500 font-medium">
+                  <li><a href="#" class="hover:text-black transition">T-Shirts</a></li>
+                  <li><a href="#" class="hover:text-black transition">Dresses</a></li>
+                  <li><a href="#" class="hover:text-black transition">Jeans</a></li>
+                  <li><a href="#" class="hover:text-black transition">Shorts</a></li>
+                  <li><a href="#" class="hover:text-black transition">Hoodies</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Shop By Brand</h3>
+                <ul class="space-y-2 text-sm text-gray-500 font-medium">
+                  <li><a href="#" class="hover:text-black transition">Zara</a></li>
+                  <li><a href="#" class="hover:text-black transition">H&M</a></li>
+                  <li><a href="#" class="hover:text-black transition">Gucci</a></li>
+                  <li><a href="#" class="hover:text-black transition">Prada</a></li>
+                </ul>
+              </div>
+              <div class="col-span-2">
+                <div class="relative rounded-xl overflow-hidden h-40 group/img">
+                  <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&q=80" class="w-full h-full object-cover transition duration-500 group-hover/img:scale-110">
+                  <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-4">
+                    <p class="text-white font-bold">New Summer Collection</p>
+                    <p class="text-white/80 text-xs">Up to 40% Off</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Men Mega Menu -->
+          <div class="group relative py-4">
+            <a href="mens.html" class="text-gray-800 hover:text-black transition cursor-pointer">Men</a>
+            <div class="absolute top-full left-0 w-[800px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-4 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
+              <div>
+                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
+                <ul class="space-y-2 text-sm text-gray-500 font-medium">
+                  <li><a href="#" class="hover:text-black transition">T-Shirts</a></li>
+                  <li><a href="#" class="hover:text-black transition">Shirts</a></li>
+                  <li><a href="#" class="hover:text-black transition">Jeans</a></li>
+                  <li><a href="#" class="hover:text-black transition">Shorts</a></li>
+                  <li><a href="#" class="hover:text-black transition">Jackets</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Shop By Brand</h3>
+                <ul class="space-y-2 text-sm text-gray-500 font-medium">
+                  <li><a href="#" class="hover:text-black transition">Nike</a></li>
+                  <li><a href="#" class="hover:text-black transition">Adidas</a></li>
+                  <li><a href="#" class="hover:text-black transition">Levis</a></li>
+                  <li><a href="#" class="hover:text-black transition">Puma</a></li>
+                </ul>
+              </div>
+              <div class="col-span-2">
+                <div class="relative rounded-xl overflow-hidden h-40 group/img">
+                  <img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=500&q=80" class="w-full h-full object-cover transition duration-500 group-hover/img:scale-110">
+                  <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-4">
+                    <p class="text-white font-bold">Formal Wear Essential</p>
+                    <p class="text-white/80 text-xs">Premium Quality</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kids Mega Menu -->
+          <div class="group relative py-4">
+            <a href="kids.html" class="text-gray-800 hover:text-black transition cursor-pointer">Kids</a>
+            <div class="absolute top-full left-0 w-[600px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-3 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
+              <div>
+                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
+                <ul class="space-y-2 text-sm text-gray-500 font-medium">
+                  <li><a href="#" class="hover:text-black transition">Baby Boys</a></li>
+                  <li><a href="#" class="hover:text-black transition">Baby Girls</a></li>
+                  <li><a href="#" class="hover:text-black transition">Toddlers</a></li>
+                </ul>
+              </div>
+              <div class="col-span-2">
+                <div class="relative rounded-xl overflow-hidden h-40 group/img">
+                  <img src="https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=500&q=80" class="w-full h-full object-cover transition duration-500 group-hover/img:scale-110">
+                  <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-4">
+                    <p class="text-white font-bold">Kids Festive Special</p>
+                    <p class="text-white/80 text-xs">Starting from $19</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="index.html" class="text-gray-800 hover:text-black transition py-4">Home</a>
+          <a href="brands.html" class="text-gray-800 hover:text-black transition py-4">All Brands</a>
+          <a href="#" class="text-gray-800 hover:text-black transition flex items-center gap-1 py-4">More</a>
+        </div>
+      </div>
+
+      <!-- Center: Search Bar -->
+      <div class="flex-1 max-w-md hidden md:block">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <input type="text" placeholder="Search for products, styles, brands..." 
+            class="block w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-full bg-[#F5F7F9] text-sm focus:bg-white focus:ring-1 focus:ring-gray-300 outline-none transition-all">
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400 hover:text-black">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: User Actions -->
+      <div class="flex items-center gap-6">
+        <a href="profile.html" class="flex items-center gap-2 text-sm font-semibold text-black group">
+          <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
+          <span class="hidden xl:inline underline">Account</span>
+        </a>
+        <a href="wishlist.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group">
+          <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span class="hidden xl:inline">Wishlist</span>
+        </a>
+        <a href="cart.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group relative">
+          <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+          <span class="hidden xl:inline">Cart</span>
+          <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+<section class="max-w-6xl mx-auto px-6 py-10">
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-white rounded-2xl p-6 shadow-sm">
+
+      <div class="flex flex-col items-center text-center">
+        <img src="https://i.pravatar.cc/150?img=3" class="w-24 h-24 rounded-full mb-4" />
+
+        <h2 id="userName" class="text-xl font-bold">Naveen Kumar</h2>
+        <p id="userEmail" class="text-gray-500 text-sm">naveen@example.com</p>
+
+        <button class="mt-4 border px-5 py-2 rounded-full text-sm hover:bg-gray-50">
+          Edit Profile
+        </button>
+      </div>
+
+      <div class="mt-6 border-t pt-4 space-y-4">
+
+  <div>
+    <p class="text-sm text-gray-500">Member since</p>
+    <p id="memberSince" class="font-medium">January 2026</p>
+  </div>
+  <br>
+
+  <div class="flex flex-col gap-2 mt-4">
+
+    <div>
+    <p class="mb-2 font-medium">My Activity</p>
+  </div>
+
+    <a href="wishlist.html" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+      <span class="flex items-center gap-3">❤️ Wishlist</span>
+      <span>›</span>
+    </a>
+
+    <a href="orders.html" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+      <span>📦 My Orders</span>
+      <span>›</span>
+    </a>
+
+    <a href="#" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+      <span>🎁 Rewards</span>
+      <span>›</span>
+    </a>
+
+    <a href="#" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+      <span>🏷️ Redeem Code</span>
+      <span>›</span>
+    </a>
+
+    <a href="#" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+      <span> 🌐 Language</span>
+      <span>›</span>
+    </a>
+
+  </div>
+</div>
+    </div>
+    <div class="md:col-span-2 space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 class="text-lg font-bold mb-4">My Wishlist</h3>
+        <div id="wishlistContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <p class="text-sm text-gray-500 italic col-span-full">Loading your wishlist...</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 class="text-lg font-bold mb-4">Recent Orders</h3>
+        <div id="ordersContainer" class="space-y-4">
+          <p class="text-sm text-gray-500 italic">Loading your orders...</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 class="text-lg font-bold mb-4">Shipping Information</h3>
+
+        <div id="addressDisplay" class="space-y-2">
+          <p class="text-sm text-gray-600">
+            <strong>Address:</strong> <span id="displayAddress">Not set</span>
+          </p>
+          <p class="text-sm text-gray-600">
+            <strong>Phone:</strong> <span id="displayPhone">Not set</span>
+          </p>
+          <br>
+          <button onclick="enableEdit()" class="mt-4 border px-5 py-2 rounded-full text-sm hover:bg-gray-50">
+            Edit Information
+          </button>
+        </div>
+
+        <div id="addressEdit" class="hidden space-y-4">
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Shipping Address</label>
+            <textarea id="inputAddress" rows="3" class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black" placeholder="Enter your full address"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Phone Number</label>
+            <input id="inputPhone" type="text" class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black" placeholder="Enter your phone number">
+          </div>
+          <div class="flex gap-2">
+            <button id="saveInfoBtn" onclick="saveProfileInfo()" class="bg-black text-white px-6 py-2 rounded-full text-sm hover:bg-gray-800 transition">
+              Save Changes
+            </button>
+            <button onclick="disableEdit()" class="border px-6 py-2 rounded-full text-sm hover:bg-gray-50 transition">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+        <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 class="text-lg font-bold mb-4">Payment Methods</h3>
+        <div class="mt-2">
+
+  
+  <button onclick="togglePayments()" 
+    class="flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+
+    <span class="flex items-center gap-2">
+
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+
+      My Payments
+    </span>
+
+    <span>›</span>
+  </button>
+
+  <div id="paymentMenu" class="hidden flex flex-col mt-2 ml-6 gap-2 text-sm">
+
+    <a href="#" class="hover:text-black text-gray-600 mt-2">💳 Pay Later</a>
+
+    <a href="#" class="hover:text-black text-gray-600 mt-2">🏦 Bank & UPI Details</a>
+
+    <a href="#" class="hover:text-black text-gray-600 mt-2">💸 Payments & Refunds</a>
+
+  </div>
+
+</div>
+        </div>
+
+     
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 class="text-lg font-bold mb-4">Account Settings</h3>
+
+    <div class="flex flex-col gap-2">
+          <div class="border-t pt-4 mt-4 space-y-2">
+
+ 
+  <div id="authButtons" class="hidden gap-6 flex flex-col md:flex-row">
+    <a href="login.html" class="text-center bg-black text-white py-2 px-6 rounded-lg text-sm">
+      Login
+    </a>
+    <a href="signup.html" class="text-center border py-2 px-6 rounded-lg text-sm hover:bg-gray-100">
+      Sign Up
+    </a>
+  </div>
+
+  <button id="logoutBtn" onclick="logout()" 
+    class="w-full py-3 px-6 rounded-xl border border-red-100 text-red-600 font-bold text-sm hover:bg-red-50 hover:border-red-200 transition-all duration-300 flex items-center justify-center gap-2">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+    Sign Out
+  </button>
+</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <script src="common.js"></script>
+  <script>
+    function togglePayments() {
+      document.getElementById("paymentMenu").classList.toggle("hidden");
+    }
+
+    function enableEdit() {
+      document.getElementById('addressDisplay').classList.add('hidden');
+      document.getElementById('addressEdit').classList.remove('hidden');
+      
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        document.getElementById('inputAddress').value = user.address || '';
+        document.getElementById('inputPhone').value = user.phone || '';
+      }
+    }
+
+    function disableEdit() {
+      document.getElementById('addressDisplay').classList.remove('hidden');
+      document.getElementById('addressEdit').classList.add('hidden');
+    }
+
+    async function saveProfileInfo() {
+      const address = document.getElementById('inputAddress').value;
+      const phone = document.getElementById('inputPhone').value;
+      const saveBtn = document.getElementById('saveInfoBtn');
+      
+      saveBtn.innerText = "Saving...";
+      saveBtn.disabled = true;
+
+      try {
+        const response = await fetch(`${API_BASE}/profile/update`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-access-token': localStorage.getItem('token')
+          },
+          body: JSON.stringify({ address, phone })
+        });
+
+        if (response.ok) {
+          document.getElementById('displayAddress').innerText = address || 'Not set';
+          document.getElementById('displayPhone').innerText = phone || 'Not set';
+          
+          // Update local storage
+          const user = JSON.parse(localStorage.getItem('user'));
+          user.address = address;
+          user.phone = phone;
+          localStorage.setItem('user', JSON.stringify(user));
+
+          alert("Profile updated successfully!");
+          disableEdit();
+        } else {
+          alert("Update failed.");
+        }
+      } catch (err) {
+        alert("Server Error: " + err.message);
+      } finally {
+        saveBtn.innerText = "Save Changes";
+        saveBtn.disabled = false;
+      }
+    }
+
+    async function loadUserOrders() {
+      const container = document.getElementById('ordersContainer');
+      try {
+        const response = await fetch(`${API_BASE}/orders`, {
+          headers: { 'x-access-token': localStorage.getItem('token') }
+        });
+        
+        if (!response.ok) throw new Error("Failed to fetch orders");
+        
+        const orders = await response.json();
+        
+        if (orders.length === 0) {
+          container.innerHTML = '<p class="text-sm text-gray-500 italic">No orders found yet.</p>';
+          return;
+        }
+
+        container.innerHTML = orders.map(order => {
+          const itemCount = order.items ? order.items.length : 0;
+          let statusColor = 'text-yellow-600';
+          if (order.status === 'Delivered') statusColor = 'text-green-600';
+          if (order.status === 'Cancelled') statusColor = 'text-red-600';
+          
+          const orderDate = new Date(order.created_at).toLocaleDateString();
+          const currentStatus = (order.status || "").toLowerCase();
+          const canCancel = currentStatus === 'pending';
+          
+          return `
+            <div class="flex justify-between items-center border-b pb-3 group">
+              <div>
+                <p class="font-medium">Order #${order._id.substring(18)}</p>
+                <p class="text-sm text-gray-500">${itemCount} Items • $${order.total} • ${orderDate}</p>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="${statusColor} text-sm font-medium">${order.status}</span>
+                ${canCancel ? `
+                  <button onclick="cancelOrder('${order._id}')" class="px-3 py-1 bg-red-50 text-red-600 text-[10px] uppercase tracking-wider font-bold rounded-full hover:bg-red-600 hover:text-white transition-colors border border-red-100">
+                    Cancel Order
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        container.innerHTML = '<p class="text-red-500 text-sm">Failed to load orders.</p>';
+      }
+    }
+
+    async function cancelOrder(orderId) {
+      if (!confirm("Are you sure you want to cancel this order?")) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/orders/${orderId}/cancel`, {
+          method: 'PUT',
+          headers: { 'x-access-token': localStorage.getItem('token') }
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+          alert("Order cancelled successfully!");
+          loadUserOrders(); // Refresh list
+        } else {
+          alert(data.message || "Failed to cancel order");
+        }
+      } catch (err) {
+        alert("An error occurred. Please try again.");
+      }
+    }
+
+    async function loadWishlist() {
+      const container = document.getElementById('wishlistContainer');
+      try {
+        const response = await fetch(`${API_BASE}/wishlist`, {
+          headers: { 'x-access-token': localStorage.getItem('token') }
+        });
+        
+        if (!response.ok) throw new Error("Failed to fetch wishlist");
+        
+        const products = await response.json();
+        
+        if (products.length === 0) {
+          container.innerHTML = '<p class="text-sm text-gray-500 italic col-span-full">Your wishlist is empty.</p>';
+          return;
+        }
+
+        // Show only the first 3 items
+        const previewItems = products.slice(0, 3);
+
+        container.innerHTML = previewItems.map(p => `
+          <div class="product-card group cursor-pointer relative" onclick="viewProduct(this)" data-id="${p._id}">
+            <button onclick="event.stopPropagation(); removeFromWishlist('${p._id}', this)" 
+              class="absolute top-1 right-1 z-10 p-1 rounded-full bg-white shadow-sm hover:text-red-500 transition-all">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="bg-[#F0EEED] rounded-xl overflow-hidden aspect-square flex items-center justify-center mb-2">
+              <img src="${p.image}" class="object-cover w-full h-full" />
+            </div>
+            <div class="font-bold text-[10px] uppercase truncate">${p.name}</div>
+            <div class="font-black text-xs">$${p.price}</div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = '<p class="text-red-500 text-sm">Failed to load wishlist.</p>';
+      }
+    }
+
+    async function removeFromWishlist(productId, btn) {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`${API_BASE}/wishlist/toggle`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-access-token': token
+          },
+          body: JSON.stringify({ product_id: productId })
+        });
+        
+        if (response.ok) {
+          // Remove the card from UI
+          btn.closest('.product-card').remove();
+          
+          // Update local user object
+          const user = JSON.parse(localStorage.getItem('user'));
+          user.wishlist = user.wishlist.filter(id => id !== productId);
+          localStorage.setItem('user', JSON.stringify(user));
+
+          // If empty, show message
+          const container = document.getElementById('wishlistContainer');
+          if (container.children.length === 0) {
+            container.innerHTML = '<p class="text-sm text-gray-500 italic col-span-full">Your wishlist is empty.</p>';
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await checkAuth();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      document.getElementById('userName').innerText = user.name || 'User';
+      document.getElementById('userEmail').innerText = user.email;
+      document.getElementById('displayAddress').innerText = user.address || 'Not set';
+      document.getElementById('displayPhone').innerText = user.phone || 'Not set';
+      
+      if (user.created_at) {
+        const date = new Date(user.created_at);
+        document.getElementById('memberSince').innerText = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      }
+
+      // Load orders and wishlist
+      loadUserOrders();
+      loadWishlist();
+    });
+  </script>
+</body>
+</html>
