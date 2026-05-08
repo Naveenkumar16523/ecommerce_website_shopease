@@ -1,0 +1,8 @@
+app.py
+db_config.py
+requirements.txt
+Procfile
+.python-version
+test_backend.py
+__pycache__/
+.venv/
