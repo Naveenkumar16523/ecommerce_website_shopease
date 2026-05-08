@@ -315,17 +315,30 @@ async function placeOrder(name, email, extraDetails = {}) {
       body: JSON.stringify(orderData)
     });
 
-    const data = await response.json();
-
     if (response.ok) {
-      alert('Order placed successfully! Order ID: ' + data.order_id);
+      const data = await response.json();
+      // Show success message more reliably
+      const btn = document.querySelector('button[onclick="submitOrder()"]');
+      if (btn) {
+        btn.innerHTML = '✅ Order Placed!';
+        btn.classList.remove('bg-black');
+        btn.classList.add('bg-green-600');
+      }
+      
+      alert('Order placed successfully! Your Order ID is: ' + (data.order_id || 'Confirmed'));
+      
       localStorage.removeItem('cart');
-      window.location.href = 'index.html';
+      
+      // Small delay to allow user to see success state
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
     } else {
-      alert('Failed to place order: ' + data.message);
+      alert('Failed to place order: ' + (data.message || 'Unknown Error'));
     }
   } catch (err) {
-    alert('Server Error: ' + err.message);
+    console.error("Checkout Error:", err);
+    alert('Checkout failed. Please check your internet connection and try again.');
   }
 }
 
