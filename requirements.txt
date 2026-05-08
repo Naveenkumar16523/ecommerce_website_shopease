@@ -4,3 +4,4 @@ pymongo
 flask-bcrypt
 PyJWT
 python-dotenv
+gunicorn

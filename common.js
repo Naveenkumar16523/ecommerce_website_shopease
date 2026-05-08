@@ -1,4 +1,8 @@
-const API_BASE = "http://127.0.0.1:5000/api";
+// Change this to your actual Render backend URL after deployment
+const PRODUCTION_API_BASE = "https://ecommerce-website-shopease.onrender.com/api";
+const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
+  ? "http://127.0.0.1:5000/api" 
+  : PRODUCTION_API_BASE;
 
 function updateCartBadge() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
