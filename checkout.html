@@ -123,17 +123,27 @@
 <script>
   function updateSummary() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) {
+      alert("Your cart is empty. Redirecting to home...");
+      window.location.href = 'index.html';
+      return;
+    }
+    
     let subtotal = 0;
-    cart.forEach(item => subtotal += (item.price * item.qty));
+    cart.forEach(item => {
+      const price = parseFloat(item.price) || 0;
+      const qty = parseInt(item.qty) || 1;
+      subtotal += (price * qty);
+    });
     
     const discount = Math.round(subtotal * 0.2);
-    const delivery = subtotal > 0 ? 15 : 0;
+    const delivery = 15;
     const total = subtotal - discount + delivery;
 
-    document.getElementById('summary-subtotal').innerText = '$' + subtotal;
-    document.getElementById('summary-discount').innerText = '-$' + discount;
-    document.getElementById('summary-delivery').innerText = '$' + delivery;
-    document.getElementById('summary-total').innerText = '$' + total;
+    document.getElementById('summary-subtotal').innerText = '$' + subtotal.toFixed(2);
+    document.getElementById('summary-discount').innerText = '-$' + discount.toFixed(2);
+    document.getElementById('summary-delivery').innerText = '$' + delivery.toFixed(2);
+    document.getElementById('summary-total').innerText = '$' + total.toFixed(2);
   }
 
   async function submitOrder() {
