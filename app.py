@@ -14,51 +14,58 @@ bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key_change_this')
 
 def init_db():
-    conn = get_db()
-    if not conn: return
-    cursor = conn.cursor()
-    
-    # Create tables
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255),
-            email VARCHAR(255) UNIQUE,
-            password VARCHAR(255),
-            address TEXT,
-            phone VARCHAR(20),
-            wishlist JSON,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255),
-            price DECIMAL(10, 2),
-            category VARCHAR(100),
-            image TEXT,
-            rating DECIMAL(3, 2) DEFAULT 4.5
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS orders (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            items JSON,
-            total DECIMAL(10, 2),
-            shipping_name VARCHAR(255),
-            shipping_address TEXT,
-            shipping_phone VARCHAR(20),
-            shipping_method VARCHAR(100),
-            status VARCHAR(50) DEFAULT 'Pending',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
-    conn.commit()
-    cursor.close()
-    conn.close()
+    print("Initializing database...")
+    try:
+        conn = get_db()
+        if not conn:
+            print("Failed to connect to database during initialization.")
+            return
+        cursor = conn.cursor()
+        
+        # Create tables
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                email VARCHAR(255) UNIQUE,
+                password VARCHAR(255),
+                address TEXT,
+                phone VARCHAR(20),
+                wishlist JSON,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS products (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                price DECIMAL(10, 2),
+                category VARCHAR(100),
+                image TEXT,
+                rating DECIMAL(3, 2) DEFAULT 4.5
+            )
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                items JSON,
+                total DECIMAL(10, 2),
+                shipping_name VARCHAR(255),
+                shipping_address TEXT,
+                shipping_phone VARCHAR(20),
+                shipping_method VARCHAR(100),
+                status VARCHAR(50) DEFAULT 'Pending',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("Database initialization successful.")
+    except Exception as e:
+        print(f"ERROR during database initialization: {e}")
 
 init_db()
 
