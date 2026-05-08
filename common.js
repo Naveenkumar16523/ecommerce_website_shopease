@@ -1,8 +1,35 @@
-// Change this to your actual Render backend URL after deployment
 const PRODUCTION_API_BASE = "https://ecommerce-website-shopease.onrender.com/api";
 const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
   ? "http://127.0.0.1:5000/api" 
   : PRODUCTION_API_BASE;
+
+// Global helper for API calls with token
+async function apiRequest(endpoint, options = {}) {
+  const token = localStorage.getItem('token');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+    if (res.status === 401) {
+      console.warn("Unauthorized! Clearing token.");
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Only redirect if we are on a page that REQUIRES auth
+      const protectedPages = ['profile.html', 'wishlist.html', 'orders.html', 'checkout.html'];
+      if (protectedPages.some(page => window.location.pathname.includes(page))) {
+        window.location.href = 'login.html';
+      }
+    }
+    return res;
+  } catch (err) {
+    console.error(`API Request failed for ${endpoint}:`, err);
+    throw err;
+  }
+}
 
 function updateCartBadge() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
