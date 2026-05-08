@@ -1,6 +1,6 @@
 flask
 flask-cors
-pymongo
+mysql-connector-python
 flask-bcrypt
 PyJWT
 python-dotenv

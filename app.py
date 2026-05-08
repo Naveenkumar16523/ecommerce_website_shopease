@@ -5,48 +5,79 @@ import jwt
 import datetime
 from functools import wraps
 from db_config import get_db
-from bson import ObjectId
-
-import os
+import json
 
 app = Flask(__name__)
 CORS(app)
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key_change_this')
 
-db = get_db()
-products_col = db.products
-users_col = db.users
-orders_col = db.orders
-
-# Helper to format MongoDB objects for JSON
-def format_doc(doc):
-    if not doc: return None
-    if isinstance(doc, list):
-        return [format_doc(item) for item in doc]
+def init_db():
+    conn = get_db()
+    if not conn: return
+    cursor = conn.cursor()
     
-    if isinstance(doc, dict):
-        new_doc = {}
-        for key, value in doc.items():
-            if key == '_id' or isinstance(value, ObjectId):
-                new_doc[key] = str(value)
-            elif isinstance(value, datetime.datetime):
-                new_doc[key] = value.isoformat()
-            elif isinstance(value, dict) or isinstance(value, list):
-                new_doc[key] = format_doc(value)
-            else:
-                new_doc[key] = value
-        return new_doc
-    return doc
+    # Create tables
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255),
+            email VARCHAR(255) UNIQUE,
+            password VARCHAR(255),
+            address TEXT,
+            phone VARCHAR(20),
+            wishlist JSON,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255),
+            price DECIMAL(10, 2),
+            category VARCHAR(100),
+            image TEXT,
+            rating DECIMAL(3, 2) DEFAULT 4.5
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            items JSON,
+            total DECIMAL(10, 2),
+            shipping_name VARCHAR(255),
+            shipping_address TEXT,
+            shipping_phone VARCHAR(20),
+            shipping_method VARCHAR(100),
+            status VARCHAR(50) DEFAULT 'Pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+init_db()
+
+# Helper to format SQL rows as dicts
+def format_row(cursor, row):
+    if not row: return None
+    desc = cursor.description
+    return {desc[i][0]: row[i] for i in range(len(row))}
+
+def format_rows(cursor, rows):
+    return [format_row(cursor, r) for r in rows]
 
 @app.route("/")
 def home():
-    try:
-        # Check if database is connected
-        db.command('ping')
-        return "<h1>SHOP EASE API is running! 🚀</h1><p>MongoDB Connection: <b>Connected ✅</b></p><p>Go to <a href='/api/seed'>/api/seed</a> to populate your data.</p>"
-    except Exception as e:
-        return f"<h1>SHOP EASE API is running! 🚀</h1><p>MongoDB Connection: <b>Failed ❌</b></p><p>Error: {str(e)}</p>"
+    conn = get_db()
+    if conn:
+        conn.close()
+        return "<h1>SHOP EASE API is running! 🚀</h1><p>TiDB Connection: <b>Connected ✅</b></p><p>Go to <a href='/api/seed'>/api/seed</a> to populate your data.</p>"
+    else:
+        return "<h1>SHOP EASE API is running! 🚀</h1><p>TiDB Connection: <b>Failed ❌</b></p>"
 
 # Authentication Decorator
 def token_required(f):
@@ -57,12 +88,17 @@ def token_required(f):
             return jsonify({'message': 'Token is missing!'}), 401
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = users_col.find_one({"_id": ObjectId(data['user_id'])})
-            if not current_user:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
+            user = format_row(cursor, cursor.fetchone())
+            cursor.close()
+            conn.close()
+            if not user:
                 return jsonify({'message': 'User not found!'}), 401
-        except:
-            return jsonify({'message': 'Token is invalid!'}), 401
-        return f(format_doc(current_user), *args, **kwargs)
+        except Exception as e:
+            return jsonify({'message': f'Token is invalid! {str(e)}'}), 401
+        return f(user, *args, **kwargs)
     return decorated
 
 # --- AUTH ROUTES ---
@@ -73,29 +109,41 @@ def signup():
     if not data.get('email') or not data.get('password'):
         return jsonify({"message": "Missing email or password"}), 400
     
-    if users_col.find_one({"email": data['email']}):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = %s", (data['email'],))
+    if cursor.fetchone():
+        cursor.close()
+        conn.close()
         return jsonify({"message": "User already exists"}), 409
     
     hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    new_user = {
-        "name": data.get('name', 'User'),
-        "email": data['email'],
-        "password": hashed_pw,
-        "address": "",
-        "phone": "",
-        "created_at": datetime.datetime.utcnow()
-    }
-    result = users_col.insert_one(new_user)
-    return jsonify({"message": "User created successfully", "user_id": str(result.inserted_id)}), 201
+    try:
+        cursor.execute("""
+            INSERT INTO users (name, email, password, address, phone, wishlist)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (data.get('name', 'User'), data['email'], hashed_pw, "", "", "[]"))
+        conn.commit()
+        user_id = cursor.lastrowid
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "User created successfully", "user_id": user_id}), 201
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.json
-    user = users_col.find_one({"email": data.get('email')})
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE email = %s", (data.get('email'),))
+    user = format_row(cursor, cursor.fetchone())
+    cursor.close()
+    conn.close()
     
     if user and bcrypt.check_password_hash(user['password'], data.get('password')):
         token = jwt.encode({
-            'user_id': str(user['_id']),
+            'user_id': user['id'],
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         }, app.config['SECRET_KEY'])
         
@@ -103,10 +151,12 @@ def login():
             "message": "Login successful",
             "token": token,
             "user": {
+                "id": user['id'],
                 "name": user['name'],
                 "email": user['email'],
                 "address": user.get('address', ''),
-                "phone": user.get('phone', '')
+                "phone": user.get('phone', ''),
+                "wishlist": json.loads(user.get('wishlist', '[]'))
             }
         }), 200
     
@@ -115,21 +165,28 @@ def login():
 @app.route("/api/me", methods=["GET"])
 @token_required
 def get_me(current_user):
-    del current_user['password']
+    if 'password' in current_user: del current_user['password']
+    if 'wishlist' in current_user and isinstance(current_user['wishlist'], str):
+        current_user['wishlist'] = json.loads(current_user['wishlist'])
     return jsonify(current_user)
 
 @app.route("/api/profile/update", methods=["POST"])
 @token_required
 def update_profile(current_user):
     data = request.json
-    users_col.update_one(
-        {"_id": ObjectId(current_user['_id'])},
-        {"$set": {
-            "address": data.get('address', current_user.get('address')),
-            "phone": data.get('phone', current_user.get('phone')),
-            "name": data.get('name', current_user.get('name'))
-        }}
-    )
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE users SET name = %s, address = %s, phone = %s WHERE id = %s
+    """, (
+        data.get('name', current_user.get('name')),
+        data.get('address', current_user.get('address')),
+        data.get('phone', current_user.get('phone')),
+        current_user['id']
+    ))
+    conn.commit()
+    cursor.close()
+    conn.close()
     return jsonify({"message": "Profile updated successfully"})
 
 # --- PRODUCT ROUTES ---
@@ -137,28 +194,48 @@ def update_profile(current_user):
 @app.route("/api/products", methods=["GET"])
 def get_products():
     category = request.args.get("category")
-    query = {"category": category} if category else {}
-    products = list(products_col.find(query))
-    return jsonify([format_doc(p) for p in products])
+    conn = get_db()
+    cursor = conn.cursor()
+    if category:
+        cursor.execute("SELECT * FROM products WHERE category = %s", (category,))
+    else:
+        cursor.execute("SELECT * FROM products")
+    products = format_rows(cursor, cursor.fetchall())
+    cursor.close()
+    conn.close()
+    return jsonify(products)
 
 @app.route("/api/products/search", methods=["GET"])
 def search_products():
-    q = request.args.get("q", "").lower()
-    query = {"name": {"$regex": q, "$options": "i"}}
-    products = list(products_col.find(query))
-    return jsonify([format_doc(p) for p in products])
+    q = request.args.get("q", "")
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM products WHERE name LIKE %s", (f"%{q}%",))
+    products = format_rows(cursor, cursor.fetchall())
+    cursor.close()
+    conn.close()
+    return jsonify(products)
 
 # --- WISHLIST ROUTES ---
 
 @app.route("/api/wishlist", methods=["GET"])
 @token_required
 def get_wishlist(current_user):
-    user = users_col.find_one({"_id": ObjectId(current_user['_id'])})
-    wishlist_ids = user.get('wishlist', [])
-    # Convert string IDs back to ObjectIds for the products query
-    obj_ids = [ObjectId(pid) for pid in wishlist_ids]
-    products = list(products_col.find({"_id": {"$in": obj_ids}}))
-    return jsonify([format_doc(p) for p in products])
+    wishlist_ids = current_user.get('wishlist', [])
+    if not wishlist_ids: return jsonify([])
+    
+    # Ensure ids are integers
+    ids = [int(i) for i in wishlist_ids if str(i).isdigit()]
+    if not ids: return jsonify([])
+    
+    format_strings = ','.join(['%s'] * len(ids))
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM products WHERE id IN ({format_strings})", tuple(ids))
+    products = format_rows(cursor, cursor.fetchall())
+    cursor.close()
+    conn.close()
+    return jsonify(products)
 
 @app.route("/api/wishlist/toggle", methods=["POST"])
 @token_required
@@ -168,9 +245,10 @@ def toggle_wishlist(current_user):
     if not product_id:
         return jsonify({"message": "Product ID required"}), 400
     
-    user = users_col.find_one({"_id": ObjectId(current_user['_id'])})
-    wishlist = user.get('wishlist', [])
+    wishlist = current_user.get('wishlist', [])
+    if isinstance(wishlist, str): wishlist = json.loads(wishlist)
     
+    product_id = int(product_id)
     if product_id in wishlist:
         wishlist.remove(product_id)
         action = "removed"
@@ -178,10 +256,12 @@ def toggle_wishlist(current_user):
         wishlist.append(product_id)
         action = "added"
         
-    users_col.update_one(
-        {"_id": ObjectId(current_user['_id'])},
-        {"$set": {"wishlist": wishlist}}
-    )
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET wishlist = %s WHERE id = %s", (json.dumps(wishlist), current_user['id']))
+    conn.commit()
+    cursor.close()
+    conn.close()
     return jsonify({"message": f"Product {action} wishlist", "action": action})
 
 # --- ORDER ROUTES ---
@@ -190,51 +270,67 @@ def toggle_wishlist(current_user):
 @token_required
 def get_orders(current_user):
     try:
-        user_id_str = current_user['_id']
-        print(f"Fetching orders for user: {user_id_str}")
-        
-        user_id_obj = ObjectId(user_id_str)
-        user_orders = list(orders_col.find({"user_id": user_id_obj}).sort("created_at", -1))
-        
-        formatted_orders = [format_doc(o) for o in user_orders]
-        print(f"Found {len(formatted_orders)} orders.")
-        return jsonify(formatted_orders)
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM orders WHERE user_id = %s ORDER BY created_at DESC", (current_user['id'],))
+        orders = format_rows(cursor, cursor.fetchall())
+        for o in orders:
+            if isinstance(o['items'], str): o['items'] = json.loads(o['items'])
+        cursor.close()
+        conn.close()
+        return jsonify(orders)
     except Exception as e:
-        print(f"ERROR in get_orders: {str(e)}")
         return jsonify({"message": str(e)}), 500
 
 @app.route("/api/orders", methods=["POST"])
 @token_required
 def place_order(current_user):
     data = request.json
-    new_order = {
-        "user_id": ObjectId(current_user['_id']), # Store as ObjectId
-        "items": data.get('items', []),
-        "total": data.get('total', 0),
-        "shipping": data.get('shipping', {}),
-        "status": "Pending",
-        "created_at": datetime.datetime.utcnow()
-    }
-    result = orders_col.insert_one(new_order)
-    return jsonify({"message": "Order placed successfully", "order_id": str(result.inserted_id)}), 201
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO orders (user_id, items, total, shipping_name, shipping_address, shipping_phone, shipping_method)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
+            current_user['id'],
+            json.dumps(data.get('items', [])),
+            data.get('total', 0),
+            data.get('shipping', {}).get('name', ''),
+            data.get('shipping', {}).get('address', ''),
+            data.get('shipping', {}).get('phone', ''),
+            data.get('shipping', {}).get('method', '')
+        ))
+        conn.commit()
+        order_id = cursor.lastrowid
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/orders/<order_id>/cancel", methods=["PUT"])
 @token_required
 def cancel_order(current_user, order_id):
     try:
-        # Verify order belongs to user
-        order = orders_col.find_one({"_id": ObjectId(order_id), "user_id": ObjectId(current_user['_id'])})
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT status FROM orders WHERE id = %s AND user_id = %s", (order_id, current_user['id']))
+        order = cursor.fetchone()
         if not order:
+            cursor.close()
+            conn.close()
             return jsonify({"message": "Order not found"}), 404
         
-        # Optional: Only allow cancellation if status is 'Pending'
-        if order.get('status') != 'Pending':
-            return jsonify({"message": f"Cannot cancel order with status: {order.get('status')}"}), 400
+        if order[0] != 'Pending':
+            cursor.close()
+            conn.close()
+            return jsonify({"message": f"Cannot cancel order with status: {order[0]}"}), 400
             
-        orders_col.update_one(
-            {"_id": ObjectId(order_id)},
-            {"$set": {"status": "Cancelled"}}
-        )
+        cursor.execute("UPDATE orders SET status = 'Cancelled' WHERE id = %s", (order_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
         return jsonify({"message": "Order cancelled successfully"})
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -242,21 +338,28 @@ def cancel_order(current_user, order_id):
 # Seed database with initial products
 @app.route("/api/seed", methods=["GET", "POST"])
 def seed_db():
-    products_col.delete_many({}) # Clear existing
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM products")
     initial_products = [
-        {"name": "T-shirt with Tape Details", "price": 120, "category": "casual", "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"},
-        {"name": "Skinny Fit Jeans", "price": 240, "category": "casual", "image": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"},
-        {"name": "Checkered Shirt", "price": 180, "category": "formal", "image": "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"},
-        {"name": "Sleeve Striped T-Shirt", "price": 130, "category": "casual", "image": "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80"},
-        {"name": "Vertical Striped Shirt", "price": 212, "category": "formal", "image": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&q=80"},
-        {"name": "Courage Graphic T-Shirt", "price": 145, "category": "men", "image": "https://images.unsplash.com/photo-1576566582419-1738421c7e7b?w=400&q=80"},
-        {"name": "Loose Fit Bermuda Shorts", "price": 80, "category": "men", "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&q=80"},
-        {"name": "Faded Skinny Jeans", "price": 210, "category": "women", "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"},
-        {"name": "Gym Stringer Tank", "price": 45, "category": "gym", "image": "https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=400&q=80"},
-        {"name": "Party Sparkle Dress", "price": 320, "category": "party", "image": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=80"},
-        {"name": "Kids Cartoon Tee", "price": 35, "category": "kids", "image": "https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=400&q=80"}
+        ("T-shirt with Tape Details", 120, "casual", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"),
+        ("Skinny Fit Jeans", 240, "casual", "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"),
+        ("Checkered Shirt", 180, "formal", "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"),
+        ("Sleeve Striped T-Shirt", 130, "casual", "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80"),
+        ("Vertical Striped Shirt", 212, "formal", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&q=80"),
+        ("Courage Graphic T-Shirt", 145, "men", "https://images.unsplash.com/photo-1576566582419-1738421c7e7b?w=400&q=80"),
+        ("Loose Fit Bermuda Shorts", 80, "men", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&q=80"),
+        ("Faded Skinny Jeans", 210, "women", "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"),
+        ("Gym Stringer Tank", 45, "gym", "https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=400&q=80"),
+        ("Party Sparkle Dress", 320, "party", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=80"),
+        ("Kids Cartoon Tee", 35, "kids", "https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=400&q=80")
     ]
-    products_col.insert_many(initial_products)
+    cursor.executemany("""
+        INSERT INTO products (name, price, category, image) VALUES (%s, %s, %s, %s)
+    """, initial_products)
+    conn.commit()
+    cursor.close()
+    conn.close()
     return jsonify({"message": f"Database seeded with {len(initial_products)} products"})
 
 if __name__ == "__main__":
