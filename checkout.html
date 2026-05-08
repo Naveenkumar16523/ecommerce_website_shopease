@@ -131,7 +131,9 @@
     
     let subtotal = 0;
     cart.forEach(item => {
-      const price = parseFloat(item.price) || 0;
+      // Robust price parsing to handle "$120", "120.00", etc.
+      let priceStr = String(item.price).replace(/[^0-9.]/g, '');
+      const price = parseFloat(priceStr) || 0;
       const qty = parseInt(item.qty) || 1;
       subtotal += (price * qty);
     });
