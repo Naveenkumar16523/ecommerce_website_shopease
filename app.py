@@ -338,6 +338,7 @@ def get_orders(current_user):
 @token_required
 def place_order(current_user):
     data = request.json
+    print(f"DEBUG: Placing order for user {current_user['id']}: {data}")
     conn = get_db()
     if not conn:
         return jsonify({"message": "Database connection failed"}), 503
@@ -359,8 +360,10 @@ def place_order(current_user):
         order_id = cursor.lastrowid
         cursor.close()
         conn.close()
+        print(f"DEBUG: Order created successfully ID: {order_id}")
         return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
     except Exception as e:
+        print(f"ERROR in place_order: {str(e)}")
         return jsonify({"message": str(e)}), 500
 
 @app.route("/api/orders/<order_id>/cancel", methods=["PUT"])

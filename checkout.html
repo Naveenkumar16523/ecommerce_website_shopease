@@ -142,15 +142,33 @@
     const address = document.getElementById('ship-address').value;
     const city = document.getElementById('ship-city').value;
     const pincode = document.getElementById('ship-pincode').value;
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const paymentMethodEl = document.querySelector('input[name="paymentMethod"]:checked');
+    
+    if (!paymentMethodEl) {
+      alert('Please select a payment method!');
+      return;
+    }
+    const paymentMethod = paymentMethodEl.value;
 
     if (!name || !address || !phone) {
       alert('Please fill in your shipping details!');
       return;
     }
 
-    const extraDetails = { phone, address, city, pincode, paymentMethod };
-    await placeOrder(name, "Customer", extraDetails); 
+    const btn = document.querySelector('button[onclick="submitOrder()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Processing...';
+    btn.disabled = true;
+
+    try {
+      const extraDetails = { phone, address, city, pincode, paymentMethod };
+      await placeOrder(name, "Customer", extraDetails); 
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
   }
 
   window.onload = async () => {
