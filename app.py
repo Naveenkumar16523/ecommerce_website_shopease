@@ -118,15 +118,18 @@ def signup():
         return jsonify({"message": "Missing email or password"}), 400
     
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id FROM users WHERE email = %s", (data['email'],))
-    if cursor.fetchone():
-        cursor.close()
-        conn.close()
-        return jsonify({"message": "User already exists"}), 409
-    
-    hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
+        
     try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = %s", (data['email'],))
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({"message": "User already exists"}), 409
+        
+        hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
         cursor.execute("""
             INSERT INTO users (name, email, password, address, phone, wishlist)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -143,30 +146,36 @@ def signup():
 def login():
     data = request.json
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = %s", (data.get('email'),))
-    user = format_row(cursor, cursor.fetchone())
-    cursor.close()
-    conn.close()
-    
-    if user and bcrypt.check_password_hash(user['password'], data.get('password')):
-        token = jwt.encode({
-            'user_id': user['id'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-        }, app.config['SECRET_KEY'])
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
         
-        return jsonify({
-            "message": "Login successful",
-            "token": token,
-            "user": {
-                "id": user['id'],
-                "name": user['name'],
-                "email": user['email'],
-                "address": user.get('address', ''),
-                "phone": user.get('phone', ''),
-                "wishlist": json.loads(user.get('wishlist', '[]'))
-            }
-        }), 200
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email = %s", (data.get('email'),))
+        user = format_row(cursor, cursor.fetchone())
+        cursor.close()
+        conn.close()
+        
+        if user and bcrypt.check_password_hash(user['password'], data.get('password')):
+            token = jwt.encode({
+                'user_id': user['id'],
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+            }, app.config['SECRET_KEY'])
+            
+            return jsonify({
+                "message": "Login successful",
+                "token": token,
+                "user": {
+                    "id": user['id'],
+                    "name": user['name'],
+                    "email": user['email'],
+                    "address": user.get('address', ''),
+                    "phone": user.get('phone', ''),
+                    "wishlist": json.loads(user.get('wishlist', '[]'))
+                }
+            }), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
     
     return jsonify({"message": "Invalid credentials"}), 401
 
@@ -183,19 +192,24 @@ def get_me(current_user):
 def update_profile(current_user):
     data = request.json
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE users SET name = %s, address = %s, phone = %s WHERE id = %s
-    """, (
-        data.get('name', current_user.get('name')),
-        data.get('address', current_user.get('address')),
-        data.get('phone', current_user.get('phone')),
-        current_user['id']
-    ))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({"message": "Profile updated successfully"})
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE users SET name = %s, address = %s, phone = %s WHERE id = %s
+        """, (
+            data.get('name', current_user.get('name')),
+            data.get('address', current_user.get('address')),
+            data.get('phone', current_user.get('phone')),
+            current_user['id']
+        ))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Profile updated successfully"})
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 # --- PRODUCT ROUTES ---
 
