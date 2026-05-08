@@ -183,23 +183,20 @@
   <script>
     async function loadFullWishlist() {
       const grid = document.getElementById('wishlistGrid');
-      const token = localStorage.getItem('token');
       
-      if (!token) {
-        grid.innerHTML = `
-          <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
-            <p class="text-gray-500 mb-6">Please login to view your wishlist.</p>
-            <a href="login.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
-          </div>
-        `;
-        return;
-      }
-
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/wishlist', {
-          headers: { 'x-access-token': token }
-        });
+        const response = await apiRequest('/wishlist');
         
+        if (response.status === 401) {
+          grid.innerHTML = `
+            <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
+              <p class="text-gray-500 mb-6">Please login to view your wishlist.</p>
+              <a href="login.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
+            </div>
+          `;
+          return;
+        }
+
         if (!response.ok) throw new Error("Failed to fetch");
         
         const products = await response.json();
@@ -216,7 +213,7 @@
 
         grid.innerHTML = products.map(p => `
           <div class="product-card group bg-white p-4 rounded-3xl shadow-sm border border-transparent hover:border-black transition-all duration-300 relative">
-            <button onclick="removeFromFullWishlist('${p._id}', this)" 
+            <button onclick="removeFromFullWishlist('${p.id}', this)" 
               class="absolute top-6 right-6 z-10 p-2 rounded-full bg-white/90 shadow-md hover:text-red-500 transition-all">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
@@ -243,11 +240,9 @@
     }
 
     async function removeFromFullWishlist(productId, btn) {
-      const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/wishlist/toggle', {
+        const response = await apiRequest('/wishlist/toggle', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-access-token': token },
           body: JSON.stringify({ product_id: productId })
         });
         

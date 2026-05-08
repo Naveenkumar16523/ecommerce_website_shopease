@@ -123,7 +123,7 @@ async function loadDynamicProducts() {
 
   let products = [];
   try {
-    const res = await fetch(`${API_BASE}/products`);
+    const res = await apiRequest('/products');
     if (!res.ok) throw new Error('API failed');
     products = await res.json();
   } catch (err) {
@@ -258,14 +258,9 @@ async function getAuthHeader() {
 }
 
 async function checkAuth() {
-  const token = localStorage.getItem('token');
-  if (!token) return null;
   try {
-    const res = await fetch(`${API_BASE}/me`, { headers: await getAuthHeader() });
-    if (!res.ok) {
-      localStorage.removeItem('token');
-      return null;
-    }
+    const res = await apiRequest('/me');
+    if (!res.ok) return null;
     return await res.json();
   } catch { return null; }
 }
@@ -315,12 +310,8 @@ async function placeOrder(name, email, extraDetails = {}) {
   };
 
   try {
-    const response = await fetch(`${API_BASE}/orders`, {
+    const response = await apiRequest('/orders', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-access-token': localStorage.getItem('token')
-      },
       body: JSON.stringify(orderData)
     });
 
