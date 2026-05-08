@@ -85,7 +85,7 @@ function updateQty(btn, change) {
   if (!qtyEl) return;
   let qty = parseInt(qtyEl.innerText);
   qty += change;
-  if (qty < 0) qty = 0;
+  if (qty < 1) qty = 1;
   qtyEl.innerText = qty;
 }
 
@@ -192,7 +192,7 @@ function renderProductsInto(products, container) {
         <div class="flex items-center justify-between gap-2" onclick="event.stopPropagation()">
           <div class="flex items-center border rounded-full bg-gray-50">
             <button onclick="updateQty(this, -1)" class="px-3 py-1 hover:text-red-500 transition">−</button>
-            <span class="px-2 text-xs font-medium qty-val">0</span>
+            <span class="px-2 text-xs font-medium qty-val">1</span>
             <button onclick="updateQty(this, 1)" class="px-3 py-1 hover:text-green-500 transition">+</button>
           </div>
           <button onclick="addToCart(this)" data-name="${p.name}" data-price="${p.price}" data-img="${p.image}"
