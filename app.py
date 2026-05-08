@@ -203,26 +203,38 @@ def update_profile(current_user):
 def get_products():
     category = request.args.get("category")
     conn = get_db()
-    cursor = conn.cursor()
-    if category:
-        cursor.execute("SELECT * FROM products WHERE category = %s", (category,))
-    else:
-        cursor.execute("SELECT * FROM products")
-    products = format_rows(cursor, cursor.fetchall())
-    cursor.close()
-    conn.close()
-    return jsonify(products)
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
+    
+    try:
+        cursor = conn.cursor()
+        if category:
+            cursor.execute("SELECT * FROM products WHERE category = %s", (category,))
+        else:
+            cursor.execute("SELECT * FROM products")
+        products = format_rows(cursor, cursor.fetchall())
+        cursor.close()
+        conn.close()
+        return jsonify(products)
+    except Exception as e:
+        print(f"Error in get_products: {e}")
+        return jsonify({"message": "Error fetching products"}), 500
 
 @app.route("/api/products/search", methods=["GET"])
 def search_products():
     q = request.args.get("q", "")
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM products WHERE name LIKE %s", (f"%{q}%",))
-    products = format_rows(cursor, cursor.fetchall())
-    cursor.close()
-    conn.close()
-    return jsonify(products)
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM products WHERE name LIKE %s", (f"%{q}%",))
+        products = format_rows(cursor, cursor.fetchall())
+        cursor.close()
+        conn.close()
+        return jsonify(products)
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 # --- WISHLIST ROUTES ---
 
@@ -232,18 +244,22 @@ def get_wishlist(current_user):
     wishlist_ids = current_user.get('wishlist', [])
     if not wishlist_ids: return jsonify([])
     
-    # Ensure ids are integers
     ids = [int(i) for i in wishlist_ids if str(i).isdigit()]
     if not ids: return jsonify([])
     
     format_strings = ','.join(['%s'] * len(ids))
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM products WHERE id IN ({format_strings})", tuple(ids))
-    products = format_rows(cursor, cursor.fetchall())
-    cursor.close()
-    conn.close()
-    return jsonify(products)
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM products WHERE id IN ({format_strings})", tuple(ids))
+        products = format_rows(cursor, cursor.fetchall())
+        cursor.close()
+        conn.close()
+        return jsonify(products)
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/wishlist/toggle", methods=["POST"])
 @token_required
@@ -256,29 +272,36 @@ def toggle_wishlist(current_user):
     wishlist = current_user.get('wishlist', [])
     if isinstance(wishlist, str): wishlist = json.loads(wishlist)
     
-    product_id = int(product_id)
-    if product_id in wishlist:
-        wishlist.remove(product_id)
-        action = "removed"
-    else:
-        wishlist.append(product_id)
-        action = "added"
-        
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE users SET wishlist = %s WHERE id = %s", (json.dumps(wishlist), current_user['id']))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({"message": f"Product {action} wishlist", "action": action})
+    try:
+        product_id = int(product_id)
+        if product_id in wishlist:
+            wishlist.remove(product_id)
+            action = "removed"
+        else:
+            wishlist.append(product_id)
+            action = "added"
+            
+        conn = get_db()
+        if not conn:
+            return jsonify({"message": "Database connection failed"}), 503
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET wishlist = %s WHERE id = %s", (json.dumps(wishlist), current_user['id']))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": f"Product {action} wishlist", "action": action})
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 # --- ORDER ROUTES ---
 
 @app.route("/api/orders", methods=["GET"])
 @token_required
 def get_orders(current_user):
+    conn = get_db()
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
     try:
-        conn = get_db()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM orders WHERE user_id = %s ORDER BY created_at DESC", (current_user['id'],))
         orders = format_rows(cursor, cursor.fetchall())
@@ -295,8 +318,10 @@ def get_orders(current_user):
 def place_order(current_user):
     data = request.json
     conn = get_db()
-    cursor = conn.cursor()
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
     try:
+        cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO orders (user_id, items, total, shipping_name, shipping_address, shipping_phone, shipping_method)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -320,8 +345,10 @@ def place_order(current_user):
 @app.route("/api/orders/<order_id>/cancel", methods=["PUT"])
 @token_required
 def cancel_order(current_user, order_id):
+    conn = get_db()
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
     try:
-        conn = get_db()
         cursor = conn.cursor()
         cursor.execute("SELECT status FROM orders WHERE id = %s AND user_id = %s", (order_id, current_user['id']))
         order = cursor.fetchone()
@@ -347,28 +374,33 @@ def cancel_order(current_user, order_id):
 @app.route("/api/seed", methods=["GET", "POST"])
 def seed_db():
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM products")
-    initial_products = [
-        ("T-shirt with Tape Details", 120, "casual", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"),
-        ("Skinny Fit Jeans", 240, "casual", "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"),
-        ("Checkered Shirt", 180, "formal", "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"),
-        ("Sleeve Striped T-Shirt", 130, "casual", "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80"),
-        ("Vertical Striped Shirt", 212, "formal", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&q=80"),
-        ("Courage Graphic T-Shirt", 145, "men", "https://images.unsplash.com/photo-1576566582419-1738421c7e7b?w=400&q=80"),
-        ("Loose Fit Bermuda Shorts", 80, "men", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&q=80"),
-        ("Faded Skinny Jeans", 210, "women", "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"),
-        ("Gym Stringer Tank", 45, "gym", "https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=400&q=80"),
-        ("Party Sparkle Dress", 320, "party", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=80"),
-        ("Kids Cartoon Tee", 35, "kids", "https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=400&q=80")
-    ]
-    cursor.executemany("""
-        INSERT INTO products (name, price, category, image) VALUES (%s, %s, %s, %s)
-    """, initial_products)
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({"message": f"Database seeded with {len(initial_products)} products"})
+    if not conn:
+        return jsonify({"message": "Database connection failed"}), 503
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM products")
+        initial_products = [
+            ("T-shirt with Tape Details", 120, "casual", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"),
+            ("Skinny Fit Jeans", 240, "casual", "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"),
+            ("Checkered Shirt", 180, "formal", "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"),
+            ("Sleeve Striped T-Shirt", 130, "casual", "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80"),
+            ("Vertical Striped Shirt", 212, "formal", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&q=80"),
+            ("Courage Graphic T-Shirt", 145, "men", "https://images.unsplash.com/photo-1576566582419-1738421c7e7b?w=400&q=80"),
+            ("Loose Fit Bermuda Shorts", 80, "men", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&q=80"),
+            ("Faded Skinny Jeans", 210, "women", "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"),
+            ("Gym Stringer Tank", 45, "gym", "https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=400&q=80"),
+            ("Party Sparkle Dress", 320, "party", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=80"),
+            ("Kids Cartoon Tee", 35, "kids", "https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=400&q=80")
+        ]
+        cursor.executemany("""
+            INSERT INTO products (name, price, category, image) VALUES (%s, %s, %s, %s)
+        """, initial_products)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": f"Database seeded with {len(initial_products)} products"})
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

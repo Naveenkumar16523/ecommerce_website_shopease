@@ -4,7 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SHOP EASE - Find Clothes That Match Your Style</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script><script>if(window.tailwind){window.tailwind.config={theme:{extend:{colors:{clifford:\"#da373d\"}}}}}</script>
+  <script>
+    // Suppress Tailwind CDN production warning
+    if (window.tailwind) {
+      window.tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              clifford: '#da373d',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <script src="common.js" defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Integral+CF:wght@700&family=Satoshi:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
