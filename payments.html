@@ -33,10 +33,13 @@
   <script src="common.js?v=1.2" defer></script>
 </head>
 <body class="bg-white text-black">
-  <nav class="flex items-center justify-between px-6 md:px-12 py-4 border-b border-gray-100 bg-white">
-    <a href="index.html" class="hero-title text-2xl font-black">SHOP EASE</a>
-    <a href="index.html" class="text-sm font-medium hover:underline">Back to Home</a>
-  </nav>
+  <!-- Shared Navigation Partial -->
+  <div id="nav-placeholder"></div>
+  <script>
+    fetch('nav.html').then(r => r.text()).then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
+    });
+  </script>
   <section class="py-20 px-6 md:px-12 max-w-3xl mx-auto">
     <h1 class="hero-title text-4xl font-black mb-8">SECURE PAYMENTS</h1>
     <div class="space-y-6">
