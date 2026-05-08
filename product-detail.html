@@ -381,7 +381,7 @@
     document.getElementById('thumb2').src = img; // In a real app these would be different
     document.getElementById('thumb3').src = img;
     
-    if(price > 150) {
+    if(parseInt(price) > 150) {
       document.getElementById('old-price').innerText = "$" + (parseInt(price) + 50);
     } else {
       document.getElementById('discount-tag').style.display = 'none';
@@ -391,15 +391,16 @@
   function updateQtyDetail(change) {
     const qtySpan = document.getElementById('detail-qty');
     let val = parseInt(qtySpan.innerText) + change;
-    if(val < 0) val = 0;
+    if(val < 1) val = 1;
     qtySpan.innerText = val;
   }
 
   function handleAddToCartDetail() {
     const name = document.getElementById('prod-name').innerText;
-    const price = document.getElementById('prod-price').innerText.replace('$', '');
+    let priceStr = document.getElementById('prod-price').innerText.replace(/[^0-9.]/g, '');
+    const price = parseFloat(priceStr);
     const img = document.getElementById('main-img').src;
-    const qty = document.getElementById('detail-qty').innerText;
+    const qty = parseInt(document.getElementById('detail-qty').innerText);
 
     // Use common.js function if available
     if(window.addToCart) {
