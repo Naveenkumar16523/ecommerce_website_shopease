@@ -9,7 +9,8 @@ import json
 import os
 
 app = Flask(__name__)
-CORS(app)
+# Allow all origins and headers for production stability
+CORS(app, resources={r"/api/*": {"origins": "*"}}, expose_headers=["Authorization"], allow_headers=["Content-Type", "Authorization", "x-access-token"])
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key_change_this')
 
