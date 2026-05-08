@@ -13,7 +13,7 @@ def get_db():
             port=int(os.getenv("TIDB_PORT", 4000)),
             user=os.getenv("TIDB_USER", "C1oET5ekms8MRP5.root"),
             password=os.getenv("TIDB_PASSWORD", "OSoCgL5M2UZ8JKO8"),
-            database=os.getenv("TIDB_DB", "sys"),
+            database=os.getenv("TIDB_DB", "test"),
             ssl_ca=os.getenv("TIDB_CA_PATH"), # Required for TiDB Cloud
             ssl_verify_cert=True if os.getenv("TIDB_CA_PATH") else False
         )
