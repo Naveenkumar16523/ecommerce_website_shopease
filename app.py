@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 import jwt
@@ -12,8 +12,9 @@ app = Flask(__name__)
 # Allow all origins and headers for production stability
 CORS(app, resources={r"/api/*": {"origins": "*"}}, expose_headers=["Authorization"], allow_headers=["Content-Type", "Authorization", "x-access-token"])
 bcrypt = Bcrypt(app)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key_change_this')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_secret_key_change_in_production')
 
+# --- DATABASE INITIALIZATION ---
 def init_db():
     print("Initializing database...")
     try:
@@ -68,7 +69,14 @@ def init_db():
     except Exception as e:
         print(f"ERROR during database initialization: {e}")
 
-init_db()
+_db_initialized = False
+
+@app.before_request
+def ensure_db_initialized():
+    global _db_initialized
+    if not _db_initialized:
+        init_db()
+        _db_initialized = True
 
 # Helper to format SQL rows as dicts
 def format_row(cursor, row):
@@ -79,14 +87,16 @@ def format_row(cursor, row):
 def format_rows(cursor, rows):
     return [format_row(cursor, r) for r in rows]
 
-@app.route("/")
-def home():
-    conn = get_db()
-    if conn:
-        conn.close()
-        return "<h1>SHOP EASE API is running! 🚀</h1><p>TiDB Connection: <b>Connected ✅</b></p><p>Go to <a href='/api/seed'>/api/seed</a> to populate your data.</p>"
-    else:
-        return "<h1>SHOP EASE API is running! 🚀</h1><p>TiDB Connection: <b>Failed ❌</b></p>"
+def safe_parse_wishlist(wl):
+    if wl is None: return []
+    if isinstance(wl, list): return wl
+    if isinstance(wl, str):
+        try:
+            parsed = json.loads(wl)
+            return parsed if isinstance(parsed, list) else []
+        except:
+            return []
+    return []
 
 # Authentication Decorator
 def token_required(f):
@@ -105,94 +115,86 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             conn = get_db()
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
-            user = format_row(cursor, cursor.fetchone())
-            cursor.close()
-            conn.close()
-            if not user:
-                return jsonify({'message': 'User not found!'}), 401
+            if not conn:
+                return jsonify({'message': 'Database connection failed!'}), 503
+            try:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
+                user = format_row(cursor, cursor.fetchone())
+                if user:
+                    user['wishlist'] = safe_parse_wishlist(user.get('wishlist'))
+                if not user:
+                    return jsonify({'message': 'User not found!'}), 401
+            finally:
+                cursor.close()
+                conn.close()
         except Exception as e:
             return jsonify({'message': f'Token is invalid! {str(e)}'}), 401
         return f(user, *args, **kwargs)
     return decorated
 
-# --- AUTH ROUTES ---
+# --- API ROUTES ---
+
+@app.route("/")
+def home():
+    # Return index.html if it exists, otherwise a status message
+    if os.path.exists("index.html"):
+        return send_from_directory('.', 'index.html')
+    return "<h1>SHOP EASE API is running! 🚀</h1>"
 
 @app.route("/api/signup", methods=["POST"])
 def signup():
     data = request.json
     if not data.get('email') or not data.get('password'):
         return jsonify({"message": "Missing email or password"}), 400
-    
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
-        
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM users WHERE email = %s", (data['email'],))
         if cursor.fetchone():
-            cursor.close()
-            conn.close()
             return jsonify({"message": "User already exists"}), 409
-        
         hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-        cursor.execute("""
-            INSERT INTO users (name, email, password, address, phone, wishlist)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (data.get('name', 'User'), data['email'], hashed_pw, "", "", "[]"))
+        cursor.execute("INSERT INTO users (name, email, password, address, phone, wishlist) VALUES (%s, %s, %s, %s, %s, %s)",
+                       (data.get('name', 'User'), data['email'], hashed_pw, "", "", "[]"))
         conn.commit()
-        user_id = cursor.lastrowid
+        return jsonify({"message": "User created successfully"}), 201
+    finally:
         cursor.close()
         conn.close()
-        return jsonify({"message": "User created successfully", "user_id": user_id}), 201
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.json
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
-        
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE email = %s", (data.get('email'),))
         user = format_row(cursor, cursor.fetchone())
-        cursor.close()
-        conn.close()
-        
         if user and bcrypt.check_password_hash(user['password'], data.get('password')):
             token = jwt.encode({
                 'user_id': user['id'],
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
             }, app.config['SECRET_KEY'])
-            
             return jsonify({
-                "message": "Login successful",
                 "token": token,
                 "user": {
                     "id": user['id'],
                     "name": user['name'],
                     "email": user['email'],
-                    "address": user.get('address', ''),
-                    "phone": user.get('phone', ''),
-                    "wishlist": json.loads(user.get('wishlist', '[]'))
+                    "wishlist": safe_parse_wishlist(user.get('wishlist'))
                 }
-            }), 200
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-    
-    return jsonify({"message": "Invalid credentials"}), 401
+            })
+        return jsonify({"message": "Invalid credentials"}), 401
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route("/api/me", methods=["GET"])
 @token_required
 def get_me(current_user):
     if 'password' in current_user: del current_user['password']
-    if 'wishlist' in current_user and isinstance(current_user['wishlist'], str):
-        current_user['wishlist'] = json.loads(current_user['wishlist'])
+    if 'wishlist' in current_user:
+        current_user['wishlist'] = safe_parse_wishlist(current_user['wishlist'])
     return jsonify(current_user)
 
 @app.route("/api/profile/update", methods=["POST"])
@@ -200,8 +202,6 @@ def get_me(current_user):
 def update_profile(current_user):
     data = request.json
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
     try:
         cursor = conn.cursor()
         cursor.execute("""
@@ -213,21 +213,15 @@ def update_profile(current_user):
             current_user['id']
         ))
         conn.commit()
+        return jsonify({"message": "Profile updated successfully"})
+    finally:
         cursor.close()
         conn.close()
-        return jsonify({"message": "Profile updated successfully"})
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-
-# --- PRODUCT ROUTES ---
 
 @app.route("/api/products", methods=["GET"])
 def get_products():
     category = request.args.get("category")
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
-    
     try:
         cursor = conn.cursor()
         if category:
@@ -235,114 +229,76 @@ def get_products():
         else:
             cursor.execute("SELECT * FROM products")
         products = format_rows(cursor, cursor.fetchall())
+        res = jsonify(products)
+        res.headers['Cache-Control'] = 'public, max-age=300'
+        return res
+    finally:
         cursor.close()
         conn.close()
-        return jsonify(products)
-    except Exception as e:
-        print(f"Error in get_products: {e}")
-        return jsonify({"message": "Error fetching products"}), 500
-
-@app.route("/api/products/search", methods=["GET"])
-def search_products():
-    q = request.args.get("q", "")
-    conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM products WHERE name LIKE %s", (f"%{q}%",))
-        products = format_rows(cursor, cursor.fetchall())
-        cursor.close()
-        conn.close()
-        return jsonify(products)
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-
-# --- WISHLIST ROUTES ---
 
 @app.route("/api/wishlist", methods=["GET"])
 @token_required
 def get_wishlist(current_user):
     wishlist_ids = current_user.get('wishlist', [])
     if not wishlist_ids: return jsonify([])
-    
     ids = [int(i) for i in wishlist_ids if str(i).isdigit()]
     if not ids: return jsonify([])
-    
     format_strings = ','.join(['%s'] * len(ids))
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
     try:
         cursor = conn.cursor()
         cursor.execute(f"SELECT * FROM products WHERE id IN ({format_strings})", tuple(ids))
         products = format_rows(cursor, cursor.fetchall())
+        return jsonify(products)
+    finally:
         cursor.close()
         conn.close()
-        return jsonify(products)
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/wishlist/toggle", methods=["POST"])
 @token_required
 def toggle_wishlist(current_user):
     data = request.json
-    product_id = data.get('product_id')
-    if not product_id:
-        return jsonify({"message": "Product ID required"}), 400
+    pid = data.get('product_id')
+    if not pid: return jsonify({"message": "Product ID required"}), 400
     
     wishlist = current_user.get('wishlist', [])
-    if isinstance(wishlist, str): wishlist = json.loads(wishlist)
+    if pid in wishlist:
+        wishlist.remove(pid)
+        action = "removed"
+    else:
+        wishlist.append(pid)
+        action = "added"
     
+    conn = get_db()
     try:
-        product_id = int(product_id)
-        if product_id in wishlist:
-            wishlist.remove(product_id)
-            action = "removed"
-        else:
-            wishlist.append(product_id)
-            action = "added"
-            
-        conn = get_db()
-        if not conn:
-            return jsonify({"message": "Database connection failed"}), 503
         cursor = conn.cursor()
         cursor.execute("UPDATE users SET wishlist = %s WHERE id = %s", (json.dumps(wishlist), current_user['id']))
         conn.commit()
+        return jsonify({"message": f"Product {action} wishlist", "action": action})
+    finally:
         cursor.close()
         conn.close()
-        return jsonify({"message": f"Product {action} wishlist", "action": action})
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-
-# --- ORDER ROUTES ---
 
 @app.route("/api/orders", methods=["GET"])
 @token_required
 def get_orders(current_user):
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM orders WHERE user_id = %s ORDER BY created_at DESC", (current_user['id'],))
         orders = format_rows(cursor, cursor.fetchall())
         for o in orders:
             if isinstance(o['items'], str): o['items'] = json.loads(o['items'])
+        return jsonify(orders)
+    finally:
         cursor.close()
         conn.close()
-        return jsonify(orders)
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/orders", methods=["POST"])
 @token_required
 def place_order(current_user):
     data = request.json
-    print(f"DEBUG: Placing order for user {current_user['id']}: {data}")
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
     try:
         cursor = conn.cursor()
         cursor.execute("""
@@ -358,49 +314,28 @@ def place_order(current_user):
             data.get('shipping', {}).get('method', '')
         ))
         conn.commit()
-        order_id = cursor.lastrowid
+        return jsonify({"message": "Order placed successfully", "order_id": cursor.lastrowid}), 201
+    finally:
         cursor.close()
         conn.close()
-        print(f"DEBUG: Order created successfully ID: {order_id}")
-        return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
-    except Exception as e:
-        print(f"ERROR in place_order: {str(e)}")
-        return jsonify({"message": str(e)}), 500
 
-@app.route("/api/orders/<order_id>/cancel", methods=["PUT"])
+@app.route("/api/orders/<order_id>/cancel", methods=["DELETE", "PUT"])
 @token_required
 def cancel_order(current_user, order_id):
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT status FROM orders WHERE id = %s AND user_id = %s", (order_id, current_user['id']))
-        order = cursor.fetchone()
-        if not order:
-            cursor.close()
-            conn.close()
-            return jsonify({"message": "Order not found"}), 404
-        
-        if order[0] != 'Pending':
-            cursor.close()
-            conn.close()
-            return jsonify({"message": f"Cannot cancel order with status: {order[0]}"}), 400
-            
-        cursor.execute("UPDATE orders SET status = 'Cancelled' WHERE id = %s", (order_id,))
+        # Permanently remove the order from the database
+        cursor.execute("DELETE FROM orders WHERE id = %s AND user_id = %s", (order_id, current_user['id']))
         conn.commit()
+        return jsonify({"message": "Order removed from database permanently"})
+    finally:
         cursor.close()
         conn.close()
-        return jsonify({"message": "Order cancelled successfully"})
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
 
-# Seed database with initial products
-@app.route("/api/seed", methods=["GET", "POST"])
+@app.route("/api/seed", methods=["GET"])
 def seed_db():
     conn = get_db()
-    if not conn:
-        return jsonify({"message": "Database connection failed"}), 503
     try:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM products")
@@ -417,15 +352,21 @@ def seed_db():
             ("Party Sparkle Dress", 320, "party", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=80"),
             ("Kids Cartoon Tee", 35, "kids", "https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=400&q=80")
         ]
-        cursor.executemany("""
-            INSERT INTO products (name, price, category, image) VALUES (%s, %s, %s, %s)
-        """, initial_products)
+        cursor.executemany("INSERT INTO products (name, price, category, image) VALUES (%s, %s, %s, %s)", initial_products)
         conn.commit()
+        return jsonify({"message": "Products seeded"})
+    finally:
         cursor.close()
         conn.close()
-        return jsonify({"message": f"Database seeded with {len(initial_products)} products"})
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
+
+# --- STATIC FILE SERVING (MUST BE LAST) ---
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify({"message": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

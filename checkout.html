@@ -4,13 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout - SHOP EASE</title>
-  <script>console.warn = (function(oldWarn){ return function(msg){ if(typeof msg === "string" && msg.includes("tailwindcss")) return; oldWarn.apply(console, arguments); } })(console.warn);</script><script src="https://cdn.tailwindcss.com"></script>
-  <script src="common.js?v=1.1" defer></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+  
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
     body { font-family: 'DM Sans', sans-serif; }
     .hero-title { font-family: 'Bebas Neue', sans-serif; }
   </style>
+
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
+
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script>
+    window.addEventListener('load', () => {
+      if (window.tailwind) {
+        window.tailwind.config = {
+          theme: { extend: { colors: { clifford: '#da373d' } } }
+        }
+      }
+    });
+  </script>
+  <script src="common.js?v=1.2" defer></script>
 </head>
 
 <body class="bg-[#F2F0F1]">
@@ -121,6 +141,8 @@
 </div>
 
 <script>
+  let qrPaymentConfirmed = false;
+
   function updateSummary() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     if (cart.length === 0) {
@@ -162,8 +184,13 @@
     }
     const paymentMethod = paymentMethodEl.value;
 
-    if (!name || !address || !phone) {
-      alert('Please fill in your shipping details!');
+    if (!name || !address || !phone || !city || !pincode) {
+      alert('Please fill in all shipping details including city and pincode!');
+      return;
+    }
+
+    if (paymentMethod === 'QR Code' && !qrPaymentConfirmed) {
+      alert('Please complete QR payment and click "I\'ve Paid" before placing the order.');
       return;
     }
 
@@ -194,11 +221,13 @@
   };
 
   function showQRModal() {
+    document.querySelector('input[value="QR Code"]').checked = true;
     document.getElementById('qrModal').classList.remove('hidden');
     document.getElementById('qrModal').classList.add('flex');
   }
 
   function hideQRModal() {
+    qrPaymentConfirmed = true;
     document.getElementById('qrModal').classList.add('hidden');
     document.getElementById('qrModal').classList.remove('flex');
   }

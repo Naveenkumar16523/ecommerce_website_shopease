@@ -1,7 +1,16 @@
-const PRODUCTION_API_BASE = "https://ecommerce-website-shopease.onrender.com/api";
-const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
+var API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
   ? "http://127.0.0.1:5000/api" 
-  : PRODUCTION_API_BASE;
+  : "/api";
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 // Global helper for API calls with token
 async function apiRequest(endpoint, options = {}) {
@@ -21,7 +30,8 @@ async function apiRequest(endpoint, options = {}) {
       // Only redirect if we are on a page that REQUIRES auth
       const protectedPages = ['profile.html', 'wishlist.html', 'orders.html', 'checkout.html'];
       if (protectedPages.some(page => window.location.pathname.includes(page))) {
-        window.location.href = 'login.html';
+        const currentPath = window.location.pathname.split('/').pop();
+        window.location.href = `login.html?redirect=${currentPath}`;
       }
     }
     return res;
@@ -44,7 +54,7 @@ function addToCart(button) {
   const price = parseFloat(button.getAttribute('data-price')) || (card.querySelector('.font-bold') ? parseFloat(card.querySelector('.font-bold').innerText.replace('$', '')) : 0);
   const image = button.getAttribute('data-img') || (card.querySelector('img') ? card.querySelector('img').src : '');
   const qtyEl = card.querySelector('.qty-val') || document.getElementById('detail-qty');
-  const qty = qtyEl ? parseInt(qtyEl.innerText) : 0;
+  const qty = qtyEl ? parseInt(qtyEl.innerText) : 1;
   if (qty <= 0) {
     alert("Please select a quantity greater than 0.");
     return;
@@ -115,20 +125,34 @@ function toggleMobileSearch() {
 // Load products from Python Backend
 document.addEventListener('DOMContentLoaded', () => loadDynamicProducts());
 
+var _productsLoaded = false;
 async function loadDynamicProducts() {
+  if (_productsLoaded) return;
+  _productsLoaded = true;
+
   const fallbackProducts = [
-    { name: 'T-shirt with Tape Details', price: 120, category: 'casual', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400', rating: 4.5 },
-    { name: 'Skinny Fit Jeans', price: 240, category: 'casual', image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', rating: 3.5 }
+    { id: 1, name: 'T-shirt with Tape Details', price: 120, category: 'casual', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400', rating: 4.5 },
+    { id: 2, name: 'Skinny Fit Jeans', price: 240, category: 'casual', image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', rating: 3.5 }
   ];
 
   let products = [];
-  try {
-    const res = await apiRequest('/products');
-    if (!res.ok) throw new Error('API failed');
-    products = await res.json();
-  } catch (err) {
-    console.error('Backend connection failed:', err);
-    products = fallbackProducts;
+  const cached = sessionStorage.getItem('products_cache');
+  const cacheTime = sessionStorage.getItem('products_cache_time');
+  const isValid = cacheTime && (Date.now() - parseInt(cacheTime)) < 5 * 60 * 1000; // 5 min
+
+  if (cached && isValid) {
+    products = JSON.parse(cached);
+  } else {
+    try {
+      const res = await apiRequest('/products');
+      if (!res.ok) throw new Error('API failed');
+      products = await res.json();
+      sessionStorage.setItem('products_cache', JSON.stringify(products));
+      sessionStorage.setItem('products_cache_time', Date.now().toString());
+    } catch (err) {
+      console.error('Backend connection failed:', err);
+      products = fallbackProducts;
+    }
   }
 
   // Render containers
@@ -163,50 +187,62 @@ function renderProductDetail(p) {
 
 function renderProductsInto(products, container) {
   const user = JSON.parse(localStorage.getItem('user')) || {};
-  const wishlist = user.wishlist || [];
+  const wishlist = (user.wishlist || []).map(Number);
 
   container.innerHTML = products.map(p => {
-    const isWishlisted = wishlist.includes(p._id);
+    const pid = p.id || p._id || null;
+    if (!pid) return '';
+    
+    const isWishlisted = wishlist.includes(Number(pid));
+    const safeName = escapeHtml(p.name);
+    const safePrice = escapeHtml(p.price);
+    const safeImg = escapeHtml(p.image);
+    
     return `
       <div class="product-card group cursor-pointer relative" onclick="viewProduct(this)"
-           data-id="${p._id}" data-name="${p.name}" data-price="${p.price}" data-category="${p.category}"
-           data-img="${p.image}">
+           data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-category="${escapeHtml(p.category)}"
+           data-img="${safeImg}">
         
         <!-- Wishlist Heart -->
         <button onclick="event.stopPropagation(); toggleWishlist(this)" 
-          data-id="${p._id}"
+          data-id="${pid}"
           class="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur shadow-sm hover:bg-white transition-all">
           <svg class="w-4 h-4 ${isWishlisted ? 'fill-red-500 stroke-red-500' : 'fill-none stroke-black'}" 
                viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
         </button>
 
         <div class="bg-[#F0EEED] rounded-2xl overflow-hidden aspect-square flex items-center justify-center mb-3">
-          <img src="${p.image}" class="product-img object-cover w-full h-full" alt="${p.name}"/>
+          <img src="${safeImg}" loading="lazy" decoding="async" width="400" height="400"
+               class="product-img object-cover w-full h-full" alt="${safeName}"/>
         </div>
-        <div class="font-semibold text-sm">${p.name}</div>
+        <div class="font-semibold text-sm">${safeName}</div>
         <div class="flex items-center gap-1 my-1">
           <div class="flex star text-xs">★★★★☆</div>
           <span class="text-xs text-gray-400">4.5/5</span>
         </div>
-        <div class="font-bold mb-3">$${p.price}</div>
+        <div class="font-bold mb-3">$${safePrice}</div>
         <div class="flex items-center justify-between gap-2" onclick="event.stopPropagation()">
           <div class="flex items-center border rounded-full bg-gray-50">
             <button onclick="updateQty(this, -1)" class="px-3 py-1 hover:text-red-500 transition">−</button>
             <span class="px-2 text-xs font-medium qty-val">1</span>
             <button onclick="updateQty(this, 1)" class="px-3 py-1 hover:text-green-500 transition">+</button>
           </div>
-          <button onclick="addToCart(this)" data-name="${p.name}" data-price="${p.price}" data-img="${p.image}"
+          <button onclick="addToCart(this)" data-name="${safeName}" data-price="${safePrice}" data-img="${safeImg}"
             class="flex-1 bg-black text-white text-xs py-2 rounded-full hover:bg-gray-800 transition">
             Add to Cart
           </button>
         </div>
       </div>
     `;
-  }).join('');
+  }).filter(Boolean).join('');
 }
 
 async function toggleWishlist(btn) {
   const productId = btn.dataset.id;
+  if (!productId || productId === 'undefined' || productId === 'null') {
+    console.error("Wishlist toggle blocked: invalid product ID:", productId);
+    return;
+  }
   const token = localStorage.getItem('token');
   
   if (!token) {
@@ -216,17 +252,18 @@ async function toggleWishlist(btn) {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/wishlist/toggle`, {
+    const response = await apiRequest('/wishlist/toggle', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-access-token': token
-      },
       body: JSON.stringify({ product_id: productId })
     });
 
     const data = await response.json();
     if (response.ok) {
+      if (productId === 'undefined') {
+        console.error("Attempted to toggle wishlist for 'undefined' product ID");
+        return;
+      }
+      
       const svg = btn.querySelector('svg');
       if (data.action === 'added') {
         svg.classList.add('fill-red-500', 'stroke-red-500');
@@ -238,9 +275,16 @@ async function toggleWishlist(btn) {
       
       // Update local storage user object
       const user = JSON.parse(localStorage.getItem('user'));
-      if (!user.wishlist) user.wishlist = [];
-      if (data.action === 'added') user.wishlist.push(productId);
-      else user.wishlist = user.wishlist.filter(id => id !== productId);
+      user.wishlist = (user.wishlist || []).map(Number);
+      
+      const cleanId = Number(productId);
+      
+      if (data.action === 'added') {
+        if (!user.wishlist.includes(cleanId)) user.wishlist.push(cleanId);
+      } else {
+        user.wishlist = user.wishlist.filter(id => id !== cleanId);
+      }
+      user.wishlist = user.wishlist.map(Number);
       localStorage.setItem('user', JSON.stringify(user));
       
     } else {
@@ -258,16 +302,32 @@ async function getAuthHeader() {
 }
 
 async function checkAuth() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  const cached = sessionStorage.getItem('auth_user');
+  if (cached) return JSON.parse(cached);
+
   try {
     const res = await apiRequest('/me');
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
+    if (!res.ok) {
+      sessionStorage.removeItem('auth_user');
+      return null;
+    }
+    const user = await res.json();
+    sessionStorage.setItem('auth_user', JSON.stringify(user));
+    return user;
+  } catch {
+    return null;
+  }
 }
 
 async function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  sessionStorage.removeItem('auth_user');
+  sessionStorage.removeItem('products_cache');
+  sessionStorage.removeItem('products_cache_time');
   window.location.href = 'index.html';
 }
 
@@ -303,7 +363,11 @@ async function placeOrder(name, email, extraDetails = {}) {
     total: total,
     shipping: {
       name: name,
-      address: extraDetails.address || 'No Address',
+      address: [
+        extraDetails.address,
+        extraDetails.city,
+        extraDetails.pincode
+      ].filter(Boolean).join(', ') || 'No Address',
       phone: extraDetails.phone || 'No Phone',
       method: extraDetails.paymentMethod || 'Not Selected'
     }

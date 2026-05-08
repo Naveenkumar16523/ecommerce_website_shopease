@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHOP EASE – Women</title>
-  <script>console.warn = (function(oldWarn){ return function(msg){ if(typeof msg === "string" && msg.includes("tailwindcss")) return; oldWarn.apply(console, arguments); } })(console.warn);</script><script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
   
   
-  <script src="common.js?v=1.1" defer></script>
+  
+  
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'DM Sans', sans-serif; }
@@ -19,170 +20,39 @@
     .size-btn.active { background: black; color: white; }
     .filter-section { border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 20px; }
   </style>
+
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
+
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script>
+    window.addEventListener('load', () => {
+      if (window.tailwind) {
+        window.tailwind.config = {
+          theme: { extend: { colors: { clifford: '#da373d' } } }
+        }
+      }
+    });
+  </script>
+  <script src="common.js?v=1.2" defer></script>
 </head>
 <body class="bg-white text-black">
 
-  <header class="bg-white sticky top-0 z-50 shadow-sm">
-    <!-- Top Tier -->
-    <div class="max-w-[1440px] mx-auto px-6 md:px-12 py-3 flex items-center justify-between gap-8 border-b border-gray-50">
-      <!-- Left: Mobile Menu & Primary Links -->
-      <div class="flex items-center gap-4 md:gap-6 text-[15px] font-semibold">
-        <!-- Mobile Hamburger -->
-        <button onclick="toggleMobileMenu()" class="md:hidden p-1 text-gray-600 hover:text-black">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
+  
+  <!-- Shared Navigation Partial -->
+  <div id="nav-placeholder"></div>
+  <script>
+    fetch('nav.html').then(r => r.text()).then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
+      if (typeof updateAuthUI === 'function') updateAuthUI();
+      if (typeof updateCartBadge === 'function') updateCartBadge();
+    });
+  </script>
 
-        <a href="index.html" class="text-2xl font-black hero-title mr-4 hidden sm:block">SHOP EASE</a>
-        
-        <div class="hidden lg:flex items-center gap-6">
-          <!-- Women Mega Menu -->
-          <div class="group relative py-4">
-            <a href="womens.html" class="text-[#A52A4E] border-b-2 border-[#A52A4E] pb-1 cursor-pointer">Women</a>
-            <div class="absolute top-full left-0 w-[800px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-4 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
-              <div>
-                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
-                <ul class="space-y-2 text-sm text-gray-500 font-medium">
-                  <li><a href="#" class="hover:text-black transition">T-Shirts</a></li>
-                  <li><a href="#" class="hover:text-black transition">Dresses</a></li>
-                  <li><a href="#" class="hover:text-black transition">Jeans</a></li>
-                  <li><a href="#" class="hover:text-black transition">Shorts</a></li>
-                  <li><a href="#" class="hover:text-black transition">Hoodies</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Shop By Brand</h3>
-                <ul class="space-y-2 text-sm text-gray-500 font-medium">
-                  <li><a href="#" class="hover:text-black transition">Zara</a></li>
-                  <li><a href="#" class="hover:text-black transition">H&M</a></li>
-                  <li><a href="#" class="hover:text-black transition">Gucci</a></li>
-                  <li><a href="#" class="hover:text-black transition">Prada</a></li>
-                </ul>
-              </div>
-              <div class="col-span-2">
-                <div class="relative rounded-xl overflow-hidden h-40 group/img">
-                  <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&q=80" class="w-full h-full object-cover transition duration-500 group-hover/img:scale-110">
-                  <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-4">
-                    <p class="text-white font-bold">New Summer Collection</p>
-                    <p class="text-white/80 text-xs">Up to 40% Off</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Men Mega Menu -->
-          <div class="group relative py-4">
-            <a href="mens.html" class="text-gray-800 hover:text-black transition cursor-pointer">Men</a>
-            <div class="absolute top-full left-0 w-[800px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-4 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
-              <div>
-                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
-                <ul class="space-y-2 text-sm text-gray-500 font-medium">
-                  <li><a href="#" class="hover:text-black transition">T-Shirts</a></li>
-                  <li><a href="#" class="hover:text-black transition">Shirts</a></li>
-                  <li><a href="#" class="hover:text-black transition">Jeans</a></li>
-                  <li><a href="#" class="hover:text-black transition">Shorts</a></li>
-                  <li><a href="#" class="hover:text-black transition">Jackets</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Shop By Brand</h3>
-                <ul class="space-y-2 text-sm text-gray-500 font-medium">
-                  <li><a href="#" class="hover:text-black transition">Nike</a></li>
-                  <li><a href="#" class="hover:text-black transition">Adidas</a></li>
-                  <li><a href="#" class="hover:text-black transition">Levis</a></li>
-                  <li><a href="#" class="hover:text-black transition">Puma</a></li>
-                </ul>
-              </div>
-              <div class="col-span-2">
-                <div class="relative rounded-xl overflow-hidden h-40 group/img">
-                  <img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=500&q=80" class="w-full h-full object-cover transition duration-500 group-hover/img:scale-110">
-                  <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-4">
-                    <p class="text-white font-bold">Formal Wear Essential</p>
-                    <p class="text-white/80 text-xs">Premium Quality</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Kids Mega Menu -->
-          <div class="group relative py-4">
-            <a href="kids.html" class="text-gray-800 hover:text-black transition cursor-pointer">Kids</a>
-            <div class="absolute top-full left-0 w-[600px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-3 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
-              <div>
-                <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
-                <ul class="space-y-2 text-sm text-gray-500 font-medium">
-                  <li><a href="#" class="hover:text-black transition">Baby Boys</a></li>
-                  <li><a href="#" class="hover:text-black transition">Baby Girls</a></li>
-                  <li><a href="#" class="hover:text-black transition">Toddlers</a></li>
-                </ul>
-              </div>
-              <div class="col-span-2">
-                <div class="relative rounded-xl overflow-hidden h-40 group/img">
-                  <img src="https://images.unsplash.com/photo-1519235106638-30cc49daeb66?w=500&q=80" class="w-full h-full object-cover transition duration-500 group-hover/img:scale-110">
-                  <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-4">
-                    <p class="text-white font-bold">Kids Festive Special</p>
-                    <p class="text-white/80 text-xs">Starting from $19</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <a href="index.html" class="text-gray-800 hover:text-black transition py-4">Home</a>
-          <a href="brands.html" class="text-gray-800 hover:text-black transition py-4">All Brands</a>
-          <a href="#" class="text-gray-800 hover:text-black transition flex items-center gap-1 py-4">More</a>
-        </div>
-      </div>
-
-      <!-- Center: Search Bar -->
-      <div class="flex-1 max-w-md hidden md:block">
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          </div>
-          <input type="text" placeholder="Search for products, styles, brands..." 
-            class="block w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-full bg-[#F5F7F9] text-sm focus:bg-white focus:ring-1 focus:ring-gray-300 outline-none transition-all">
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400 hover:text-black">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: User Actions -->
-      <div class="flex items-center gap-6">
-        <a href="profile.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group">
-          <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
-          <span class="hidden xl:inline">Account</span>
-        </a>
-        <a href="wishlist.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group">
-          <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <span class="hidden xl:inline">Wishlist</span>
-        </a>
-        <a href="cart.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group relative">
-          <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
-          <span class="hidden xl:inline">Cart</span>
-          <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">0</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Category Bar -->
-    <div class="bg-white border-b border-gray-100 overflow-x-auto scrollbar-hide py-3 hidden md:block">
-      <div class="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between gap-8 text-[13px] font-medium text-gray-500 whitespace-nowrap">
-        <a href="#" class="text-black font-bold border-b border-black">Sale</a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Indian Wear <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Western Wear <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Footwear <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Lingerie <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Bags <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Jewellery <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Active & Sports <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Watches <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-        <a href="#" class="hover:text-black flex items-center gap-1">Tech Acc <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></a>
-      </div>
-    </div>
-  </header>
 
   <div class="px-6 md:px-12 py-3 text-sm text-gray-400">
     Home › <span class="text-black font-medium">Women</span>
