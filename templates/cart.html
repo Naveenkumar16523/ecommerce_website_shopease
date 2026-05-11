@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}SHOP EASE – Cart{% endblock %}
+
+{% block content %}
+<div class="px-6 md:px-12 py-3 text-sm text-gray-400 flex items-center gap-1">
+    <a href="index.html" class="hover:text-black">Home</a>
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <span class="text-black font-medium">Cart</span>
+  </div>
+ 
+  <div class="px-6 md:px-12 mb-6">
+    <h1 class="hero-title text-4xl font-black tracking-wide">YOUR CART</h1>
+  </div>
+ 
+  
+  <div class="flex flex-col lg:flex-row gap-6 px-6 md:px-12 pb-14 items-start">
+ 
+   
+    <div class="flex-1 min-w-0">
+      <div id="cart-container" class="border border-gray-200 rounded-2xl overflow-hidden divide-y divide-gray-100">
+        
+        <div class="border-t border-gray-100"></div>
+  
+        <div class="border-t border-gray-100"></div>
+
+      </div>
+    </div>
+  
+    <div class="w-full lg:w-[380px] flex-shrink-0">
+      <div class="border border-gray-200 rounded-2xl p-6 space-y-4">
+        <h2 class="font-bold text-lg">Order Summary</h2>
+ 
+        <div class="space-y-3">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Subtotal</span>
+            <span class="font-semibold" id="subtotal">$565</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Discount (-20%)</span>
+            <span class="font-semibold text-red-500" id="discount">-$113</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Delivery Fee</span>
+            <span class="font-semibold" id="delivery-fee">$15</span>
+          </div>
+        </div>
+ 
+        <hr class="border-gray-100"/>
+ 
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-base">Total</span>
+          <span class="font-bold text-xl" id="total">$467</span>
+        </div>
+ 
+        
+        <div class="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2 mt-1">
+          <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M3 12l9 9 9-9-9-9-9 9z"/></svg>
+          <input type="text" placeholder="Add promo code" class="promo-input flex-1 text-sm bg-transparent placeholder-gray-400 outline-none"/>
+          <button class="bg-black text-white text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-gray-800 transition">Apply</button>
+        </div>
+
+        <a href="checkout.html">
+  <button class="w-full bg-black text-white py-3 rounded-full mt-4 hover:bg-gray-800 transition">
+    Go to Checkout →
+  </button>
+</a>
+      </div>
+    </div>
+ 
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const container = document.getElementById('cart-container');
+
+function renderCart() {
+  const cart = cartStore.get();
+  container.innerHTML = "";
+
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
+        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+          <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-black mb-1">Your cart is empty</h3>
+        <p class="text-gray-400 text-sm mb-6 max-w-xs">Looks like you haven't added anything to your cart yet.</p>
+        <a href="index.html" class="inline-flex items-center justify-center bg-black text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-gray-800 transition shadow-lg shadow-black/5">
+          Continue Shopping
+        </a>
+      </div>
+    `;
+    updateSummary();
+    return;
+  }
+
+  cart.forEach((item) => {
+    const pid = item.product_id;
+    const imgUrl = item.image || 'https://via.placeholder.com/400?text=Product';
+    
+    container.innerHTML += `
+      <div class="flex items-start gap-4 p-4 md:p-5 border-b last:border-b-0" data-product-id="${pid}">
+        <div class="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-[#F0EEED] flex-shrink-0">
+          <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/400?text=Product'" class="w-full h-full object-cover"/>
+        </div>
+
+        <div class="flex-1 flex flex-col justify-between h-full">
+          <div class="flex justify-between items-start">
+            <div>
+              <h2 class="font-bold text-sm md:text-base">${item.name}</h2>
+              <p class="text-xs text-gray-400">ID: ${pid}</p>
+            </div>
+            <button onclick="removeItem(${pid})" class="text-red-500 p-1 hover:opacity-70 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+
+          <div class="flex justify-between items-center mt-2 md:mt-4">
+            <p class="font-bold text-lg">$${item.price}</p>
+            <div class="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-4">
+              <button onclick="changeQty(${pid}, -1)" class="text-lg font-medium hover:text-red-500">−</button>
+              <span class="text-sm font-bold min-w-[20px] text-center">${item.qty}</span>
+              <button onclick="changeQty(${pid}, 1)" class="text-lg font-medium hover:text-green-500">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  updateSummary();
+}
+
+function changeQty(productId, delta) {
+  const cart = cartStore.get();
+  const item = cart.find(i => i.product_id === productId);
+  if (item) {
+    const newQty = item.qty + delta;
+    if (newQty <= 0) {
+      cartStore.remove(productId);
+    } else {
+      cartStore.updateQty(productId, newQty);
+    }
+  }
+}
+
+function removeItem(productId) {
+  cartStore.remove(productId);
+}
+
+function updateSummary() {
+  const subtotal = cartStore.subtotal;
+  const discount = subtotal > 0 ? Math.round(subtotal * 0.2) : 0;
+  const delivery = subtotal > 0 ? 15 : 0;
+  const total = subtotal - discount + delivery;
+
+  document.getElementById('subtotal').innerText = '$' + subtotal;
+  document.getElementById('discount').innerText = '-$' + discount;
+  document.getElementById('delivery-fee').innerText = '$' + delivery;
+  document.getElementById('total').innerText = '$' + total;
+}
+
+// Listen for global cart updates
+document.addEventListener('cart:updated', () => {
+  renderCart();
+});
+
+// Initial render
+renderCart();
+</script>
+{% endblock %}

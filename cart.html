@@ -190,12 +190,10 @@
     </div>
   </footer>
  <script>
-
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const container = document.getElementById('cart-container');
 
-
 function renderCart() {
+  const cart = cartStore.get();
   container.innerHTML = "";
 
   if (cart.length === 0) {
@@ -215,21 +213,23 @@ function renderCart() {
     return;
   }
 
-  cart.forEach((item, index) => {
+  cart.forEach((item) => {
+    const pid = item.product_id;
+    const imgUrl = item.image || 'https://via.placeholder.com/400?text=Product';
+    
     container.innerHTML += `
-      <div class="flex items-start gap-4 p-4 md:p-5 border-b last:border-b-0">
+      <div class="flex items-start gap-4 p-4 md:p-5 border-b last:border-b-0" data-product-id="${pid}">
         <div class="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-[#F0EEED] flex-shrink-0">
-          <img src="${item.image}" class="w-full h-full object-cover"/>
+          <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/400?text=Product'" class="w-full h-full object-cover"/>
         </div>
 
         <div class="flex-1 flex flex-col justify-between h-full">
           <div class="flex justify-between items-start">
             <div>
               <h2 class="font-bold text-sm md:text-base">${item.name}</h2>
-              <p class="text-xs text-gray-400">Size: Large</p>
-              <p class="text-xs text-gray-400">Color: White</p>
+              <p class="text-xs text-gray-400">ID: ${pid}</p>
             </div>
-            <button onclick="removeItem(${index})" class="text-red-500 p-1">
+            <button onclick="removeItem(${pid})" class="text-red-500 p-1 hover:opacity-70 transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/></svg>
             </button>
           </div>
@@ -237,9 +237,9 @@ function renderCart() {
           <div class="flex justify-between items-center mt-2 md:mt-4">
             <p class="font-bold text-lg">$${item.price}</p>
             <div class="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-4">
-              <button onclick="changeQty(${index}, -1)" class="text-lg font-medium">−</button>
+              <button onclick="changeQty(${pid}, -1)" class="text-lg font-medium hover:text-red-500">−</button>
               <span class="text-sm font-bold min-w-[20px] text-center">${item.qty}</span>
-              <button onclick="changeQty(${index}, 1)" class="text-lg font-medium">+</button>
+              <button onclick="changeQty(${pid}, 1)" class="text-lg font-medium hover:text-green-500">+</button>
             </div>
           </div>
         </div>
@@ -250,32 +250,25 @@ function renderCart() {
   updateSummary();
 }
 
-
-function changeQty(index, delta) {
-  cart[index].qty += delta;
-  if (cart[index].qty <= 0) {
-    cart.splice(index, 1);
+function changeQty(productId, delta) {
+  const cart = cartStore.get();
+  const item = cart.find(i => i.product_id === productId);
+  if (item) {
+    const newQty = item.qty + delta;
+    if (newQty <= 0) {
+      cartStore.remove(productId);
+    } else {
+      cartStore.updateQty(productId, newQty);
+    }
   }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-  renderCart();
 }
 
-
-function removeItem(index) {
-  cart.splice(index, 1);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  renderCart();
+function removeItem(productId) {
+  cartStore.remove(productId);
 }
-
 
 function updateSummary() {
-  let subtotal = 0;
-
-  cart.forEach(item => {
-    subtotal += item.price * item.qty;
-  });
-
+  const subtotal = cartStore.subtotal;
   const discount = subtotal > 0 ? Math.round(subtotal * 0.2) : 0;
   const delivery = subtotal > 0 ? 15 : 0;
   const total = subtotal - discount + delivery;
@@ -284,15 +277,14 @@ function updateSummary() {
   document.getElementById('discount').innerText = '-$' + discount;
   document.getElementById('delivery-fee').innerText = '$' + delivery;
   document.getElementById('total').innerText = '$' + total;
-
-  const badge = document.getElementById('cartBadge');
-  if (badge) {
-    let totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-    badge.innerText = totalQty;
-  }
 }
 
+// Listen for global cart updates
+document.addEventListener('cart:updated', () => {
+  renderCart();
+});
 
+// Initial render
 renderCart();
 </script>
 </body>

@@ -1,0 +1,25 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+    - id: check-added-large-files
+    - id: check-merge-conflict
+    - id: debug-statements
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+
+- repo: local
+  hooks:
+    - id: forbid-print
+      name: Forbid print() statements
+      entry: 'print\('
+      language: pygrep
+      types: [python]
+      exclude: 'logger.py' # logger.py is allowed to use sys.stdout if needed, but we check for print specifically
+    
+    - id: forbid-debug-files
+      name: Forbid debug files
+      entry: '(debug|scratch|temp|.*_backup|.*_old)\.py'
+      language: pygrep
+      types: [file]
+      files: '\.py$'

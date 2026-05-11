@@ -230,29 +230,53 @@
   </footer>
 
 <script>
-  // Dynamic Loading Logic
-  window.onload = function() {
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get('name') || "Classic T-Shirt";
-    const price = params.get('price') || "120";
-    const img = params.get('img') || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400";
-    const category = params.get('category') || "Men";
+  let currentProduct = null;
 
-    document.getElementById('prod-name').innerText = name;
-    document.getElementById('breadcrumb-name').innerText = name;
-    document.getElementById('breadcrumb-category').innerText = category;
-    document.getElementById('prod-price').innerText = "$" + price;
-    document.getElementById('main-img').src = img;
-    document.getElementById('thumb1').src = img;
-    document.getElementById('thumb2').src = img; // In a real app these would be different
-    document.getElementById('thumb3').src = img;
+  async function loadProductDetail() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
     
-    if(parseInt(price) > 150) {
-      document.getElementById('old-price').innerText = "$" + (parseInt(price) + 50);
-    } else {
-      document.getElementById('discount-tag').style.display = 'none';
+    if (!id) {
+      document.body.innerHTML = `<div class="p-20 text-center"><h1 class="text-2xl font-bold">Product not found</h1><a href="index.html" class="underline">Go Home</a></div>`;
+      return;
     }
-  };
+
+    try {
+      const response = await apiRequest(`/products/${id}`);
+      if (!response.ok) {
+        if (response.status === 404) throw new Error("Product not found");
+        throw new Error("Failed to load product");
+      }
+      
+      const product = await response.json();
+      currentProduct = product;
+
+      // Update UI
+      document.getElementById('prod-name').innerText = product.name;
+      document.getElementById('breadcrumb-name').innerText = product.name;
+      document.getElementById('breadcrumb-category').innerText = product.category;
+      document.getElementById('prod-price').innerText = "$" + product.price;
+      document.getElementById('main-img').src = product.image;
+      document.getElementById('thumb1').src = product.image;
+      document.getElementById('thumb2').src = product.image;
+      document.getElementById('thumb3').src = product.image;
+      
+      if(parseFloat(product.price) > 150) {
+        document.getElementById('old-price').innerText = "$" + (parseFloat(product.price) + 50);
+      } else {
+        document.getElementById('discount-tag').style.display = 'none';
+      }
+      
+      document.getElementById('detail-qty').innerText = "1";
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById('prod-name').innerText = "Error: " + err.message;
+      showToast(err.message, 'error');
+    }
+  }
+
+  window.onload = loadProductDetail;
 
   function updateQtyDetail(change) {
     const qtySpan = document.getElementById('detail-qty');
@@ -262,23 +286,11 @@
   }
 
   function handleAddToCartDetail() {
-    const name = document.getElementById('prod-name').innerText;
-    let priceStr = document.getElementById('prod-price').innerText.replace(/[^0-9.]/g, '');
-    const price = parseFloat(priceStr);
-    const img = document.getElementById('main-img').src;
+    if (!currentProduct) return;
     const qty = parseInt(document.getElementById('detail-qty').innerText);
-
-    // Use common.js?v=1.1 function if available
-    if(window.addToCart) {
-      // Mock a button element for compatibility
-      const mockBtn = {
-        dataset: { name, price, img },
-        parentElement: { querySelector: () => ({ innerText: qty }) }
-      };
-      addToCart(mockBtn);
-    } else {
-      alert(`Added ${qty}x ${name} to cart!`);
-    }
+    
+    // Call the centralized store
+    cartStore.add(currentProduct, qty);
   }
 </script>
 

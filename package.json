@@ -1,0 +1,31 @@
+{
+  "name": "e-commerce-website",
+  "version": "1.0.0",
+  "description": "A premium e-commerce platform built with Flask and TiDB Cloud.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "css:build": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "css:dev": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Naveenkumar16523/ecommerce_website_shopease.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Naveenkumar16523/ecommerce_website_shopease/issues"
+  },
+  "homepage": "https://github.com/Naveenkumar16523/ecommerce_website_shopease#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.14",
+    "tailwindcss": "^3.4.19"
+  }
+}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SHOP EASE - Find Clothes That Match Your Style{% endblock %}
+
+{% block content %}
+<section class="bg-[#F2F0F1] relative min-h-[500px] md:min-h-[660px] flex flex-col md:flex-row items-center px-6 md:px-16 overflow-hidden">
+    <div class="max-w-lg z-10 py-10 md:py-14 text-left w-full">
+        <h1 data-t="hero_title" class="hero-title text-4xl sm:text-5xl md:text-7xl leading-tight md:leading-none mb-4">
+            FIND CLOTHES THAT MATCHES YOUR STYLE
+        </h1>
+        <p data-t="hero_subtitle" class="text-gray-500 text-sm md:text-base mb-8 max-w-xs leading-relaxed">
+            Browse through our diverse range of meticulously crafted garments.
+        </p>
+        <button data-t="shop_now" class="w-full sm:w-auto bg-black text-white px-10 py-3.5 rounded-full text-sm font-medium hover:bg-gray-800 transition">
+            Shop Now
+        </button>
+        
+        <div class="flex md:hidden flex-wrap gap-6 mt-10">
+            <div><p class="text-2xl font-bold">200+</p><p class="text-xs text-gray-500">International Brands</p></div>
+            <div><p class="text-2xl font-bold">2,000+</p><p class="text-xs text-gray-500">High-Quality Products</p></div>
+            <div><p class="text-2xl font-bold">30,000+</p><p class="text-xs text-gray-500">Happy Customers</p></div>
+        </div>
+    </div>
+
+    <div class="flex-1 self-stretch flex justify-center md:justify-end items-end relative w-full mt-6 md:mt-0">
+        <img src="/static/assets/Rectangle2.jpg" alt="Fashion Model" class="relative z-10 w-full md:w-auto h-auto max-h-[380px] sm:max-h-[480px] md:max-h-[580px] object-contain object-bottom"/>
+    </div>
+</section>
+
+<div class="bg-black py-4 overflow-hidden">
+    <div class="flex gap-16 animate-marquee whitespace-nowrap items-center brand-bar text-white text-xl md:text-2xl" style="animation: marquee 30s linear infinite;">
+        <span>VERSACE</span><span>ZARA</span><span>GUCCI</span><span>PRADA</span><span>Calvin Klein</span>
+        <span>VERSACE</span><span>ZARA</span><span>GUCCI</span><span>PRADA</span><span>Calvin Klein</span>
+    </div>
+</div>
+<style>
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; }
+</style>
+
+<section class="px-6 md:px-16 py-14">
+    <h2 data-t="new_arrivals" class="text-center text-3xl font-black tracking-tight mb-10 hero-title">NEW ARRIVALS</h2>
+    <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <!-- Products injected via JS -->
+    </div>
+    <div class="text-center mt-10">
+        <a href="/new-arrivals.html" data-t="view_all" class="inline-block border border-gray-300 px-10 py-2.5 rounded-full text-sm font-medium hover:bg-gray-50 transition">View All</a>
+    </div>
+</section>
+
+<hr class="border-gray-200 mx-6 md:mx-16"/>
+
+<section class="px-6 md:px-16 py-14">
+    <h2 data-t="top_selling" class="text-center text-3xl font-black tracking-tight mb-10 hero-title">TOP SELLING</h2>
+    <div id="top-selling-container" class="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <!-- Products injected via JS -->
+    </div>
+    <div class="text-center mt-10">
+        <a href="/top-selling.html" data-t="view_all" class="border border-gray-300 px-10 py-2.5 rounded-full text-sm font-medium hover:bg-gray-50 transition">View All</a>
+    </div>
+</section>
+
+<section class="px-6 md:px-16 py-10">
+    <div class="bg-[#F0EEED] rounded-3xl p-8 md:p-12">
+        <h2 data-t="browse_style" class="text-center text-3xl md:text-4xl font-black mb-8 hero-title">BROWSE BY DRESS STYLE</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <a href="/casual-category.html" class="style-card h-48 md:h-64 block">
+                <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Casual"/>
+                <div class="absolute inset-0 flex items-start p-5">
+                    <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Casual</span>
+                </div>
+            </a>
+            <a href="/formal-category.html" class="style-card h-48 md:h-64 block">
+                <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Formal"/>
+                <div class="absolute inset-0 flex items-start p-5">
+                    <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Formal</span>
+                </div>
+            </a>
+            <a href="/party-category.html" class="style-card h-48 md:h-64 block">
+                <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Party"/>
+                <div class="absolute inset-0 flex items-start p-5">
+                    <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Party</span>
+                </div>
+            </a>
+            <a href="/gym-category.html" class="style-card h-48 md:h-64 block">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Gym"/>
+                <div class="absolute inset-0 flex items-start p-5">
+                    <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Gym</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="px-6 md:px-16 py-14">
+    <h2 class="text-3xl md:text-4xl font-black hero-title mb-8">OUR HAPPY CUSTOMERS</h2>
+    <div id="reviewSlider" class="flex gap-5 overflow-x-auto scrollbar-hide review-slider pb-2">
+        <!-- Reviews... -->
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    async function loadFeatured() {
+        const arrivals = await apiRequest('/products?per_page=4');
+        if (arrivals.ok) {
+            const data = await arrivals.json();
+            renderProducts('new-arrivals-container', data.data);
+        }
+        
+        const topSelling = await apiRequest('/products?per_page=4&page=2');
+        if (topSelling.ok) {
+            const data = await topSelling.json();
+            renderProducts('top-selling-container', data.data);
+        }
+    }
+
+    function renderProducts(containerId, products) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = products.map(p => `
+            <div class="product-card group cursor-pointer" onclick="viewProduct(this)" 
+                 data-id="${p.id}" data-name="${p.name}" data-slug="${p.slug}">
+                <div class="bg-[#F0EEED] rounded-2xl overflow-hidden aspect-square flex items-center justify-center mb-4">
+                    <img src="${p.image}" class="object-cover w-full h-full transition duration-500 group-hover:scale-110" />
+                </div>
+                <h3 class="font-bold text-sm md:text-base mb-1">${p.name}</h3>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-yellow-400 text-xs">★★★★★</span>
+                    <span class="text-xs text-gray-500">${p.rating}/5</span>
+                </div>
+                <p class="font-bold text-lg">$${p.price}</p>
+            </div>
+        `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFeatured);
+</script>
+{% endblock %}

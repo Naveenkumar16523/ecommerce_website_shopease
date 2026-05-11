@@ -5,3 +5,7 @@ flask-bcrypt
 PyJWT
 python-dotenv
 gunicorn
+flask-limiter==3.7.0
+redis # Optional for distributed rate limiting
+pytest
+aiohttp # For load testing

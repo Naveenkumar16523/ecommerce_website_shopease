@@ -1,47 +1,70 @@
 import os
+import sys
 import mysql.connector
 from mysql.connector import pooling
 from dotenv import load_dotenv
+from contextlib import contextmanager
+from logger import setup_logger
+
+logger = setup_logger(__name__)
 
 load_dotenv()
 
-# Required environment variables
-required_vars = ["TIDB_HOST", "TIDB_USER", "TIDB_PASSWORD", "TIDB_DB"]
-missing_vars = [var for var in required_vars if not os.getenv(var)]
+def _require_env(name):
+    value = os.getenv(name)
+    if not value:
+        logger.error(f"Missing required environment variable: {name}")
+        sys.exit(1)
+    return value
 
-if missing_vars:
-    print(f"CRITICAL ERROR: Missing required environment variables: {', '.join(missing_vars)}")
-    print("Please set them in your .env file or environment.")
-    exit(1)
+# Pool Configuration
+DB_POOL_MIN = int(os.getenv("DB_POOL_MIN", 2))
+DB_POOL_MAX = int(os.getenv("DB_POOL_MAX", 20))
 
-# Create a connection pool
-db_config = {
-    "host": os.getenv("TIDB_HOST"),
+db_params = {
+    "host": _require_env("TIDB_HOST"),
     "port": int(os.getenv("TIDB_PORT", 4000)),
-    "user": os.getenv("TIDB_USER"),
-    "password": os.getenv("TIDB_PASSWORD"),
-    "database": os.getenv("TIDB_DB"),
+    "user": _require_env("TIDB_USER"),
+    "password": _require_env("TIDB_PASSWORD"),
+    "database": _require_env("TIDB_DB"),
     "ssl_ca": os.getenv("TIDB_CA_PATH"),
     "ssl_verify_cert": True if os.getenv("TIDB_CA_PATH") else False
 }
 
 try:
     connection_pool = pooling.MySQLConnectionPool(
-        pool_name="mypool",
-        pool_size=5,
+        pool_name="ecommerce_pool",
+        pool_size=DB_POOL_MAX,
         pool_reset_session=True,
-        **db_config
+        **db_params
     )
-    print("MySQL Connection Pool created successfully.")
+    logger.info(f"MySQL Connection Pool initialized (size: {DB_POOL_MAX})")
 except Exception as e:
-    print(f"Error creating MySQL Connection Pool: {e}")
+    logger.critical(f"Failed to initialize MySQL Connection Pool: {e}")
     connection_pool = None
 
+@contextmanager
 def get_db():
-    if connection_pool:
-        try:
-            return connection_pool.get_connection()
-        except Exception as e:
-            print(f"Error getting connection from pool: {e}")
-            return None
-    return None
+    if not connection_pool:
+        raise Exception("Database connection pool is not initialized.")
+    
+    conn = connection_pool.get_connection()
+    cursor = conn.cursor()
+    try:
+        yield conn, cursor
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        cursor.close()
+        if conn and conn.is_connected():
+            conn.close() # Returns to pool
+
+def get_pool_stats():
+    if not connection_pool:
+        return None
+    return {
+        "pool_name": connection_pool.pool_name,
+        "pool_size": connection_pool.pool_size,
+    }

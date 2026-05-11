@@ -1,4 +1,39 @@
-__pycache__/
-scratch/
-.vscode/
+# Environment variables
 .env
+
+# Python Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Workspace/Editor folders
+.vscode/
+.idea/
+
+# Scratch and Debug files
+scratch/
+test_*.py
+fix_*.py
+seed.py
+optimize_*.py
+
+# Vercel
+.vercel/
+
+# Node
+node_modules/
+static/css/output.css
+
+# Debug and Temporary Files
+debug*.py
+temp*.py
+scratch*.py
+*_backup.py
+*_old.py
+optimize_*.py
+refactor_*.py
+migrate_*.py
+seed.py
+test_backend.py
+load_test.py

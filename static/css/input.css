@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .hero-title {
+    @apply font-bebas;
+  }
+  body {
+    @apply font-dm;
+  }
+}
+
+@layer components {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .style-card {
+    @apply relative overflow-hidden rounded-[1.5rem] transition-all duration-300;
+  }
+  .style-card:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
+  .style-card img {
+    @apply transition-transform duration-500;
+  }
+  .style-card:hover img {
+    @apply scale-105;
+  }
+}

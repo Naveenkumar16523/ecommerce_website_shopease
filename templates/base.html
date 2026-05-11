@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SHOP EASE{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+    
+    <!-- Fonts & Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --font-bebas: 'Bebas Neue', 'Impact', 'Arial Black', sans-serif;
+            --font-dm: 'DM Sans', 'Inter', 'system-ui', -apple-system, sans-serif;
+        }
+        .hero-title { font-family: var(--font-bebas); }
+        body { font-family: var(--font-dm); font-display: swap; }
+    </style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .style-card { position: relative; overflow: hidden; border-radius: 1.5rem; transition: all 0.3s ease; }
+        .style-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .style-card img { transition: transform 0.5s ease; }
+        .style-card:hover img { transform: scale(1.05); }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-white">
+
+    {% include 'partials/_nav.html' %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/_footer.html' %}
+
+    <!-- Core Scripts -->
+    <script src="/static/common.js?v=1.4"></script>
+    <script>
+        // Global utilities
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileSidebar');
+            if (menu) menu.classList.toggle('-translate-x-full');
+        }
+
+        function viewProduct(element) {
+            const id = element.getAttribute('data-id');
+            const name = element.getAttribute('data-name') || 'product';
+            const slug = element.getAttribute('data-slug') || `${slugify(name)}-${id}`;
+            if (id) window.location.href = `/products/${id}/${slug}`;
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+
+</body>
+</html>

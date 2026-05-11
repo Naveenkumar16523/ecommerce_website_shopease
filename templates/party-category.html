@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}SHOP EASE – Party{% endblock %}
+
+{% block content %}
+<div class="px-6 md:px-12 py-3 text-sm text-gray-400">
+    Home › <span class="text-black font-medium">Party</span>
+  </div>
+
+  <div class="flex gap-8 px-6 md:px-12 pb-20">
+    
+    <aside class="hidden md:block w-72 border rounded-[20px] p-6 h-fit bg-white sticky top-24">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-bold text-xl">Filters</h2>
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      </div>
+
+      
+      <div class="filter-section">
+        <ul class="space-y-4 text-gray-500 text-sm">
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">T-shirts <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Shorts <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Shirts <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Hoodie <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Jeans <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+        </ul>
+      </div>
+
+      
+      <div class="filter-section">
+        <h3 class="font-bold text-sm mb-4">Price</h3>
+        <input type="range" min="50" max="500" value="200" class="w-full accent-black mb-2">
+        <div class="flex justify-between text-sm font-bold">
+          <span>$50</span>
+          <span>$200</span>
+        </div>
+      </div>
+
+      
+      <div class="filter-section">
+        <h3 class="font-bold text-sm mb-4">Colors</h3>
+        <div class="flex flex-wrap gap-2.5">
+          <div class="color-dot bg-green-500"></div>
+          <div class="color-dot bg-red-500"></div>
+          <div class="color-dot bg-yellow-400"></div>
+          <div class="color-dot bg-orange-500"></div>
+          <div class="color-dot bg-blue-400"></div>
+          <div class="color-dot bg-blue-700 active"></div>
+          <div class="color-dot bg-purple-500"></div>
+          <div class="color-dot bg-pink-400"></div>
+          <div class="color-dot bg-white"></div>
+          <div class="color-dot bg-black"></div>
+        </div>
+      </div>
+
+      
+      <div class="filter-section">
+        <h3 class="font-bold text-sm mb-4">Size</h3>
+        <div class="flex flex-wrap gap-2">
+          <button class="size-btn">XX-Small</button>
+          <button class="size-btn">X-Small</button>
+          <button class="size-btn">Small</button>
+          <button class="size-btn">Medium</button>
+          <button class="size-btn active">Large</button>
+          <button class="size-btn">X-Large</button>
+        </div>
+      </div>
+
+      
+      <div class="filter-section border-0 mb-0 pb-0">
+        <h3 class="font-bold text-sm mb-4">Dress Style</h3>
+        <ul class="space-y-4 text-gray-500 text-sm">
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Casual <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Formal <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between text-black font-medium cursor-pointer">Party <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="flex items-center justify-between hover:text-black cursor-pointer">Gym <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+        </ul>
+      </div>
+
+      <button class="w-full bg-black text-white py-3.5 rounded-full mt-6 font-bold text-sm hover:bg-gray-800 transition">Apply Filter</button>
+    </aside>
+
+    
+    <main class="flex-1">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-black hero-title uppercase">Party</h1>
+        <div class="flex items-center gap-3 text-sm text-gray-400">
+          <span>Showing 1-10 of 100 Products</span>
+          <div class="hidden md:block">Sort by: <span class="text-black font-bold">Most Popular ▾</span></div>
+        </div>
+      </div>
+      <div id="category-products-container" data-category="Party" class="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        
+      </div>
+    </main>
+  </div>
+{% endblock %}
+

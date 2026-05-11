@@ -1,51 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title data-t="profile_title"> My Profile - SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-  </style>
+{% extends "base.html" %}
 
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
+{% block title %}SHOP EASE{% endblock %}
 
-  <script src="https://cdn.tailwindcss.com" defer></script>
-  <script>
-    window.addEventListener('load', () => {
-      if (window.tailwind) {
-        window.tailwind.config = {
-          theme: { extend: { colors: { clifford: '#da373d' } } }
-        }
-      }
-    });
-  </script>
-  <script src="common.js?v=1.2" defer></script>
-</head>
-<body class="bg-[#F2F0F1]">
-
-  
-  <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
-      document.getElementById('nav-placeholder').innerHTML = html;
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
-  </script>
-
-
+{% block content %}
 <section class="max-w-6xl mx-auto px-6 py-10">
 
   <div class="grid md:grid-cols-3 gap-6">
@@ -227,8 +184,10 @@
     </div>
   </div>
 </section>
+{% endblock %}
 
-  <script>
+{% block extra_scripts %}
+<script>
     function togglePayments() {
       document.getElementById("paymentMenu").classList.toggle("hidden");
     }
@@ -447,5 +406,4 @@
       if (langSelect) langSelect.value = localStorage.getItem('lang') || 'en';
     });
   </script>
-</body>
-</html>
+{% endblock %}

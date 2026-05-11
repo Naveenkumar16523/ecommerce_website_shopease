@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Your Wishlist – SHOP EASE{% endblock %}
+
+{% block content %}
+<section class="py-12 px-6 md:px-12 max-w-6xl mx-auto min-h-screen">
+    <h1 class="hero-title text-5xl font-black mb-8 tracking-wider italic">MY WISHLIST</h1>
+    
+    <div id="wishlistGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <!-- Wishlist items will be loaded here -->
+      <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
+        <p class="text-gray-500 italic">Loading your saved items...</p>
+      </div>
+    </div>
+
+  </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    async function loadFullWishlist() {
+      const grid = document.getElementById('wishlistGrid');
+      
+      try {
+        const response = await apiRequest('/wishlist');
+        
+        if (response.status === 401) {
+          grid.innerHTML = `
+            <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
+              <p class="text-gray-500 mb-6">Please login to view your wishlist.</p>
+              <a href="login.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
+            </div>
+          `;
+          return;
+        }
+
+        if (!response.ok) throw new Error("Failed to fetch");
+        
+        const products = await response.json();
+        
+        if (products.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
+              <p class="text-gray-500 mb-6">Your wishlist is empty.</p>
+              <a href="index.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Explore Products</a>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = products.map(p => {
+          const safeName = escapeHtml(p.name);
+          const safePrice = escapeHtml(p.price);
+          const safeImg = escapeHtml(p.image);
+          return `
+            <div class="product-card group bg-white p-4 rounded-3xl shadow-sm border border-transparent hover:border-black transition-all duration-300 relative">
+              <button onclick="removeFromFullWishlist('${p.id}', this)" 
+                class="absolute top-6 right-6 z-10 p-2 rounded-full bg-white/90 shadow-md hover:text-red-500 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+              
+              <div onclick="window.location.href='product-detail.html?name=${encodeURIComponent(p.name)}'" class="cursor-pointer">
+                <div class="bg-[#F0EEED] rounded-2xl overflow-hidden aspect-square flex items-center justify-center mb-4">
+                  <img src="${safeImg}" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <h3 class="font-bold text-sm mb-1 truncate uppercase">${safeName}</h3>
+                <p class="font-black text-xl">$${safePrice}</p>
+              </div>
+              
+              <button onclick="addToCartFromWishlist(this)" 
+                data-name="${safeName}" data-price="${safePrice}" data-img="${safeImg}"
+                class="w-full mt-4 bg-black text-white py-3 rounded-xl text-xs font-bold hover:bg-gray-800 transition-all">
+                Move to Cart
+              </button>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        grid.innerHTML = `<p class="col-span-full text-center text-red-500">Error loading wishlist. Please try again.</p>`;
+      }
+    }
+
+    async function removeFromFullWishlist(productId, btn) {
+      try {
+        const response = await apiRequest('/wishlist/toggle', {
+          method: 'POST',
+          body: JSON.stringify({ product_id: productId })
+        });
+        
+        if (response.ok) {
+          const card = btn.closest('.product-card');
+          card.classList.add('scale-0', 'opacity-0');
+          setTimeout(() => {
+            card.remove();
+            if (document.getElementById('wishlistGrid').children.length === 0) {
+              loadFullWishlist(); // Refresh to show empty state
+            }
+          }, 300);
+
+          // Update local storage
+          const user = JSON.parse(localStorage.getItem('user'));
+          user.wishlist = user.wishlist.filter(id => id !== productId);
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function addToCartFromWishlist(btn) {
+      addToCart(btn);
+      alert("Added to cart!");
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFullWishlist);
+  </script>
+{% endblock %}
