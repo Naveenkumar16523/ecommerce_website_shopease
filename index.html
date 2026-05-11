@@ -37,7 +37,6 @@
     #mobileSidebar { transition: transform 0.3s ease-in-out; }
   </style>
 
-  <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,12 +57,11 @@
 </head>
 <body class="bg-white text-black overflow-x-hidden">
 
-  <!-- Shared Navigation Partial -->
   <div id="nav-placeholder"></div>
   <script>
     fetch('nav.html').then(r => r.text()).then(html => {
       document.getElementById('nav-placeholder').innerHTML = html;
-      // Re-run updateAuthUI and updateCartBadge after nav is loaded
+
       if (typeof updateAuthUI === 'function') updateAuthUI();
       if (typeof updateCartBadge === 'function') updateCartBadge();
     });
@@ -71,17 +69,15 @@
     
   </header>
 
- 
-
    <section class="bg-[#F2F0F1] relative min-h-[500px] md:min-h-[660px] flex flex-col md:flex-row items-center px-6 md:px-16 overflow-hidden">
     <div class="max-w-lg z-10 py-10 md:py-14 text-left w-full">
-      <h1 class="hero-title text-4xl sm:text-5xl md:text-7xl leading-tight md:leading-none mb-4">
-        FIND CLOTHES<br class="hidden md:block"> THAT MATCHES<br class="hidden md:block"> YOUR STYLE
+      <h1 data-t="hero_title" class="hero-title text-4xl sm:text-5xl md:text-7xl leading-tight md:leading-none mb-4">
+        FIND CLOTHES THAT MATCHES YOUR STYLE
       </h1>
-      <p class="text-gray-500 text-sm md:text-base mb-8 max-w-xs leading-relaxed">
+      <p data-t="hero_subtitle" class="text-gray-500 text-sm md:text-base mb-8 max-w-xs leading-relaxed">
         Browse through our diverse range of meticulously crafted garments.
       </p>
-      <button class="w-full sm:w-auto bg-black text-white px-10 py-3.5 rounded-full text-sm font-medium hover:bg-gray-800 transition">
+      <button data-t="shop_now" class="w-full sm:w-auto bg-black text-white px-10 py-3.5 rounded-full text-sm font-medium hover:bg-gray-800 transition">
         Shop Now
       </button>
       
@@ -111,12 +107,12 @@
   </style>
  
   <section class="px-6 md:px-16 py-14">
-    <h2 class="text-center text-3xl font-black tracking-tight mb-10 hero-title text-4xl">NEW ARRIVALS</h2>
+    <h2 data-t="new_arrivals" class="text-center text-3xl font-black tracking-tight mb-10 hero-title text-4xl">NEW ARRIVALS</h2>
     <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-4 gap-5">
       
     </div>
     <div class="text-center mt-10">
-      <a href="new-arrivals.html" 
+      <a href="new-arrivals.html" data-t="view_all"
    class="inline-block border border-gray-300 px-10 py-2.5 rounded-full text-sm font-medium hover:bg-gray-50 transition">
   View All
 </a>
@@ -125,7 +121,7 @@
  
   <hr class="border-gray-200 mx-6 md:mx-16"/>
   <section class="px-6 md:px-16 py-14">
-    <h2 class="text-center text-3xl font-black tracking-tight mb-10 hero-title text-4xl">TOP SELLING</h2>
+    <h2 data-t="top_selling" class="text-center text-3xl font-black tracking-tight mb-10 hero-title text-4xl">TOP SELLING</h2>
 
     <div id="top-selling-container" class="grid grid-cols-2 md:grid-cols-4 gap-5">
       
@@ -134,7 +130,7 @@
 
     </div>
     <div class="text-center mt-10">
-      <a href="top-selling.html" 
+      <a href="top-selling.html" data-t="view_all"
    class="border border-gray-300 px-10 py-2.5 rounded-full text-sm font-medium hover:bg-gray-50 transition">
   View All
 </a>
@@ -143,7 +139,7 @@
  
 <section class="px-6 md:px-16 py-10">
   <div class="bg-[#F0EEED] rounded-3xl p-8 md:p-12">
-    <h2 class="text-center text-3xl md:text-4xl font-black mb-8 hero-title">BROWSE BY DRESS STYLE</h2>
+    <h2 data-t="browse_style" class="text-center text-3xl md:text-4xl font-black mb-8 hero-title">BROWSE BY DRESS STYLE</h2>
     <div class="grid grid-cols-2 gap-4">
 
      
@@ -253,19 +249,19 @@
       <div>
         <div class="font-bold text-sm mb-4 tracking-widest">COMPANY</div>
         <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="about.html" class="hover:text-black">About</a></li>
-          <li><a href="features.html" class="hover:text-black">Features</a></li>
-          <li><a href="works.html" class="hover:text-black">Works</a></li>
-          <li><a href="career.html" class="hover:text-black">Career</a></li>
+          <li><a href="about.html" data-t="footer_about" class="hover:text-black">About</a></li>
+          <li><a href="features.html" data-t="footer_features" class="hover:text-black">Features</a></li>
+          <li><a href="works.html" data-t="footer_works" class="hover:text-black">Works</a></li>
+          <li><a href="career.html" data-t="footer_career" class="hover:text-black">Career</a></li>
         </ul>
       </div>
       <div>
         <div class="font-bold text-sm mb-4 tracking-widest">HELP</div>
         <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="support.html" class="hover:text-black">Customer Support</a></li>
-          <li><a href="delivery-details.html" class="hover:text-black">Delivery Details</a></li>
-          <li><a href="terms.html" class="hover:text-black">Terms & Conditions</a></li>
-          <li><a href="privacy.html" class="hover:text-black">Privacy Policy</a></li>
+          <li><a href="support.html" data-t="footer_customer_support" class="hover:text-black">Customer Support</a></li>
+          <li><a href="delivery-details.html" data-t="footer_delivery_details" class="hover:text-black">Delivery Details</a></li>
+          <li><a href="terms.html" data-t="footer_terms" class="hover:text-black">Terms & Conditions</a></li>
+          <li><a href="privacy.html" data-t="footer_privacy" class="hover:text-black">Privacy Policy</a></li>
         </ul>
       </div>
       <div>

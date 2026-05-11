@@ -2,6 +2,51 @@ var API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostn
   ? "http://127.0.0.1:5000/api" 
   : "https://ecommerce-website-shopease.onrender.com/api";
 
+// --- Multi-Language Support ---
+let currentLang = localStorage.getItem('lang') || 'en';
+let translations = {};
+
+async function loadLanguage(lang) {
+  if (translations[lang]) return translations[lang];
+  try {
+    const res = await fetch(`translations/${lang}.json`);
+    if (!res.ok) throw new Error(`Could not load ${lang} translation`);
+    const data = await res.json();
+    translations[lang] = data;
+    return data;
+  } catch (err) {
+    console.error("Language Load Error:", err);
+    if (lang !== 'en') return loadLanguage('en');
+    return {};
+  }
+}
+
+function translatePage() {
+  const dict = translations[currentLang];
+  if (!dict) return;
+
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (dict[key]) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = dict[key];
+      } else {
+        el.innerText = dict[key];
+      }
+    }
+  });
+}
+
+async function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  await loadLanguage(lang);
+  translatePage();
+  // Optional: Trigger event for parts that need manual refresh
+  document.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
+}
+// ------------------------------
+
 function escapeHtml(str) {
   if (!str) return "";
   return String(str)
@@ -412,7 +457,9 @@ function viewProduct(element) {
   if (name) window.location.href = `product-detail.html?name=${encodeURIComponent(name)}`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadLanguage(currentLang);
+  translatePage();
   updateCartBadge();
   updateAuthUI();
 });
