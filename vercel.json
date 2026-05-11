@@ -34,6 +34,10 @@
     {
       "src": "assets/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "translations/**/*.json",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
