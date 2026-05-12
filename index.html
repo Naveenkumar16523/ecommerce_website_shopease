@@ -7,53 +7,32 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
   
   
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-  
-  
-  <script src="common.js?v=1.2" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Integral+CF:wght@700&family=Satoshi:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/app.css">
+
+  <link rel="stylesheet" href="/static/css/output.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
     body { font-family: 'DM Sans', sans-serif; }
     .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
-    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.15em; }
-    .star { color: #FFC633; }
+    .brand-bar  { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.15em; }
+    .star       { color: #FFC633; }
     .badge-sale { background: #FF3333; }
-    .badge-new { background: #01AB31; }
+    .badge-new  { background: #01AB31; }
     .nav-link:hover { text-decoration: underline; }
-    .product-card:hover .product-img { transform: scale(1.04); }
-    .product-img { transition: transform 0.3s ease; }
-    .style-card { position: relative; overflow: hidden; border-radius: 1.25rem; cursor: pointer; }
-    .style-card:hover img { transform: scale(1.05); }
-    .style-card img { transition: transform 0.4s ease; }
     input[type=email]:focus { outline: 2px solid #fff; }
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .review-slider { scroll-behavior: smooth; }
-    #mobileSidebar { transition: transform 0.3s ease-in-out; }
   </style>
 
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-  <script src="https://cdn.tailwindcss.com" defer></script>
-  <script>
-    window.addEventListener('load', () => {
-      if (window.tailwind) {
-        window.tailwind.config = {
-          theme: { extend: { colors: { clifford: '#da373d' } } }
-        }
-      }
-    });
-  </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/js/config.js"></script>
+  <script src="/static/js/ui.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/cart.js"></script>
+  <script src="/static/js/wishlist.js"></script>
+  <script src="/static/js/products.js"></script>
+  <script src="/static/js/app.js" defer></script>
 </head>
 <body class="bg-white text-black overflow-x-hidden">
 
@@ -291,7 +270,6 @@
     </div>
   </footer>
  
-  
 
   <script>
     

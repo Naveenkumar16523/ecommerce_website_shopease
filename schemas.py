@@ -10,7 +10,7 @@ class SignupSchema(Schema):
     password = fields.Str(required=True, validate=validate.Length(min=8, max=128))
 
     @validates('password')
-    def validate_password(self, value):
+    def validate_password(self, value, **kwargs):
         if not any(c.isupper() for c in value):
             raise ValidationError("Password must contain at least one uppercase letter.")
         if not any(c.isdigit() for c in value):
@@ -49,7 +49,8 @@ class ShippingSchema(Schema):
     name = fields.Str(required=True, validate=validate.Length(min=2, max=100))
     address = fields.Str(required=True, validate=validate.Length(min=5, max=500))
     phone = fields.Str(required=True, validate=validate.Regexp(r'^\+?1?\d{9,15}$'))
-    method = fields.Str(validate=validate.OneOf(['Standard', 'Express', 'COD']))
+    # Checkout UI sends labels like "Cash on Delivery", not only Standard/Express/COD
+    method = fields.Str(required=False, load_default='Standard', validate=validate.Length(max=100))
 
 class OrderSchema(Schema):
     class Meta:

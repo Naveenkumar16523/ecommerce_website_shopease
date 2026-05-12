@@ -156,12 +156,16 @@ async function apiRequest(endpoint, options = {}) {
     });
     
     if (res.status === 401) {
-      console.warn("Unauthorized! Clearing session.");
+      // Only warn on protected page requests, not background auth checks
+      // Wishlist is guest-friendly (localStorage); do not force redirect here — wishlist page handles 401.
+      const isProtectedPage = ['profile.html', 'orders.html', 'checkout.html']
+        .some(page => window.location.pathname.includes(page));
+      
       localStorage.removeItem('user');
       sessionStorage.removeItem('auth_user');
       
-      const protectedPages = ['profile.html', 'wishlist.html', 'orders.html', 'checkout.html'];
-      if (protectedPages.some(page => window.location.pathname.includes(page))) {
+      if (isProtectedPage) {
+        console.warn("Unauthorized! Redirecting to login.");
         const currentPath = window.location.pathname.split('/').pop();
         window.location.href = `login.html?redirect=${currentPath}`;
       }
@@ -282,7 +286,8 @@ async function loadDynamicProducts() {
     try {
       const res = await apiRequest('/products');
       if (!res.ok) throw new Error('API failed');
-      products = await res.json();
+      const resData = await res.json();
+      products = resData.data || resData;
       sessionStorage.setItem('products_cache', JSON.stringify(products));
       sessionStorage.setItem('products_cache_time', Date.now().toString());
     } catch (err) {
@@ -321,9 +326,21 @@ function renderProductDetail(p) {
   document.getElementById('thumb1').src = p.image;
 }
 
+function getWishlistIdsForUi() {
+  let fromUser = [];
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    if (user && Array.isArray(user.wishlist)) fromUser = user.wishlist.map(Number);
+  } catch {}
+  let fromGuest = [];
+  try {
+    fromGuest = JSON.parse(localStorage.getItem('wishlist') || '[]').map(Number).filter(Boolean);
+  } catch {}
+  return [...new Set([...fromUser, ...fromGuest])];
+}
+
 function renderProductsInto(products, container) {
-  const user = JSON.parse(localStorage.getItem('user')) || {};
-  const wishlist = (user.wishlist || []).map(Number);
+  const wishlist = getWishlistIdsForUi();
 
   container.innerHTML = products.map(p => {
     const pid = p.id || p._id || null;
@@ -380,10 +397,32 @@ async function toggleWishlist(btn) {
     console.error("Wishlist toggle blocked: invalid product ID:", productId);
     return;
   }
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const pidNum = Number(productId);
+  const WL_KEY = 'wishlist';
+  function wlGuestGet() {
+    try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]').map(Number).filter(Boolean); }
+    catch { return []; }
+  }
+  function wlGuestSet(ids) {
+    localStorage.setItem(WL_KEY, JSON.stringify([...new Set(ids)]));
+  }
+
   if (!user) {
-    alert("Please login to use the Wishlist.");
-    window.location.href = 'login.html';
+    const ids = wlGuestGet();
+    const had = ids.includes(pidNum);
+    const next = had ? ids.filter((id) => id !== pidNum) : [...ids, pidNum];
+    wlGuestSet(next);
+    const svg = btn.querySelector('svg');
+    if (svg) {
+      if (!had) {
+        svg.classList.add('fill-red-500', 'stroke-red-500');
+        svg.classList.remove('fill-none', 'stroke-black');
+      } else {
+        svg.classList.add('fill-none', 'stroke-black');
+        svg.classList.remove('fill-red-500', 'stroke-red-500');
+      }
+    }
     return;
   }
 
@@ -398,14 +437,14 @@ async function toggleWishlist(btn) {
       // Sync local user object for immediate UI updates
       let user = JSON.parse(localStorage.getItem('user')) || {};
       if (!user.wishlist) user.wishlist = [];
-      
-      const pidNum = Number(productId);
+
       if (data.action === 'added') {
         if (!user.wishlist.includes(pidNum)) user.wishlist.push(pidNum);
       } else {
         user.wishlist = user.wishlist.filter(id => Number(id) !== pidNum);
       }
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('wishlist', JSON.stringify(user.wishlist.map(Number)));
 
       const svg = btn.querySelector('svg');
       if (data.action === 'added') {
@@ -434,6 +473,10 @@ async function checkAuth() {
   // Rely on backend /me check since we can't read the HttpOnly cookie in JS
   const cached = sessionStorage.getItem('auth_user');
   if (cached) return JSON.parse(cached);
+
+  // Only call /api/me if we have a hint that the user was previously logged in
+  const hasUserHint = localStorage.getItem('user');
+  if (!hasUserHint) return null;
 
   try {
     const res = await apiRequest('/me');
@@ -497,7 +540,7 @@ async function placeOrder(name, email, extraDetails = {}) {
 
   const orderData = {
     items: cart,
-    total: cartStore.subtotal + 15 - Math.round(cartStore.subtotal * 0.2), // Simple calc for demo
+    total: cartStore.subtotal + 15 - Math.round(cartStore.subtotal * 0.2),
     shipping: {
       name: name,
       address: [
@@ -509,6 +552,25 @@ async function placeOrder(name, email, extraDetails = {}) {
       method: extraDetails.paymentMethod || 'Not Selected'
     }
   };
+
+  try {
+    const res = await apiRequest('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      cartStore.clear();
+      showToast('Order placed successfully!', 'success');
+      return data;
+    } else {
+      showToast(data.message || 'Failed to place order', 'error');
+    }
+  } catch (err) {
+    showToast('Connection error. Please try again.', 'error');
+    console.error('placeOrder error:', err);
+  }
+}
 
 // --- UI Utility: Toasts, Confirmations, Prompts ---
 const toast = {
@@ -622,7 +684,8 @@ async function migrateLegacyCart() {
     try {
       const res = await apiRequest('/products');
       if (!res.ok) return;
-      const products = await res.json();
+      const resData = await res.json();
+      const products = resData.data || resData;
       
       const migrated = cart.map(item => {
         const p = products.find(prod => prod.name === item.name);

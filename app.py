@@ -9,13 +9,16 @@ from schemas import (
     SignupSchema, LoginSchema, ProfileUpdateSchema, 
     OrderSchema, WishlistToggleSchema
 )
-from db_config import get_db
+from db_config import get_db, USE_SQLITE
+from werkzeug.exceptions import HTTPException
 from seeds.products import INITIAL_PRODUCTS
 from config import get_config
 import json
 import os
 import click
 import time
+import math
+import decimal
 from logger import setup_logger
 from slugify import slugify
 
@@ -31,7 +34,7 @@ app.config.from_object(config)
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["5000 per day", "1000 per hour"],
     storage_uri=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 )
 
@@ -162,8 +165,6 @@ def init_db():
                     INDEX ix_login_email_locked (email, locked_until)
                 )
             """)
-            conn.commit()
-            cursor.close()
         logger.info("Database initialization successful.")
     except Exception as e:
         logger.error(f"ERROR during database initialization: {e}")
@@ -193,6 +194,79 @@ def format_row(cursor, row):
 def format_rows(cursor, rows):
     return [format_row(cursor, row) for row in rows]
 
+def utc_now():
+    return datetime.datetime.now(datetime.timezone.utc)
+
+def parse_datetime(value):
+    """Normalize DB datetime values to timezone-aware UTC."""
+    if value is None:
+        return None
+    if isinstance(value, datetime.datetime):
+        if value.tzinfo is None:
+            return value.replace(tzinfo=datetime.timezone.utc)
+        return value.astimezone(datetime.timezone.utc)
+    if isinstance(value, datetime.date):
+        return datetime.datetime.combine(value, datetime.time.min, tzinfo=datetime.timezone.utc)
+    if isinstance(value, str):
+        s = value.replace("Z", "+00:00")
+        dt = datetime.datetime.fromisoformat(s)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
+    return None
+
+def _mysql_reset_login_attempts(cursor, email):
+    cursor.execute(
+        "INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 0, CURRENT_TIMESTAMP, NULL) "
+        "ON DUPLICATE KEY UPDATE attempts = 0, locked_until = NULL",
+        (email,),
+    )
+
+def _sqlite_reset_login_attempts(cursor, email):
+    cursor.execute(
+        """INSERT INTO login_attempts (email, attempts, last_attempt, locked_until)
+           VALUES (%s, 0, CURRENT_TIMESTAMP, NULL)
+           ON CONFLICT(email) DO UPDATE SET
+             attempts = 0, locked_until = NULL, last_attempt = CURRENT_TIMESTAMP""",
+        (email,),
+    )
+
+def _mysql_record_failed_login(cursor, email):
+    cursor.execute(
+        """
+        INSERT INTO login_attempts (email, attempts, last_attempt, locked_until)
+        VALUES (%s, 1, CURRENT_TIMESTAMP, NULL)
+        ON DUPLICATE KEY UPDATE
+            attempts = attempts + 1,
+            last_attempt = CURRENT_TIMESTAMP,
+            locked_until = IF(attempts + 1 >= 10, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE), NULL)
+        """,
+        (email,),
+    )
+
+def _sqlite_record_failed_login(cursor, email):
+    cursor.execute("SELECT attempts FROM login_attempts WHERE email = %s", (email,))
+    row = cursor.fetchone()
+    if row is None:
+        cursor.execute(
+            "INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 1, CURRENT_TIMESTAMP, NULL)",
+            (email,),
+        )
+        return
+    new_a = int(row[0]) + 1
+    if new_a >= 10:
+        cursor.execute(
+            """UPDATE login_attempts SET attempts = %s, last_attempt = CURRENT_TIMESTAMP,
+                   locked_until = datetime('now', '+30 minutes') WHERE email = %s""",
+            (new_a, email),
+        )
+    else:
+        cursor.execute(
+            """UPDATE login_attempts SET attempts = %s, last_attempt = CURRENT_TIMESTAMP,
+                   locked_until = NULL WHERE email = %s""",
+            (new_a, email),
+        )
+
 def safe_parse_wishlist(wl):
     if wl is None: return []
     if isinstance(wl, list): return wl
@@ -215,13 +289,11 @@ def token_required(f):
             return jsonify({'message': 'Authentication cookie is missing!'}), 401
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            with get_db() as conn:
-                cursor = conn.cursor()
+            with get_db() as (conn, cursor):
                 cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
                 user = format_row(cursor, cursor.fetchone())
                 if not user:
                     return jsonify({'message': 'User not found!'}), 401
-                cursor.close()
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Session expired. Please login again.'}), 401
         except jwt.InvalidTokenError:
@@ -317,17 +389,15 @@ def paginate_collection(base_query, count_query, params, schema=None, order_by="
 
 # --- API ROUTES ---
 
-@app.route("/")
 @app.route("/api/health")
 def health_check():
     """Public health check and uptime monitor endpoint"""
     db_status = "Connected"
     try:
-        with get_db() as conn:
-            cursor = conn.cursor()
+        with get_db() as (conn, cursor):
             cursor.execute("SELECT 1")
-            cursor.close()
-    except:
+    except Exception as e:
+        logger.error(f"Health check DB error: {e}")
         db_status = "Disconnected"
 
     return jsonify({
@@ -362,34 +432,36 @@ def signup(data):
 def login(data):
     email = data.get('email')
     password = data.get('password')
-    
+    cookie_secure = app.config.get('SESSION_COOKIE_SECURE', False)
+
     try:
         with get_db() as (conn, cursor):
-            # --- ACCOUNT LOCKOUT CHECK ---
             cursor.execute("SELECT attempts, locked_until FROM login_attempts WHERE email = %s", (email,))
-            row = format_row(cursor, cursor.fetchone())
-            
-            if row and row['locked_until'] and row['locked_until'] > datetime.datetime.utcnow():
-                wait_seconds = int((row['locked_until'] - datetime.datetime.utcnow()).total_seconds())
-                return jsonify({
-                    "error": "Account Locked",
-                    "message": f"Too many failed attempts. Account locked for {wait_seconds // 60} minutes.",
-                    "retry_after": wait_seconds
-                }), 423 # 423 Locked
-            
-            # Check credentials
+            lock_raw = cursor.fetchone()
+            if lock_raw:
+                locked_until = parse_datetime(lock_raw[1])
+                if locked_until and locked_until > utc_now():
+                    wait_seconds = max(0, int((locked_until - utc_now()).total_seconds()))
+                    return jsonify({
+                        "error": "Account Locked",
+                        "message": f"Too many failed attempts. Account locked for {max(1, wait_seconds // 60)} minutes.",
+                        "retry_after": wait_seconds
+                    }), 423
+
             cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = format_row(cursor, cursor.fetchone())
-            
+
             if user and bcrypt.check_password_hash(user['password'], data.get('password')):
-                # Success: Reset attempts
-                cursor.execute("INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 0, CURRENT_TIMESTAMP, NULL) ON DUPLICATE KEY UPDATE attempts = 0, locked_until = NULL", (email,))
-                
+                if USE_SQLITE:
+                    _sqlite_reset_login_attempts(cursor, email)
+                else:
+                    _mysql_reset_login_attempts(cursor, email)
+
                 token = jwt.encode({
                     'user_id': user['id'],
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-                }, app.config['SECRET_KEY'])
-                
+                    'exp': utc_now() + datetime.timedelta(hours=24)
+                }, app.config['SECRET_KEY'], algorithm='HS256')
+
                 resp = make_response(jsonify({
                     "user": {
                         "id": user['id'],
@@ -397,28 +469,27 @@ def login(data):
                         "email": user['email']
                     }
                 }))
-                
-                resp.set_cookie('auth_token', token, httponly=True, secure=True, samesite='Lax', max_age=24 * 60 * 60)
+                resp.set_cookie(
+                    'auth_token', token,
+                    httponly=True, secure=cookie_secure, samesite='Lax',
+                    max_age=24 * 60 * 60, path='/',
+                )
                 return resp
+
+            if USE_SQLITE:
+                _sqlite_record_failed_login(cursor, email)
             else:
-                # Failure: Increment attempts
-                cursor.execute("""
-                    INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) 
-                    VALUES (%s, 1, CURRENT_TIMESTAMP, NULL) 
-                    ON DUPLICATE KEY UPDATE 
-                        attempts = attempts + 1, 
-                        last_attempt = CURRENT_TIMESTAMP,
-                        locked_until = IF(attempts + 1 >= 10, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE), NULL)
-                """, (email,))
-                return jsonify({"message": "Invalid credentials"}), 401
-                
+                _mysql_record_failed_login(cursor, email)
+            return jsonify({"message": "Invalid credentials"}), 401
+
     except Exception as e:
         return jsonify({"message": f"Error during login: {str(e)}"}), 500
 
 @app.route("/api/logout", methods=["POST"])
 def logout_api():
+    cookie_secure = app.config.get('SESSION_COOKIE_SECURE', False)
     resp = make_response(jsonify({"message": "Logged out successfully"}))
-    resp.delete_cookie('auth_token')
+    resp.delete_cookie('auth_token', path='/', secure=cookie_secure, samesite='Lax')
     return resp
 
 @app.route("/api/me", methods=["GET"])
@@ -640,16 +711,40 @@ def get_orders(current_user):
 @validate_payload(OrderSchema)
 def place_order(data, current_user):
     items = data.get('items', [])
-    
+    client_total = float(data.get('total', 0))
+
     try:
         with get_db() as (conn, cursor):
-            # 1. Create the Order header
+            priced = []
+            server_subtotal = 0.0
+            for item in items:
+                pid = item['product_id']
+                qty = int(item.get('qty', 1))
+                cursor.execute("SELECT price FROM products WHERE id = %s", (pid,))
+                res = cursor.fetchone()
+                if not res:
+                    return jsonify({"message": f"Product {pid} is no longer available."}), 400
+                unit_price = float(res[0])
+                server_subtotal += unit_price * qty
+                priced.append((pid, qty, unit_price))
+
+            # Match static/common.js placeOrder: subtotal + 15 - Math.round(subtotal * 0.2)
+            discount = int(math.floor(server_subtotal * 0.2 + 0.5))
+            delivery = 15
+            server_grand = server_subtotal - discount + delivery
+
+            if abs(client_total - server_grand) > 0.02:
+                return jsonify({
+                    "message": "Order total does not match current prices. Please refresh your cart.",
+                    "expected_total": round(server_grand, 2),
+                }), 400
+
             cursor.execute("""
                 INSERT INTO orders (user_id, total, shipping_name, shipping_address, shipping_phone, shipping_method)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (
                 current_user['id'],
-                data.get('total', 0),
+                round(server_grand, 2),
                 data.get('shipping', {}).get('name', ''),
                 data.get('shipping', {}).get('address', ''),
                 data.get('shipping', {}).get('phone', ''),
@@ -657,17 +752,12 @@ def place_order(data, current_user):
             ))
             order_id = cursor.lastrowid
 
-            # 2. Create the line items (Snapshotting current prices)
-            for item in items:
-                cursor.execute("SELECT price FROM products WHERE id = %s", (item['product_id'],))
-                res = cursor.fetchone()
-                unit_price = res[0] if res else item.get('price', 0)
-                
+            for pid, qty, unit_price in priced:
                 cursor.execute("""
                     INSERT INTO order_items (order_id, product_id, quantity, unit_price)
                     VALUES (%s, %s, %s, %s)
-                """, (order_id, item['product_id'], item.get('qty', 1), unit_price))
-            
+                """, (order_id, pid, qty, unit_price))
+
         app.logger.info(f"ORDER PLACED: ID {order_id} | User {current_user['id']} | Items: {len(items)}")
         return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
     except Exception as e:
@@ -708,18 +798,11 @@ def seed_db_command(force):
         logger.error(f"Seeding error: {e}")
 
 # --- STATIC FILE SERVING (MUST BE LAST) ---
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('.', path)
-
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    retry_after = e.description.split("at ")[-1] if "at" in e.description else "60"
-    # Attempt to extract numeric retry after if possible
     import re
     seconds = re.search(r'\d+', e.description)
     seconds = seconds.group() if seconds else "60"
-    
     resp = jsonify({
         "error": "Too Many Requests",
         "message": "You have exceeded the rate limit. Please slow down.",
@@ -730,21 +813,33 @@ def ratelimit_handler(e):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return e.get_response()
+    logger.error(f"Unhandled exception: {e}")
     return jsonify({"message": str(e)}), 500
-
-@app.route("/<path:filename>")
-def serve_pages(filename):
-    if filename.endswith(".html"):
-        # Strip .html and try to render from templates
-        template_name = filename
-        active_page = filename.replace(".html", "")
-        if os.path.exists(os.path.join(app.template_folder, template_name)):
-            return render_template(template_name, active_page=active_page)
-    return send_from_directory(".", filename)
 
 @app.route("/")
 def index_page():
-    return render_template("index.html", active_page="home")
+    # Serve the original full-featured root index.html
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    # Auto-append .html if there's no file extension
+    if '.' not in path:
+        path += '.html'
+        
+    # For .html files, check templates first, then root directory
+    if path.endswith('.html'):
+        template_path = os.path.join(app.template_folder, path)
+        if os.path.exists(template_path):
+            active_page = path.replace('.html', '')
+            try:
+                return render_template(path, active_page=active_page)
+            except Exception:
+                pass
+    return send_from_directory('.', path)
+
 
 @app.route("/api/sync", methods=["GET"])
 def sync_data():

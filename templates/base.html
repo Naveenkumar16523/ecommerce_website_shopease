@@ -19,7 +19,7 @@
         }
         .hero-title { font-family: var(--font-bebas); }
         body { font-family: var(--font-dm); font-display: swap; }
-    </style>
+        
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .style-card { position: relative; overflow: hidden; border-radius: 1.5rem; transition: all 0.3s ease; }
@@ -27,6 +27,8 @@
         .style-card img { transition: transform 0.5s ease; }
         .style-card:hover img { transform: scale(1.05); }
     </style>
+
+    <link rel="stylesheet" href="/static/css/output.css">
 
     {% block extra_head %}{% endblock %}
 </head>
@@ -41,7 +43,7 @@
     {% include 'partials/_footer.html' %}
 
     <!-- Core Scripts -->
-    <script src="/static/common.js?v=1.4"></script>
+    <script src="/static/common.js?v=1.5"></script>
     <script>
         // Global utilities
         function toggleMobileMenu() {

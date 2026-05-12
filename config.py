@@ -8,9 +8,13 @@ class Config:
                          "For security, the application cannot start without a secret key.")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Set True in production (HTTPS only). False allows cookies on http://localhost.
+    SESSION_COOKIE_SECURE = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    # Allow auth cookie over http://localhost (Secure cookies are not sent on plain HTTP)
+    SESSION_COOKIE_SECURE = False  # same as Config default; explicit for readability
     # Default local dev origins
     ALLOWED_ORIGINS = [
         "http://localhost:5000", 
@@ -21,6 +25,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    SESSION_COOKIE_SECURE = True
     @property
     def ALLOWED_ORIGINS(self):
         origins = os.getenv("ALLOWED_ORIGINS")
@@ -30,6 +35,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
+    SESSION_COOKIE_SECURE = False
     ALLOWED_ORIGINS = ["http://localhost"]
 
 def get_config():

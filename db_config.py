@@ -2,69 +2,109 @@ import os
 import sys
 import mysql.connector
 from mysql.connector import pooling
+import sqlite3
 from dotenv import load_dotenv
 from contextlib import contextmanager
-from logger import setup_logger
+import logging
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-def _require_env(name):
-    value = os.getenv(name)
-    if not value:
-        logger.error(f"Missing required environment variable: {name}")
-        sys.exit(1)
-    return value
+# Check if we should use SQLite fallback (Demo Mode)
+TIDB_HOST = os.getenv("TIDB_HOST")
+USE_SQLITE = TIDB_HOST in [None, "", "your-tidb-host.tidbcloud.com"]
 
-# Pool Configuration
-DB_POOL_MIN = int(os.getenv("DB_POOL_MIN", 2))
-DB_POOL_MAX = int(os.getenv("DB_POOL_MAX", 20))
+class SQLiteCursorShim:
+    def __init__(self, cursor):
+        self.cursor = cursor
+    
+    def execute(self, query, params=None):
+        import re
+        # Convert MySQL-isms to SQLite-isms
+        query = query.replace('%s', '?')
+        query = query.replace('AUTO_INCREMENT', '')
+        # INTEGER PRIMARY KEY is required for SQLite rowid / lastrowid behavior
+        query = re.sub(r'\bINT\s+PRIMARY\s+KEY\b', 'INTEGER PRIMARY KEY', query, flags=re.IGNORECASE)
+        # SQLite uses UNIQUE instead of UNIQUE KEY and doesn't support named unique keys inside CREATE TABLE
+        query = re.sub(r'UNIQUE KEY\s+\w+\s*', 'UNIQUE', query, flags=re.IGNORECASE)
+        query = re.sub(r'UNIQUE\s+\w+\s*', 'UNIQUE', query, flags=re.IGNORECASE)
+        # Strip MySQL-specific INDEX definitions inside CREATE TABLE
+        query = re.sub(r',\s*INDEX\s+ix_.*\(.*\)', '', query, flags=re.IGNORECASE)
+        # Strip MySQL-specific ON UPDATE CURRENT_TIMESTAMP
+        query = re.sub(r'DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP', query, flags=re.IGNORECASE)
+        
+        if params:
+            return self.cursor.execute(query, params)
+        return self.cursor.execute(query)
+    
+    def fetchone(self): return self.cursor.fetchone()
+    def fetchall(self): return self.cursor.fetchall()
+    def close(self): self.cursor.close()
+    
+    @property
+    def description(self): return self.cursor.description
+    @property
+    def lastrowid(self): return self.cursor.lastrowid
 
-db_params = {
-    "host": _require_env("TIDB_HOST"),
-    "port": int(os.getenv("TIDB_PORT", 4000)),
-    "user": _require_env("TIDB_USER"),
-    "password": _require_env("TIDB_PASSWORD"),
-    "database": _require_env("TIDB_DB"),
-    "ssl_ca": os.getenv("TIDB_CA_PATH"),
-    "ssl_verify_cert": True if os.getenv("TIDB_CA_PATH") else False
-}
+class SQLiteConnection:
+    def __init__(self, db_path):
+        self.conn = sqlite3.connect(db_path, check_same_thread=False)
+        self.conn.row_factory = sqlite3.Row
+        self.conn.execute("PRAGMA foreign_keys = ON")
+    
+    def cursor(self, dictionary=True, buffered=True):
+        return SQLiteCursorShim(self.conn.cursor())
+    
+    def commit(self): self.conn.commit()
+    def rollback(self): self.conn.rollback()
+    def close(self): self.conn.close()
 
-try:
-    connection_pool = pooling.MySQLConnectionPool(
-        pool_name="ecommerce_pool",
-        pool_size=DB_POOL_MAX,
-        pool_reset_session=True,
-        **db_params
-    )
-    logger.info(f"MySQL Connection Pool initialized (size: {DB_POOL_MAX})")
-except Exception as e:
-    logger.critical(f"Failed to initialize MySQL Connection Pool: {e}")
-    connection_pool = None
+class SQLitePool:
+    def __init__(self, db_path):
+        self.db_path = db_path
+    def get_connection(self):
+        return SQLiteConnection(self.db_path)
+
+connection_pool = None
+
+if USE_SQLITE:
+    logger.info("Using SQLite Fallback (Demo Mode)")
+    connection_pool = SQLitePool("ecommerce_demo.db")
+else:
+    db_params = {
+        "host": TIDB_HOST,
+        "port": int(os.getenv("TIDB_PORT", 4000)),
+        "user": os.getenv("TIDB_USER"),
+        "password": os.getenv("TIDB_PASSWORD"),
+        "database": os.getenv("TIDB_DB"),
+        "ssl_ca": os.getenv("TIDB_CA_PATH")
+    }
+    try:
+        connection_pool = pooling.MySQLConnectionPool(
+            pool_name="ecommerce_pool",
+            pool_size=5,
+            **db_params
+        )
+    except Exception as e:
+        logger.error(f"Failed to initialize MySQL Pool: {e}")
 
 @contextmanager
 def get_db():
     if not connection_pool:
         raise Exception("Database connection pool is not initialized.")
-    
     conn = connection_pool.get_connection()
-    cursor = conn.cursor()
     try:
+        cursor = conn.cursor()
         yield conn, cursor
         conn.commit()
     except Exception as e:
         conn.rollback()
-        raise e
+        raise
     finally:
         cursor.close()
-        if conn and conn.is_connected():
-            conn.close() # Returns to pool
+        conn.close()
 
 def get_pool_stats():
-    if not connection_pool:
-        return None
-    return {
-        "pool_name": connection_pool.pool_name,
-        "pool_size": connection_pool.pool_size,
-    }
+    if USE_SQLITE: return {"type": "sqlite", "mode": "demo"}
+    return {"status": "mysql"}

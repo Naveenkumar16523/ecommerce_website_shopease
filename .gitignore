@@ -1,6 +1,9 @@
 # Environment variables
 .env
 
+# Local demo database (may contain user data)
+ecommerce_demo.db
+
 # Python Bytecode
 __pycache__/
 *.pyc
