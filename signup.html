@@ -1,124 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="/static/css/app.css">
-  <link rel="stylesheet" href="/static/css/output.css">
-  <script src="/static/js/config.js"></script>
-  <script src="/static/js/ui.js"></script>
-  <script src="/static/js/api.js"></script>
-  <script src="/static/js/auth.js"></script>
-  <script src="/static/js/cart.js"></script>
-  <script src="/static/js/wishlist.js"></script>
-  <script src="/static/js/products.js"></script>
-  <script src="/static/js/app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | SHOP EASE</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/cart.js"></script>
+    <script src="/static/js/wishlist.js"></script>
+    <script src="/static/js/products.js"></script>
+    <script src="/static/js/app.js" defer></script>
 </head>
-<body class="bg-gray-50 text-black overflow-x-hidden">
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
 
-  <section class="min-h-screen flex items-center justify-center px-4 py-12 w-full">
-    <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-      <h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden">
+        <div class="p-8 md:p-12">
+            <div class="text-center mb-10">
+                <a href="index.html" class="text-3xl font-black italic tracking-tighter">SHOP EASE</a>
+                <p class="text-gray-400 mt-2 text-sm uppercase tracking-widest">Create your account</p>
+            </div>
 
-      <!-- Inline Error Container -->
-      <div id="api-error-container" class="hidden"></div>
+            <div id="api-error-container"></div>
 
-      <form id="signupForm" class="space-y-4">
-        <input type="text" placeholder="Full Name" required
-          class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Full Name</label>
+                    <input type="text" id="name" required placeholder="John Doe" 
+                           class="w-full bg-gray-50 border-none rounded-xl py-3 px-5 focus:ring-2 focus:ring-black transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Email Address</label>
+                    <input type="email" id="email" required placeholder="name@company.com" 
+                           class="w-full bg-gray-50 border-none rounded-xl py-3 px-5 focus:ring-2 focus:ring-black transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" 
+                           class="w-full bg-gray-50 border-none rounded-xl py-3 px-5 focus:ring-2 focus:ring-black transition">
+                    <p class="text-[10px] text-gray-400 mt-1 uppercase">Min 8 chars, 1 Uppercase, 1 Number, 1 Special Char</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Confirm Password</label>
+                    <input type="password" id="confirm-password" required placeholder="••••••••" 
+                           class="w-full bg-gray-50 border-none rounded-xl py-3 px-5 focus:ring-2 focus:ring-black transition">
+                </div>
 
-        <input type="email" placeholder="Email" required
-          class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg transform active:scale-95">Create Account</button>
+                </div>
+            </form>
 
-        <div class="relative">
-          <input id="signupPassword" type="password" placeholder="Password" required
-            class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black pr-10">
-          <button type="button" onclick="togglePassword('signupPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-          </button>
+            <div class="mt-8 text-center text-sm text-gray-500">
+                Already have an account? 
+                <a href="login.html" class="font-bold text-black border-b border-black">Sign in</a>
+            </div>
         </div>
-
-        <div class="relative">
-          <input id="confirmPassword" type="password" placeholder="Confirm Password" required
-            class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black pr-10">
-          <button type="button" onclick="togglePassword('confirmPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-          </button>
-        </div>
-
-        <button type="submit"
-          class="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 disabled:bg-gray-400">
-          Sign Up
-        </button>
-      </form>
-
-      <p class="text-sm text-center mt-4">
-        Already have an account?
-        <a href="login.html" class="text-black font-semibold underline">Login</a>
-      </p>
     </div>
-  </section>
 
-  <script>
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      const icon = btn.querySelector('svg');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.053 0 2.062.18 3 .512M7 7l10 10M9.88 9.88a3 3 0 104.24 4.24" />';
-      } else {
-        input.type = 'password';
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
-      }
-    }
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm-password').value;
 
-    document.getElementById('signupForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const fullName = document.querySelector('input[placeholder="Full Name"]').value;
-      const email = document.querySelector('input[type="email"]').value;
-      const password = document.getElementById('signupPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirm) {
+                return window.toast.error('Passwords do not match');
+            }
 
-      if(password !== confirmPassword){
-        toast.warning("Passwords do not match!");
-        return;
-      }
-
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      submitBtn.innerText = "Creating Account...";
-      submitBtn.disabled = true;
-
-      try {
-        const response = await fetch(`${API_BASE}/signup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: fullName, email, password })
+            const res = await window.Auth.signup(name, email, password);
+            if (res.ok) {
+                window.toast.success('Account created! Please login.');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+            } else {
+                window.toast.error(res.message);
+            }
         });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          toast.success("Signup Successful! You can now log in.");
-          setTimeout(() => { window.location.href = "login.html"; }, 1500);
-        } else {
-          toast.error("Signup failed: " + data.message);
-        }
-      } catch (err) {
-        toast.error("Server Error: " + err.message);
-      } finally {
-        submitBtn.innerText = "Sign Up";
-        submitBtn.disabled = false;
-      }
-    });
-  </script>
+    </script>
 
 </body>
 </html>

@@ -1,130 +1,112 @@
 /**
- * auth.js — Authentication state management for SHOP EASE.
- * Handles login, logout, session persistence, and auth-aware UI updates.
+ * Authentication Management
  */
 
-const Auth = {
-  /**
-   * Returns cached user or null. Does NOT make a network call.
-   */
-  getUser() {
-    const session = sessionStorage.getItem('auth_user');
-    if (session) return JSON.parse(session);
-    const local = localStorage.getItem('user');
-    if (local) return JSON.parse(local);
-    return null;
-  },
+window.Auth = {
+    getUser() {
+        const sessionUser = sessionStorage.getItem('auth_user');
+        if (sessionUser) return JSON.parse(sessionUser);
+        
+        const localUser = localStorage.getItem('user');
+        if (localUser) return JSON.parse(localUser);
+        
+        return null;
+    },
 
-  /**
-   * Checks auth with backend (only if there's a local hint).
-   * Refreshes session cache.
-   */
-  async checkAuth() {
-    const cached = sessionStorage.getItem('auth_user');
-    if (cached) return JSON.parse(cached);
+    async checkAuth() {
+        // Return session cached user if exists
+        const sessionUser = sessionStorage.getItem('auth_user');
+        if (sessionUser) return JSON.parse(sessionUser);
 
-    // Only hit /api/me if user was previously logged in
-    if (!localStorage.getItem('user')) return null;
+        // If localStorage hint exists, verify with server
+        if (localStorage.getItem('user')) {
+            try {
+                const user = await window.API.getMe();
+                if (user) {
+                    sessionStorage.setItem('auth_user', JSON.stringify(user));
+                    return user;
+                }
+            } catch (e) {
+                console.error('Auth verification failed', e);
+            }
+        }
+        return null;
+    },
 
-    try {
-      const user = await window.API.getMe();
-      if (user) {
-        sessionStorage.setItem('auth_user', JSON.stringify(user));
-        localStorage.setItem('user', JSON.stringify(user));
+    clearSession() {
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('auth_user');
+        sessionStorage.removeItem('products_cache'); // Custom cache prefix if used
+        if (window.API_CACHE) window.API_CACHE.clearCache();
+    },
+
+    async login(email, password) {
+        const data = await window.API.login(email, password);
+        if (data && data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            sessionStorage.setItem('auth_user', JSON.stringify(data.user));
+            return { ok: true, user: data.user };
+        }
+        return { ok: false, message: data?.message || 'Login failed' };
+    },
+
+    async signup(name, email, password) {
+        const data = await window.API.signup(name, email, password);
+        if (data && data.status === 'success') {
+            return { ok: true, message: data.message };
+        }
+        return { ok: false, message: data?.message || 'Signup failed' };
+    },
+
+    async logout() {
+        try {
+            await window.API.logout();
+        } catch (e) {}
+        this.clearSession();
+        window.location.href = 'index.html';
+    },
+
+    async updateUI() {
+        const user = await this.checkAuth();
+        const accountLinks = document.querySelectorAll('[data-se="account-link"]');
+        const logoutBtns = document.querySelectorAll('[data-se="logout-btn"]');
+
+        accountLinks.forEach(link => {
+            if (user) {
+                const firstName = user.name ? user.name.split(' ')[0] : 'User';
+                link.textContent = firstName;
+                link.href = 'profile.html';
+            } else {
+                link.textContent = 'Login';
+                link.href = 'login.html';
+            }
+        });
+
+        logoutBtns.forEach(btn => {
+            btn.classList.toggle('hidden', !user);
+            if (user) {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    this.logout();
+                };
+            }
+        });
+
         return user;
-      }
-      this.clearSession();
-      return null;
-    } catch {
-      return null;
+    },
+
+    requireAuth(redirectTo = 'login.html') {
+        const user = this.getUser();
+        if (!user) {
+            const current = window.location.pathname.split('/').pop();
+            window.location.href = `${redirectTo}?redirect=${current}`;
+            return false;
+        }
+        return true;
     }
-  },
-
-  clearSession() {
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('auth_user');
-    sessionStorage.removeItem('products_cache');
-    sessionStorage.removeItem('products_cache_time');
-  },
-
-  async login(email, password) {
-    const res = await window.API.login(email, password);
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('user', JSON.stringify(data.user));
-      return { ok: true, user: data.user };
-    }
-    return { ok: false, message: data.message || 'Login failed' };
-  },
-
-  async signup(name, email, password) {
-    const res = await window.API.signup(name, email, password);
-    const data = await res.json();
-    return { ok: res.ok, message: data.message };
-  },
-
-  async logout() {
-    try { await window.API.logout(); } catch {}
-    this.clearSession();
-    window.location.href = 'index.html';
-  },
-
-  /**
-   * Updates the nav UI based on auth state.
-   * Swaps profile/login links, hides banner for logged-in users.
-   */
-  async updateUI() {
-    const user = await this.checkAuth();
-
-    // Top banner — hide for logged-in users
-    const banner = document.querySelector('.se-banner, [data-se="banner"]')
-      || document.querySelector('.bg-black.text-white.text-center.text-xs.py-2');
-    if (banner && user) banner.classList.add('hidden');
-
-    // Account link — show name if logged in
-    const accountLinks = document.querySelectorAll('[data-se="account-link"]');
-    accountLinks.forEach(link => {
-      if (user) {
-        link.textContent = user.name?.split(' ')[0] || 'Account';
-        link.href = 'profile.html';
-      } else {
-        link.textContent = 'Login';
-        link.href = 'login.html';
-      }
-    });
-
-    // Logout buttons
-    document.querySelectorAll('[data-se="logout-btn"]').forEach(btn => {
-      btn.style.display = user ? 'flex' : 'none';
-      btn.onclick = () => this.logout();
-    });
-
-    return user;
-  },
-
-  /**
-   * Guard: redirects to login if user is not authenticated.
-   * Use at the top of protected page scripts.
-   */
-  async requireAuth(redirectTo) {
-    const user = await this.checkAuth();
-    if (!user) {
-      const page = redirectTo || window.location.pathname.split('/').pop();
-      window.location.href = `login.html?redirect=${page}`;
-      return null;
-    }
-    return user;
-  },
-
-  isProtectedPage() {
-    const path = window.location.pathname.split('/').pop();
-    return (window.SE_CONFIG?.PROTECTED_PAGES ?? []).includes(path);
-  },
 };
 
-window.Auth = Auth;
-
-// Backward-compat shims
-window.checkAuth    = () => Auth.checkAuth();
-window.logout       = () => Auth.logout();
-window.updateAuthUI = () => Auth.updateUI();
+// Backward compatibility
+window.checkAuth = () => window.Auth.checkAuth();
+window.logout = () => window.Auth.logout();
+window.updateAuthUI = () => window.Auth.updateUI();

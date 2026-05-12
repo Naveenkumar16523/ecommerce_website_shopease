@@ -141,58 +141,7 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// Global helper for API calls (Cookies automatically included)
-async function apiRequest(endpoint, options = {}) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers
-  };
-
-  try {
-    const res = await fetch(`${API_BASE}${endpoint}`, { 
-      ...options, 
-      headers,
-      credentials: 'include' 
-    });
-    
-    if (res.status === 401) {
-      // Only warn on protected page requests, not background auth checks
-      // Wishlist is guest-friendly (localStorage); do not force redirect here — wishlist page handles 401.
-      const isProtectedPage = ['profile.html', 'orders.html', 'checkout.html']
-        .some(page => window.location.pathname.includes(page));
-      
-      localStorage.removeItem('user');
-      sessionStorage.removeItem('auth_user');
-      
-      if (isProtectedPage) {
-        console.warn("Unauthorized! Redirecting to login.");
-        const currentPath = window.location.pathname.split('/').pop();
-        window.location.href = `login.html?redirect=${currentPath}`;
-      }
-    }
-    
-    if (res.status === 403) {
-      const data = await res.json().catch(() => ({}));
-      if (data.error === "CORS Forbidden") {
-        toast.error("Security Error: This site is not authorized to access the API.");
-      }
-    }
-    
-    if (res.status === 429 || res.status === 423) {
-      const data = await res.json().catch(() => ({}));
-      const seconds = data.retry_after || 60;
-      showRateLimitError(seconds, data.error || "Rate Limited");
-    }
-
-    return res;
-  } catch (err) {
-    console.error(`API Request failed for ${endpoint}:`, err);
-    if (err instanceof TypeError) {
-      toast.error("Connection Error: Could not connect to the API server.");
-    }
-    throw err;
-  }
-}
+// Removed apiRequest - now using static/js/api.js
 
 function updateCartBadge() {
   const badge = document.getElementById("cartBadge");

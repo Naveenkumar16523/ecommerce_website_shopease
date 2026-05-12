@@ -1,36 +1,35 @@
-from flask import Flask, request, jsonify, send_from_directory, make_response, render_template, g
-from flask_cors import CORS
-from flask_bcrypt import Bcrypt
-import jwt
-import datetime
-from functools import wraps
-from marshmallow import ValidationError
-from schemas import (
-    SignupSchema, LoginSchema, ProfileUpdateSchema, 
-    OrderSchema, WishlistToggleSchema
-)
-from db_config import get_db, USE_SQLITE
-from werkzeug.exceptions import HTTPException
-from seeds.products import INITIAL_PRODUCTS
-from config import get_config
-import json
 import os
 import click
+import json
 import time
 import math
 import decimal
-from logger import setup_logger
-from slugify import slugify
-
-logger = setup_logger(__name__)
+import datetime
+import functools
+import jwt
+from flask import Flask, request, jsonify, make_response, send_from_directory, g, render_template, redirect, url_for
+from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from marshmallow import ValidationError
+from slugify import slugify
+from werkzeug.exceptions import HTTPException, NotFound
 
+import schemas
+import db_config
+import config
+from logger import logger
+from seeds.products import INITIAL_PRODUCTS
+
+# --- App Initialization ---
 app = Flask(__name__)
-config = get_config()
-app.config.from_object(config)
+current_config = config.get_config()
+app.config.from_object(current_config)
 
-# --- RATE LIMITER CONFIGURATION ---
+bcrypt = Bcrypt(app)
+
+# Rate Limiter
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
@@ -38,280 +37,245 @@ limiter = Limiter(
     storage_uri=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 )
 
-# --- STRICT CORS CONFIGURATION ---
-# support_credentials=True: Allows HttpOnly cookies to be sent
-# origins: Pulled from config.ALLOWED_ORIGINS (env var in production)
-CORS(app, resources={r"/api/*": {
-    "origins": config.ALLOWED_ORIGINS,
-    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "allow_headers": ["Content-Type"]
-}}, supports_credentials=True)
+# CORS
+CORS(app, resources={r"/api/*": {"origins": current_config.ALLOWED_ORIGINS}}, supports_credentials=True)
 
 @app.after_request
 def add_cors_headers(response):
-    # Security Defense-in-Depth: Double check origin
     origin = request.headers.get('Origin')
-    if origin and origin in config.ALLOWED_ORIGINS:
+    if origin in current_config.ALLOWED_ORIGINS:
         response.headers['Access-Control-Allow-Origin'] = origin
         response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
-@app.errorhandler(403)
-def forbidden_error(e):
-    origin = request.headers.get('Origin', 'Unknown')
-    logger.warning(f"CORS REJECTION: Request from unauthorized origin: {origin}")
-    return jsonify({
-        "error": "CORS Forbidden",
-        "message": f"Origin {origin} is not whitelisted.",
-        "status": 403
-    }), 403
+# --- Helper Functions ---
+def utc_now():
+    return datetime.datetime.now(datetime.timezone.utc)
 
-bcrypt = Bcrypt(app)
-
-# --- DATABASE INITIALIZATION ---
-def init_db():
-    logger.info("Initializing database...")
-    try:
-        with get_db() as (conn, cursor):
-            # Create tables with comprehensive performance indexing
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(255),
-                    email VARCHAR(255) UNIQUE,
-                    password VARCHAR(255),
-                    address TEXT,
-                    phone VARCHAR(20),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX ix_users_email (email),
-                    INDEX ix_users_updated (updated_at)
-                )
-            """)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS products (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(255),
-                    price DECIMAL(10, 2),
-                    category VARCHAR(100),
-                    image TEXT,
-                    rating DECIMAL(3, 2) DEFAULT 4.5,
-                    slug VARCHAR(255) UNIQUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX ix_products_category (category),
-                    INDEX ix_products_price (price),
-                    INDEX ix_products_slug (slug),
-                    INDEX ix_products_updated (updated_at)
-                )
-            """)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS wishlist (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    product_id INT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-                    UNIQUE KEY unique_user_product (user_id, product_id),
-                    INDEX ix_wishlist_user (user_id),
-                    INDEX ix_wishlist_product (product_id),
-                    INDEX ix_wishlist_updated (updated_at)
-                )
-            """)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS orders (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    total DECIMAL(10, 2),
-                    status VARCHAR(50) DEFAULT 'Pending',
-                    shipping_name VARCHAR(255),
-                    shipping_address TEXT,
-                    shipping_phone VARCHAR(20),
-                    shipping_method VARCHAR(100),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                    INDEX ix_orders_user_status (user_id, status),
-                    INDEX ix_orders_user_date (user_id, updated_at DESC),
-                    INDEX ix_orders_status_date (status, updated_at DESC),
-                    INDEX ix_orders_updated (updated_at)
-                )
-            """)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS order_items (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    order_id INT,
-                    product_id INT,
-                    quantity INT,
-                    unit_price DECIMAL(10, 2),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
-                    INDEX ix_items_order (order_id),
-                    INDEX ix_items_product (product_id),
-                    INDEX ix_items_updated (updated_at)
-                )
-            """)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS login_attempts (
-                    email VARCHAR(255) PRIMARY KEY,
-                    attempts INT DEFAULT 0,
-                    last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    locked_until TIMESTAMP NULL,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX ix_login_email_locked (email, locked_until)
-                )
-            """)
-        logger.info("Database initialization successful.")
-    except Exception as e:
-        logger.error(f"ERROR during database initialization: {e}")
-
-_db_initialized = False
-
-@app.before_request
-def ensure_db_initialized():
-    global _db_initialized
-    if not _db_initialized:
-        init_db()
-        _db_initialized = True
-
-# Helper to format SQL rows as dicts
 def format_row(cursor, row):
     if not row: return None
-    columns = [col[0] for col in cursor.description]
-    data = dict(zip(columns, row))
-    # Convert datetime/timestamp to ISO 8601
-    for key, value in data.items():
-        if isinstance(value, (datetime.datetime, datetime.date)):
-            data[key] = value.isoformat()
-        elif isinstance(value, decimal.Decimal):
-            data[key] = float(value)
-    return data
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        name = col[0]
+        val = row[idx]
+        if isinstance(val, (datetime.datetime, datetime.date)):
+            d[name] = val.isoformat()
+        elif isinstance(val, decimal.Decimal):
+            d[name] = float(val)
+        else:
+            d[name] = val
+    return d
 
 def format_rows(cursor, rows):
     return [format_row(cursor, row) for row in rows]
 
-def utc_now():
-    return datetime.datetime.now(datetime.timezone.utc)
+def generate_product_slug(product_id, name):
+    return f"{slugify(name)}-{product_id}"
 
-def parse_datetime(value):
-    """Normalize DB datetime values to timezone-aware UTC."""
-    if value is None:
-        return None
-    if isinstance(value, datetime.datetime):
-        if value.tzinfo is None:
-            return value.replace(tzinfo=datetime.timezone.utc)
-        return value.astimezone(datetime.timezone.utc)
-    if isinstance(value, datetime.date):
-        return datetime.datetime.combine(value, datetime.time.min, tzinfo=datetime.timezone.utc)
-    if isinstance(value, str):
-        s = value.replace("Z", "+00:00")
-        dt = datetime.datetime.fromisoformat(s)
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.timezone.utc)
-        return dt.astimezone(datetime.timezone.utc)
-    return None
+# Login Attempt Helpers
+def _reset_login_attempts(cursor, email):
+    cursor.execute("DELETE FROM login_attempts WHERE email = %s", (email,))
 
-def _mysql_reset_login_attempts(cursor, email):
-    cursor.execute(
-        "INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 0, CURRENT_TIMESTAMP, NULL) "
-        "ON DUPLICATE KEY UPDATE attempts = 0, locked_until = NULL",
-        (email,),
-    )
-
-def _sqlite_reset_login_attempts(cursor, email):
-    cursor.execute(
-        """INSERT INTO login_attempts (email, attempts, last_attempt, locked_until)
-           VALUES (%s, 0, CURRENT_TIMESTAMP, NULL)
-           ON CONFLICT(email) DO UPDATE SET
-             attempts = 0, locked_until = NULL, last_attempt = CURRENT_TIMESTAMP""",
-        (email,),
-    )
-
-def _mysql_record_failed_login(cursor, email):
-    cursor.execute(
-        """
-        INSERT INTO login_attempts (email, attempts, last_attempt, locked_until)
-        VALUES (%s, 1, CURRENT_TIMESTAMP, NULL)
-        ON DUPLICATE KEY UPDATE
-            attempts = attempts + 1,
-            last_attempt = CURRENT_TIMESTAMP,
-            locked_until = IF(attempts + 1 >= 10, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE), NULL)
-        """,
-        (email,),
-    )
-
-def _sqlite_record_failed_login(cursor, email):
+def _record_failed_login(cursor, email):
     cursor.execute("SELECT attempts FROM login_attempts WHERE email = %s", (email,))
     row = cursor.fetchone()
-    if row is None:
+    now = utc_now()
+    if row:
+        attempts = row[0] + 1
+        locked_until = None
+        if attempts >= 10:
+            locked_until = now + datetime.timedelta(minutes=30)
         cursor.execute(
-            "INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 1, CURRENT_TIMESTAMP, NULL)",
-            (email,),
-        )
-        return
-    new_a = int(row[0]) + 1
-    if new_a >= 10:
-        cursor.execute(
-            """UPDATE login_attempts SET attempts = %s, last_attempt = CURRENT_TIMESTAMP,
-                   locked_until = datetime('now', '+30 minutes') WHERE email = %s""",
-            (new_a, email),
+            "UPDATE login_attempts SET attempts = %s, last_attempt = %s, locked_until = %s WHERE email = %s",
+            (attempts, now, locked_until, email)
         )
     else:
         cursor.execute(
-            """UPDATE login_attempts SET attempts = %s, last_attempt = CURRENT_TIMESTAMP,
-                   locked_until = NULL WHERE email = %s""",
-            (new_a, email),
+            "INSERT INTO login_attempts (email, attempts, last_attempt) VALUES (%s, 1, %s)",
+            (email, now)
         )
 
-def safe_parse_wishlist(wl):
-    if wl is None: return []
-    if isinstance(wl, list): return wl
-    if isinstance(wl, str):
-        try:
-            parsed = json.loads(wl)
-            return parsed if isinstance(parsed, list) else []
-        except:
-            return []
-    return []
-
-# Authentication Decorator (Cookie Based)
+# --- Auth Decorators ---
 def token_required(f):
-    @wraps(f)
+    @functools.wraps(f)
     def decorated(*args, **kwargs):
-        # Exclusively read token from HttpOnly cookie
         token = request.cookies.get('auth_token')
-        
         if not token:
-            return jsonify({'message': 'Authentication cookie is missing!'}), 401
+            return jsonify({"message": "Token is missing!"}), 401
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            with get_db() as (conn, cursor):
+            with db_config.get_db() as (conn, cursor):
                 cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
                 user = format_row(cursor, cursor.fetchone())
-                if not user:
-                    return jsonify({'message': 'User not found!'}), 401
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Session expired. Please login again.'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Invalid authentication token.'}), 401
+            if not user:
+                return jsonify({"message": "User not found!"}), 401
+            g.user = user
         except Exception as e:
-            return jsonify({'message': f'Authentication error: {str(e)}'}), 401
+            return jsonify({"message": "Token is invalid!", "error": str(e)}), 401
         return f(user, *args, **kwargs)
     return decorated
 
+def validate_payload(schema_class):
+    def decorator(f):
+        @functools.wraps(f)
+        def decorated(*args, **kwargs):
+            try:
+                schema = schema_class()
+                data = schema.load(request.json or {})
+                return f(data, *args, **kwargs)
+            except ValidationError as err:
+                return jsonify({"errors": err.messages}), 422
+        return decorated
+    return decorator
+
+# --- Pagination Helper ---
+def paginate_collection(base_query, count_query, params=None, schema=None, order_by="id DESC"):
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    if per_page > 100: per_page = 100
+    offset = (page - 1) * per_page
+
+    params = params or ()
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute(count_query, params)
+        total_items = cursor.fetchone()[0]
+        
+        data_query = f"{base_query} ORDER BY {order_by} LIMIT {per_page} OFFSET {offset}"
+        cursor.execute(data_query, params)
+        rows = format_rows(cursor, cursor.fetchall())
+
+    total_pages = math.ceil(total_items / per_page)
+    has_next = page < total_pages
+    has_prev = page > 1
+
+    return {
+        "data": rows,
+        "meta": {
+            "page": page,
+            "per_page": per_page,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "has_next": has_next,
+            "has_prev": has_prev
+        }
+    }
+
+# --- Database Initialization ---
+_db_initialized = False
+
+def init_db():
+    global _db_initialized
+    if _db_initialized: return
+    
+    with db_config.get_db() as (conn, cursor):
+        # Users
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                email VARCHAR(255) UNIQUE,
+                password VARCHAR(255),
+                address TEXT,
+                phone VARCHAR(20),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX ix_users_email (email),
+                INDEX ix_users_updated (updated_at)
+            )
+        """)
+        
+        # Products
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS products (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                price DECIMAL(10,2),
+                category VARCHAR(100),
+                image TEXT,
+                rating DECIMAL(3,2) DEFAULT 4.5,
+                slug VARCHAR(255) UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX ix_products_slug (slug),
+                INDEX ix_products_category (category)
+            )
+        """)
+        
+        # Wishlist
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS wishlist (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                product_id INT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+                UNIQUE KEY unique_user_product (user_id, product_id),
+                INDEX ix_wishlist_user (user_id)
+            )
+        """)
+        
+        # Orders
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                total DECIMAL(10,2),
+                status VARCHAR(50) DEFAULT 'Pending',
+                shipping_name VARCHAR(255),
+                shipping_address TEXT,
+                shipping_phone VARCHAR(20),
+                shipping_method VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                INDEX ix_orders_user (user_id)
+            )
+        """)
+        
+        # Order Items
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS order_items (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                order_id INT,
+                product_id INT,
+                quantity INT,
+                unit_price DECIMAL(10,2),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+                INDEX ix_order_items_order (order_id)
+            )
+        """)
+        
+        # Login Attempts
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS login_attempts (
+                email VARCHAR(255) PRIMARY KEY,
+                attempts INT DEFAULT 0,
+                last_attempt TIMESTAMP,
+                locked_until TIMESTAMP NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX ix_login_email_locked (email, locked_until)
+            )
+        """)
+        
+    _db_initialized = True
+    logger.info("Database initialized.")
+
 @app.before_request
-def load_logged_in_user():
-    token = request.cookies.get('auth_token')
+def setup():
+    init_db()
+    # Load logged in user
     g.user = None
+    token = request.cookies.get('auth_token')
     if token:
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            with get_db() as (conn, cursor):
-                cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
+            with db_config.get_db() as (conn, cursor):
+                cursor.execute("SELECT id, name, email FROM users WHERE id = %s", (data['user_id'],))
                 g.user = format_row(cursor, cursor.fetchone())
         except:
             pass
@@ -319,574 +283,391 @@ def load_logged_in_user():
 @app.context_processor
 def inject_globals():
     return {
-        'current_year': datetime.datetime.now().year,
-        'current_user': g.user
+        "current_year": datetime.datetime.now().year,
+        "current_user": g.user
     }
 
-def validate_payload(schema_class):
-    def decorator(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            schema = schema_class()
-            try:
-                # data = schema.load(request.json or {})
-                # Note: marshmallow 3.x returns just the data
-                validated_data = schema.load(request.json or {})
-                return f(validated_data, *args, **kwargs)
-            except ValidationError as err:
-                return jsonify({"errors": err.messages}), 422
-        return wrapper
-    return decorator
+# --- API Routes ---
 
-def paginate_collection(base_query, count_query, params, schema=None, order_by="id DESC"):
-    try:
-        page = int(request.args.get('page', 1))
-        per_page = int(request.args.get('per_page', 20))
-    except (ValueError, TypeError):
-        return jsonify({"message": "Page and per_page must be positive integers"}), 400
-
-    if page < 1 or per_page < 1:
-        return jsonify({"message": "Page and per_page must be positive integers"}), 400
-    
-    per_page = min(per_page, 100)
-    offset = (page - 1) * per_page
-
-    try:
-        with get_db() as (conn, cursor):
-            # Get total count
-            cursor.execute(count_query, params)
-            total_items = cursor.fetchone()[0]
-            
-            # Get paginated data
-            final_query = f"{base_query} ORDER BY {order_by} LIMIT %s OFFSET %s"
-            cursor.execute(final_query, params + (per_page, offset))
-            raw_data = format_rows(cursor, cursor.fetchall())
-
-        total_pages = (total_items + per_page - 1) // per_page
-        
-        data = raw_data
-        if schema:
-            data = schema(many=True).dump(raw_data)
-
-        return jsonify({
-            "data": data,
-            "meta": {
-                "page": page,
-                "per_page": per_page,
-                "total_items": total_items,
-                "total_pages": total_pages,
-                "has_next": page < total_pages,
-                "has_prev": page > 1
-            },
-            "links": {
-                "next": f"{request.path}?page={page+1}&per_page={per_page}" if page < total_pages else None,
-                "prev": f"{request.path}?page={page-1}&per_page={per_page}" if page > 1 else None
-            }
-        })
-    except Exception as e:
-        app.logger.error(f"Pagination error: {str(e)}")
-        return jsonify({"message": "An error occurred while fetching the collection"}), 500
-
-# --- API ROUTES ---
-
-@app.route("/api/health")
-def health_check():
-    """Public health check and uptime monitor endpoint"""
-    db_status = "Connected"
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT 1")
-    except Exception as e:
-        logger.error(f"Health check DB error: {e}")
-        db_status = "Disconnected"
-
+@app.route('/api/health')
+def health():
     return jsonify({
-        "status": "Healthy" if db_status == "Connected" else "Degraded",
-        "database": db_status,
-        "timestamp": time.time(),
+        "status": "healthy",
+        "database": db_config.get_pool_stats(),
+        "timestamp": utc_now().isoformat(),
         "version": "1.2.0",
         "api": "SHOP EASE API"
     })
 
-@app.route("/api/signup", methods=["POST"])
+@app.route('/api/signup', methods=['POST'])
 @limiter.limit("3 per minute; 10 per hour")
-@validate_payload(SignupSchema)
+@validate_payload(schemas.SignupSchema)
 def signup(data):
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT id FROM users WHERE email = %s", (data['email'],))
-            if cursor.fetchone():
-                return jsonify({"message": "User already exists"}), 409
-            cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)", (
-                data['name'], 
-                data['email'], 
-                bcrypt.generate_password_hash(data['password']).decode('utf-8')
-            ))
-        return jsonify({"message": "User registered successfully"}), 201
-    except Exception as e:
-        return jsonify({"message": f"Error during signup: {str(e)}"}), 500
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT id FROM users WHERE email = %s", (data['email'],))
+        if cursor.fetchone():
+            return jsonify({"message": "Email already registered"}), 409
+        
+        hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        cursor.execute(
+            "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
+            (data['name'], data['email'], hashed_pw)
+        )
+    return jsonify({"message": "User registered successfully"}), 201
 
-@app.route("/api/login", methods=["POST"])
-@limiter.limit("5 per minute; 20 per hour; 50 per day")
-@validate_payload(LoginSchema)
+@app.route('/api/login', methods=['POST'])
+@limiter.limit("5 per minute; 20 per hour")
+@validate_payload(schemas.LoginSchema)
 def login(data):
-    email = data.get('email')
-    password = data.get('password')
-    cookie_secure = app.config.get('SESSION_COOKIE_SECURE', False)
-
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT attempts, locked_until FROM login_attempts WHERE email = %s", (email,))
-            lock_raw = cursor.fetchone()
-            if lock_raw:
-                locked_until = parse_datetime(lock_raw[1])
-                if locked_until and locked_until > utc_now():
-                    wait_seconds = max(0, int((locked_until - utc_now()).total_seconds()))
-                    return jsonify({
-                        "error": "Account Locked",
-                        "message": f"Too many failed attempts. Account locked for {max(1, wait_seconds // 60)} minutes.",
-                        "retry_after": wait_seconds
-                    }), 423
-
-            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-            user = format_row(cursor, cursor.fetchone())
-
-            if user and bcrypt.check_password_hash(user['password'], data.get('password')):
-                if USE_SQLITE:
-                    _sqlite_reset_login_attempts(cursor, email)
-                else:
-                    _mysql_reset_login_attempts(cursor, email)
-
-                token = jwt.encode({
-                    'user_id': user['id'],
-                    'exp': utc_now() + datetime.timedelta(hours=24)
-                }, app.config['SECRET_KEY'], algorithm='HS256')
-
-                resp = make_response(jsonify({
-                    "user": {
-                        "id": user['id'],
-                        "name": user['name'],
-                        "email": user['email']
-                    }
-                }))
-                resp.set_cookie(
-                    'auth_token', token,
-                    httponly=True, secure=cookie_secure, samesite='Lax',
-                    max_age=24 * 60 * 60, path='/',
-                )
-                return resp
-
-            if USE_SQLITE:
-                _sqlite_record_failed_login(cursor, email)
-            else:
-                _mysql_record_failed_login(cursor, email)
+    email = data['email']
+    with db_config.get_db() as (conn, cursor):
+        # Check lockout
+        cursor.execute("SELECT attempts, locked_until FROM login_attempts WHERE email = %s", (email,))
+        attempt_row = cursor.fetchone()
+        if attempt_row and attempt_row[1]:
+            locked_until = attempt_row[1]
+            # Handle both SQLite (string) and MySQL (datetime)
+            if isinstance(locked_until, str):
+                locked_until = datetime.datetime.fromisoformat(locked_until.replace('Z', '+00:00'))
+            
+            if locked_until > utc_now():
+                retry_after = int((locked_until - utc_now()).total_seconds())
+                return jsonify({
+                    "message": "Account locked due to too many failed attempts",
+                    "retry_after": retry_after
+                }), 423
+        
+        cursor.execute("SELECT id, name, email, password FROM users WHERE email = %s", (email,))
+        user = format_row(cursor, cursor.fetchone())
+        
+        if user and bcrypt.check_password_hash(user['password'], data['password']):
+            _reset_login_attempts(cursor, email)
+            token = jwt.encode({
+                "user_id": user['id'],
+                "exp": utc_now() + datetime.timedelta(hours=24)
+            }, app.config['SECRET_KEY'], algorithm="HS256")
+            
+            res = make_response(jsonify({
+                "user": {
+                    "id": user['id'],
+                    "name": user['name'],
+                    "email": user['email']
+                }
+            }))
+            res.set_cookie(
+                'auth_token', 
+                token, 
+                httponly=True, 
+                secure=app.config['SESSION_COOKIE_SECURE'],
+                samesite='Lax',
+                max_age=86400
+            )
+            return res
+        else:
+            _record_failed_login(cursor, email)
             return jsonify({"message": "Invalid credentials"}), 401
 
-    except Exception as e:
-        return jsonify({"message": f"Error during login: {str(e)}"}), 500
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    res = make_response(jsonify({"message": "Logged out successfully"}))
+    res.delete_cookie('auth_token')
+    return res
 
-@app.route("/api/logout", methods=["POST"])
-def logout_api():
-    cookie_secure = app.config.get('SESSION_COOKIE_SECURE', False)
-    resp = make_response(jsonify({"message": "Logged out successfully"}))
-    resp.delete_cookie('auth_token', path='/', secure=cookie_secure, samesite='Lax')
-    return resp
-
-@app.route("/api/me", methods=["GET"])
+@app.route('/api/me')
 @token_required
-def get_me(current_user):
-    if 'password' in current_user: del current_user['password']
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT product_id FROM wishlist WHERE user_id = %s", (current_user['id'],))
-            current_user['wishlist_ids'] = [row[0] for row in cursor.fetchall()]
-    except:
-        current_user['wishlist_ids'] = []
-    return jsonify(current_user)
+def get_me(user):
+    user.pop('password', None)
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT product_id FROM wishlist WHERE user_id = %s", (user['id'],))
+        user['wishlist_ids'] = [r[0] for r in cursor.fetchall()]
+    return jsonify(user)
 
-@app.route("/api/profile/update", methods=["POST"])
+@app.route('/api/profile/update', methods=['POST', 'PUT'])
 @token_required
-@validate_payload(ProfileUpdateSchema)
-def update_profile(data, current_user):
+@validate_payload(schemas.ProfileUpdateSchema)
+def update_profile(user, data):
     client_updated_at = data.get('updated_at')
-    
-    try:
-        with get_db() as (conn, cursor):
-            # Optimistic Locking Check
-            if client_updated_at:
-                cursor.execute("SELECT updated_at FROM users WHERE id = %s", (current_user['id'],))
-                db_row = cursor.fetchone()
-                if db_row:
-                    db_updated_at = db_row[0].isoformat() if hasattr(db_row[0], 'isoformat') else str(db_row[0])
-                    if db_updated_at != client_updated_at:
-                        return jsonify({
-                            "error": "Conflict",
-                            "message": "The profile was updated by another session. Please refresh.",
-                            "db_updated_at": db_updated_at
-                        }), 409
+    with db_config.get_db() as (conn, cursor):
+        if client_updated_at:
+            cursor.execute("SELECT updated_at FROM users WHERE id = %s", (user['id'],))
+            db_val = cursor.fetchone()[0]
+            # Normalizing comparison
+            if str(db_val) != str(client_updated_at):
+                return jsonify({
+                    "error": "Conflict",
+                    "message": "Profile was updated elsewhere. Please refresh.",
+                    "db_updated_at": str(db_val)
+                }), 409
+        
+        cursor.execute(
+            "UPDATE users SET address = %s, phone = %s WHERE id = %s",
+            (data.get('address'), data.get('phone'), user['id'])
+        )
+    return jsonify({"message": "Profile updated successfully"})
 
-            cursor.execute("""
-                UPDATE users SET address = %s, phone = %s WHERE id = %s
-            """, (
-                data.get('address', current_user.get('address')),
-                data.get('phone', current_user.get('phone')),
-                current_user['id']
-            ))
-        return jsonify({"message": "Profile updated successfully"})
-    except Exception as e:
-        return jsonify({"message": f"Error updating profile: {str(e)}"}), 500
-
-def generate_product_slug(product_id, name):
-    return f"{slugify(name)}-{product_id}"
-
-@app.route("/api/products", methods=["GET"])
+@app.route('/api/products')
 @limiter.limit("30 per minute")
 def get_products():
-    category = request.args.get("category")
-    where_clause = "WHERE category = %s" if category else "WHERE 1=1"
-    params = (category,) if category else ()
+    category = request.args.get('category')
+    base = "SELECT * FROM products"
+    count = "SELECT COUNT(*) FROM products"
+    params = ()
+    if category:
+        base += " WHERE category = %s"
+        count += " WHERE category = %s"
+        params = (category,)
     
-    return paginate_collection(
-        base_query=f"SELECT * FROM products {where_clause}",
-        count_query=f"SELECT COUNT(*) FROM products {where_clause}",
-        params=params,
-        order_by="id ASC"
-    )
+    return jsonify(paginate_collection(base, count, params, order_by="id ASC"))
 
-@app.route("/products/<int:product_id>/<string:slug>", methods=["GET"])
-def get_product_canonical(product_id, slug):
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
-            product = format_row(cursor, cursor.fetchone())
+@app.route('/api/products/<int:id>')
+def get_product(id):
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT * FROM products WHERE id = %s", (id,))
+        product = format_row(cursor, cursor.fetchone())
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+    return jsonify(product)
 
-        if not product:
-            return render_template("404.html"), 404
-
-        # Canonical check
-        correct_slug = product.get('slug')
-        if not correct_slug:
-            correct_slug = generate_product_slug(product_id, product['name'])
-            with get_db() as (conn, cursor):
-                cursor.execute("UPDATE products SET slug = %s WHERE id = %s", (correct_slug, product_id))
-
-        if slug != correct_slug:
-            from flask import redirect, url_for
-            return redirect(url_for('get_product_canonical', product_id=product_id, slug=correct_slug), code=301)
-
-        return render_template("product-detail.html", product=product)
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-
-@app.route("/product-detail.html", methods=["GET"])
-def legacy_product_redirect():
-    pid = request.args.get('id')
-    if pid:
-        try:
-            with get_db() as (conn, cursor):
-                cursor.execute("SELECT id, name, slug FROM products WHERE id = %s", (pid,))
-                row = format_row(cursor, cursor.fetchone())
-            if row:
-                slug = row.get('slug') or generate_product_slug(row['id'], row['name'])
-                from flask import redirect, url_for
-                return redirect(url_for('get_product_canonical', product_id=row['id'], slug=slug), code=301)
-        except:
-            pass
-    from flask import redirect
-    return redirect("/", code=302)
-
-@app.route("/api/products/<int:product_id>", methods=["GET"])
-def get_product(product_id):
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
-            product = format_row(cursor, cursor.fetchone())
-        if not product:
-            return jsonify({"message": "Product not found"}), 404
-        return jsonify(product)
-    except Exception as e:
-        return jsonify({"message": f"Error: {str(e)}"}), 500
-
-@app.route("/api/wishlist", methods=["GET"])
+@app.route('/api/wishlist')
 @token_required
-def get_wishlist(current_user):
-    return paginate_collection(
-        base_query="""
-            SELECT p.* FROM products p
-            JOIN wishlist w ON p.id = w.product_id
-            WHERE w.user_id = %s
-        """,
-        count_query="SELECT COUNT(*) FROM wishlist WHERE user_id = %s",
-        params=(current_user['id'],),
-        order_by="w.created_at DESC"
-    )
+def get_wishlist(user):
+    base = "SELECT p.* FROM products p JOIN wishlist w ON p.id = w.product_id WHERE w.user_id = %s"
+    count = "SELECT COUNT(*) FROM wishlist WHERE user_id = %s"
+    return jsonify(paginate_collection(base, count, (user['id'],), order_by="w.created_at DESC"))
 
-@app.route("/api/wishlist/toggle", methods=["POST"])
+@app.route('/api/wishlist/toggle', methods=['POST'])
 @token_required
 @limiter.limit("20 per minute")
-@validate_payload(WishlistToggleSchema)
-def toggle_wishlist(data, current_user):
-    pid = data.get('product_id')
-    
-    try:
-        with get_db() as (conn, cursor):
-            # Check if exists
-            cursor.execute("SELECT id FROM wishlist WHERE user_id = %s AND product_id = %s", (current_user['id'], pid))
-            exists = cursor.fetchone()
-            
-            if exists:
-                cursor.execute("DELETE FROM wishlist WHERE user_id = %s AND product_id = %s", (current_user['id'], pid))
-                action = "removed"
-            else:
-                cursor.execute("INSERT INTO wishlist (user_id, product_id) VALUES (%s, %s)", (current_user['id'], pid))
-                action = "added"
-            
-        return jsonify({"message": f"Product {action} wishlist", "action": action})
-    except Exception as e:
-        return jsonify({"message": f"Error toggling wishlist: {str(e)}"}), 500
+@validate_payload(schemas.WishlistToggleSchema)
+def toggle_wishlist(user, data):
+    pid = data['product_id']
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT id FROM wishlist WHERE user_id = %s AND product_id = %s", (user['id'], pid))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.execute("DELETE FROM wishlist WHERE id = %s", (existing[0],))
+            return jsonify({"message": "Removed from wishlist", "action": "removed"})
+        else:
+            cursor.execute("INSERT INTO wishlist (user_id, product_id) VALUES (%s, %s)", (user['id'], pid))
+            return jsonify({"message": "Added to wishlist", "action": "added"})
 
-@app.route("/api/orders", methods=["GET"])
+@app.route('/api/orders')
 @token_required
-def get_orders(current_user):
-    # This one is special because we need to fetch items after paginating orders
-    try:
-        page = int(request.args.get('page', 1))
-        per_page = min(int(request.args.get('per_page', 10)), 100)
-        offset = (page - 1) * per_page
-    except:
-        return jsonify({"message": "Invalid pagination params"}), 400
-
-    try:
-        with get_db() as (conn, cursor):
-            # 1. Count total orders
-            cursor.execute("SELECT COUNT(*) FROM orders WHERE user_id = %s", (current_user['id'],))
-            total_items = cursor.fetchone()[0]
-            
-            # 2. Get paginated orders
-            cursor.execute("""
-                SELECT * FROM orders WHERE user_id = %s 
-                ORDER BY created_at DESC 
-                LIMIT %s OFFSET %s
-            """, (current_user['id'], per_page, offset))
-            orders = format_rows(cursor, cursor.fetchall())
-            
-            if not orders:
-                return jsonify({"data": [], "meta": {"page": page, "total_items": total_items, "total_pages": 0}})
-
-            # 3. Get all line items for the returned page
+def get_orders(user):
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    offset = (page - 1) * per_page
+    
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT COUNT(*) FROM orders WHERE user_id = %s", (user['id'],))
+        total = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT * FROM orders WHERE user_id = %s ORDER BY created_at DESC LIMIT %s OFFSET %s", 
+                       (user['id'], per_page, offset))
+        orders = format_rows(cursor, cursor.fetchall())
+        
+        if orders:
             order_ids = [o['id'] for o in orders]
-            format_strings = ','.join(['%s'] * len(order_ids))
+            placeholders = ','.join(['%s'] * len(order_ids))
             cursor.execute(f"""
                 SELECT oi.*, p.name, p.image 
-                FROM order_items oi
-                LEFT JOIN products p ON oi.product_id = p.id
-                WHERE oi.order_id IN ({format_strings})
+                FROM order_items oi 
+                LEFT JOIN products p ON oi.product_id = p.id 
+                WHERE oi.order_id IN ({placeholders})
             """, tuple(order_ids))
-            all_items = format_rows(cursor, cursor.fetchall())
+            items = format_rows(cursor, cursor.fetchall())
+            
+            for order in orders:
+                order['items'] = [i for i in items if i['order_id'] == order['id']]
+                for i in order['items']:
+                    i['subtotal'] = float(i['unit_price']) * i['quantity']
+        
+    total_pages = math.ceil(total / per_page)
+    return jsonify({
+        "data": orders,
+        "meta": {
+            "page": page,
+            "per_page": per_page,
+            "total_items": total,
+            "total_pages": total_pages
+        }
+    })
 
-        # Group items
-        for o in orders:
-            o['items'] = [i for i in all_items if i['order_id'] == o['id']]
-            for i in o['items']:
-                i['subtotal'] = float(i['quantity'] * i['unit_price'])
-
-        total_pages = (total_items + per_page - 1) // per_page
-        return jsonify({
-            "data": orders,
-            "meta": {
-                "page": page,
-                "per_page": per_page,
-                "total_items": total_items,
-                "total_pages": total_pages,
-                "has_next": page < total_pages,
-                "has_prev": page > 1
-            }
-        })
-    except Exception as e:
-        return jsonify({"message": f"Error: {str(e)}"}), 500
-
-@app.route("/api/orders", methods=["POST"])
+@app.route('/api/orders', methods=['POST'])
 @token_required
 @limiter.limit("10 per minute")
-@validate_payload(OrderSchema)
-def place_order(data, current_user):
-    items = data.get('items', [])
-    client_total = float(data.get('total', 0))
-
-    try:
-        with get_db() as (conn, cursor):
-            priced = []
-            server_subtotal = 0.0
-            for item in items:
-                pid = item['product_id']
-                qty = int(item.get('qty', 1))
-                cursor.execute("SELECT price FROM products WHERE id = %s", (pid,))
-                res = cursor.fetchone()
-                if not res:
-                    return jsonify({"message": f"Product {pid} is no longer available."}), 400
-                unit_price = float(res[0])
-                server_subtotal += unit_price * qty
-                priced.append((pid, qty, unit_price))
-
-            # Match static/common.js placeOrder: subtotal + 15 - Math.round(subtotal * 0.2)
-            discount = int(math.floor(server_subtotal * 0.2 + 0.5))
-            delivery = 15
-            server_grand = server_subtotal - discount + delivery
-
-            if abs(client_total - server_grand) > 0.02:
-                return jsonify({
-                    "message": "Order total does not match current prices. Please refresh your cart.",
-                    "expected_total": round(server_grand, 2),
-                }), 400
-
+@validate_payload(schemas.OrderSchema)
+def place_order(user, data):
+    with db_config.get_db() as (conn, cursor):
+        server_subtotal = 0
+        order_items = []
+        for item in data['items']:
+            cursor.execute("SELECT price, name FROM products WHERE id = %s", (item['product_id'],))
+            prod = cursor.fetchone()
+            if not prod:
+                return jsonify({"message": f"Product {item['product_id']} not found"}), 400
+            price = float(prod[0])
+            server_subtotal += price * item['qty']
+            order_items.append({
+                "product_id": item['product_id'],
+                "qty": item['qty'],
+                "price": price
+            })
+            
+        discount = int(math.floor(server_subtotal * 0.2 + 0.5))
+        delivery = 15
+        server_grand = server_subtotal - discount + delivery
+        
+        if abs(data['total'] - server_grand) > 0.02:
+            return jsonify({
+                "message": "Order total mismatch",
+                "expected_total": server_grand
+            }), 400
+            
+        ship = data['shipping']
+        cursor.execute("""
+            INSERT INTO orders (user_id, total, shipping_name, shipping_address, shipping_phone, shipping_method)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (user['id'], server_grand, ship['name'], ship['address'], ship['phone'], ship.get('method', 'Standard')))
+        order_id = cursor.lastrowid
+        
+        for i in order_items:
             cursor.execute("""
-                INSERT INTO orders (user_id, total, shipping_name, shipping_address, shipping_phone, shipping_method)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (
-                current_user['id'],
-                round(server_grand, 2),
-                data.get('shipping', {}).get('name', ''),
-                data.get('shipping', {}).get('address', ''),
-                data.get('shipping', {}).get('phone', ''),
-                data.get('shipping', {}).get('method', '')
-            ))
-            order_id = cursor.lastrowid
+                INSERT INTO order_items (order_id, product_id, quantity, unit_price)
+                VALUES (%s, %s, %s, %s)
+            """, (order_id, i['product_id'], i['qty'], i['price']))
+            
+    return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
 
-            for pid, qty, unit_price in priced:
-                cursor.execute("""
-                    INSERT INTO order_items (order_id, product_id, quantity, unit_price)
-                    VALUES (%s, %s, %s, %s)
-                """, (order_id, pid, qty, unit_price))
-
-        app.logger.info(f"ORDER PLACED: ID {order_id} | User {current_user['id']} | Items: {len(items)}")
-        return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
-    except Exception as e:
-        return jsonify({"message": f"Error placing order: {str(e)}"}), 500
-
-@app.route("/api/orders/<order_id>/cancel", methods=["DELETE", "PUT"])
+@app.route('/api/orders/<order_id>/cancel', methods=['DELETE', 'PUT'])
 @token_required
-def cancel_order(current_user, order_id):
+def cancel_order(user, order_id):
     try:
-        with get_db() as (conn, cursor):
-            # Permanently remove the order from the database
-            cursor.execute("DELETE FROM orders WHERE id = %s AND user_id = %s", (order_id, current_user['id']))
-        return jsonify({"message": "Order removed from database permanently"})
-    except Exception as e:
-        return jsonify({"message": f"Error cancelling order: {str(e)}"}), 500
+        oid = int(order_id)
+    except:
+        return jsonify({"message": "Invalid order ID"}), 400
+        
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("DELETE FROM orders WHERE id = %s AND user_id = %s", (oid, user['id']))
+        if cursor.rowcount == 0:
+            return jsonify({"message": "Order not found or not authorized"}), 404
+            
+    return jsonify({"message": "Order cancelled"})
 
-# --- CLI COMMANDS (Server Side Only) ---
-@app.cli.command("seed-db")
-@click.option('--force', is_flag=True, help="Skip confirmation prompt")
-def seed_db_command(force):
-    """Seeds the database with initial products (Terminal only)"""
-    if not force:
-        if not click.confirm("This will DELETE all existing products. Continue?"):
-            logger.info("Database seed aborted by user.")
-            return
+@app.route('/api/sync')
+def sync_products():
+    since = request.args.get('since')
+    query = "SELECT * FROM products"
+    params = ()
+    if since:
+        query += " WHERE updated_at > %s"
+        params = (since,)
+    
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute(query, params)
+        data = format_rows(cursor, cursor.fetchall())
+        
+    return jsonify({
+        "data": data,
+        "meta": {"count": len(data), "since": since}
+    })
 
+@app.route('/health/db')
+def db_health():
     try:
-        with get_db() as (conn, cursor):
-            for p in INITIAL_PRODUCTS:
-                cursor.execute("SELECT id FROM products WHERE name = %s", (p['name'],))
-                if not cursor.fetchone():
-                    cursor.execute("""
-                        INSERT INTO products (name, price, category, image, rating)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (p['name'], p['price'], p['category'], p['image'], p.get('rating', 4.5)))
-        logger.info("Database seeded successfully! ✅")
+        with db_config.get_db() as (conn, cursor):
+            cursor.execute("SELECT 1")
+        return jsonify({"status": "healthy", "stats": db_config.get_pool_stats()}), 200
     except Exception as e:
-        logger.error(f"Seeding error: {e}")
+        return jsonify({"status": "unhealthy", "error": str(e)}), 503
 
-# --- STATIC FILE SERVING (MUST BE LAST) ---
+# --- Static Serving & SEO ---
+
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    if not os.path.splitext(path)[1]:
+        path += '.html'
+    
+    if path.endswith('.html'):
+        if os.path.exists(os.path.join('templates', path)):
+            return render_template(path)
+    
+    return send_from_directory('.', path)
+
+@app.route('/products/<int:id>/<slug>')
+def product_canonical(id, slug):
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT * FROM products WHERE id = %s", (id,))
+        product = format_row(cursor, cursor.fetchone())
+        
+    if not product:
+        return abort(404)
+        
+    expected_slug = slugify(product['name'])
+    if slug != expected_slug:
+        return redirect(url_for('product_canonical', id=id, slug=expected_slug), code=301)
+        
+    return render_template('product-detail.html', product=product)
+
+@app.route('/product-detail.html')
+def legacy_product_redirect():
+    pid = request.args.get('id', type=int)
+    if not pid: return redirect(url_for('index'))
+    
+    with db_config.get_db() as (conn, cursor):
+        cursor.execute("SELECT name FROM products WHERE id = %s", (pid,))
+        row = cursor.fetchone()
+    
+    if not row: return redirect(url_for('index'))
+    return redirect(url_for('product_canonical', id=pid, slug=slugify(row[0])), code=301)
+
+# --- Error Handlers ---
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    import re
-    seconds = re.search(r'\d+', e.description)
-    seconds = seconds.group() if seconds else "60"
-    resp = jsonify({
+    return jsonify({
         "error": "Too Many Requests",
-        "message": "You have exceeded the rate limit. Please slow down.",
-        "retry_after": int(seconds),
-        "limit": str(e.description)
-    })
-    return make_response(resp, 429)
+        "message": str(e.description),
+        "retry_after": e.retry_after,
+        "limit": str(e.limit)
+    }), 429
+
+@app.errorhandler(403)
+def forbidden_handler(e):
+    return jsonify({"error": "CORS Forbidden", "message": str(e), "status": 403}), 403
 
 @app.errorhandler(Exception)
 def handle_exception(e):
     if isinstance(e, HTTPException):
         return e.get_response()
-    logger.error(f"Unhandled exception: {e}")
+    logger.exception("Unhandle exception occurred")
     return jsonify({"message": str(e)}), 500
 
-@app.route("/")
-def index_page():
-    # Serve the original full-featured root index.html
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:path>')
-def serve_static(path):
-    # Auto-append .html if there's no file extension
-    if '.' not in path:
-        path += '.html'
-        
-    # For .html files, check templates first, then root directory
-    if path.endswith('.html'):
-        template_path = os.path.join(app.template_folder, path)
-        if os.path.exists(template_path):
-            active_page = path.replace('.html', '')
-            try:
-                return render_template(path, active_page=active_page)
-            except Exception:
-                pass
-    return send_from_directory('.', path)
-
-
-@app.route("/api/sync", methods=["GET"])
-def sync_data():
-    """Incremental sync endpoint for products"""
-    since = request.args.get('since')
-    try:
-        with get_db() as (conn, cursor):
-            query = "SELECT * FROM products"
-            params = ()
-            if since:
-                query += " WHERE updated_at > %s"
-                params = (since,)
+# --- CLI Commands ---
+@app.cli.command("seed-db")
+@click.option('--force', is_flag=True)
+def seed_db(force):
+    if not force:
+        if not click.confirm('This will seed the database with initial products. Continue?'):
+            return
             
-            cursor.execute(query, params)
-            rows = format_rows(cursor, cursor.fetchall())
-            
-        return jsonify({
-            "data": rows,
-            "meta": {
-                "count": len(rows),
-                "since": since
-            }
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    with db_config.get_db() as (conn, cursor):
+        for p in INITIAL_PRODUCTS:
+            cursor.execute("SELECT id FROM products WHERE name = %s", (p['name'],))
+            if not cursor.fetchone():
+                cursor.execute(
+                    "INSERT INTO products (name, price, category, image, rating) VALUES (%s, %s, %s, %s, %s)",
+                    (p['name'], p['price'], p['category'], p['image'], p['rating'])
+                )
+                pid = cursor.lastrowid
+                slug = generate_product_slug(pid, p['name'])
+                cursor.execute("UPDATE products SET slug = %s WHERE id = %s", (slug, pid))
+    
+    click.echo("Database seeded successfully.")
 
-@app.route("/health/db")
-def health_db():
-    from db_config import get_pool_stats
-    try:
-        with get_db() as (conn, cursor):
-            cursor.execute("SELECT 1")
-            cursor.fetchone()
-        
-        stats = get_pool_stats()
-        return jsonify({
-            "status": "healthy",
-            "database": "connected",
-            "pool": stats
-        }), 200
-    except Exception as e:
-        app.logger.error(f"Database health check failed: {e}")
-        return jsonify({
-            "status": "unhealthy",
-            "error": str(e)
-        }), 503
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

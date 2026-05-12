@@ -6,8 +6,6 @@ PyJWT
 python-dotenv
 gunicorn
 flask-limiter==3.7.0
-redis
-pytest
-aiohttp
 marshmallow>=3.19,<5
 python-slugify
+pytest

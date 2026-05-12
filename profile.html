@@ -1,451 +1,96 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title data-t="profile_title"> My Profile - SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-  </style>
-
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-    <!-- Modular JS stack -->
-  <link rel="stylesheet" href="/static/css/app.css">
-  <link rel="stylesheet" href="/static/css/output.css">
-  <script src="/static/js/config.js"></script>
-  <script src="/static/js/ui.js"></script>
-  <script src="/static/js/api.js"></script>
-  <script src="/static/js/auth.js"></script>
-  <script src="/static/js/cart.js"></script>
-  <script src="/static/js/wishlist.js"></script>
-  <script src="/static/js/products.js"></script>
-  <script src="/static/js/app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | SHOP EASE</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/cart.js"></script>
+    <script src="/static/js/wishlist.js"></script>
+    <script src="/static/js/products.js"></script>
+    <script src="/static/js/app.js" defer></script>
 </head>
-<body class="bg-[#F2F0F1]">
+<body class="bg-gray-50">
 
-  
-  <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
-      document.getElementById('nav-placeholder').innerHTML = html;
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
-  </script>
-
-
-<section class="max-w-6xl mx-auto px-6 py-10">
-
-  <div class="grid md:grid-cols-3 gap-6">
-
-    <div class="bg-white rounded-2xl p-6 shadow-sm">
-
-      <div class="flex flex-col items-center text-center">
-        <img src="https://i.pravatar.cc/150?img=3" class="w-24 h-24 rounded-full mb-4" />
-
-        <h2 id="userName" class="text-xl font-bold">Naveen Kumar</h2>
-        <p id="userEmail" class="text-gray-500 text-sm">naveen@example.com</p>
-
-        <button data-t="profile_edit" class="mt-4 border px-5 py-2 rounded-full text-sm hover:bg-gray-50">
-          Edit Profile
-        </button>
-      </div>
-
-      <div class="mt-6 border-t pt-4 space-y-4">
-
-  <div>
-    <p data-t="profile_member_since" class="text-sm text-gray-500">Member since</p>
-    <p id="memberSince" class="font-medium">January 2026</p>
-  </div>
-  <br>
-
-  <div class="flex flex-col gap-2 mt-4">
-
-    <div>
-    <p data-t="profile_activity" class="mb-2 font-medium">My Activity</p>
-  </div>
-
-    <a href="wishlist.html" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-      <span class="flex items-center gap-3">❤️ <span data-t="profile_wishlist">Wishlist</span></span>
-      <span>›</span>
-    </a>
-
-    <a href="orders.html" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-      <span>📦 <span data-t="profile_orders">My Orders</span></span>
-      <span>›</span>
-    </a>
-
-    <a href="#" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-      <span>🎁 <span data-t="profile_rewards">Rewards</span></span>
-      <span>›</span>
-    </a>
-
-    <a href="#" class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-      <span>🏷️ <span data-t="profile_redeem">Redeem Code</span></span>
-      <span>›</span>
-    </a>
-
-    <div class="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-      <span class="flex items-center gap-3">🌐 <span data-t="profile_language">Language</span></span>
-      <select id="langSelect" onchange="setLanguage(this.value)" class="bg-transparent focus:outline-none pl-3 font-bold  text-xs">
-        <option value="en">English</option>
-        <option value="hi">हिन्दी (Hindi)</option>
-        <option value="ta">தமிழ் (Tamil)</option>
-        <option value="te">తెలుగు (Telugu)</option>
-        <option value="kn">ಕನ್ನಡ (Kannada)</option>
-        <option value="ml">മലയാളം (Malayalam)</option>
-      </select>
-      
-    </div>
-
-  </div>
-</div>
-    </div>
-    <div class="md:col-span-2 space-y-6">
-      <div class="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 data-t="profile_wishlist" class="text-lg font-bold mb-4">My Wishlist</h3>
-        <div id="wishlistContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <p class="text-sm text-gray-500 italic col-span-full">Loading your wishlist...</p>
+    <nav class="bg-white shadow-sm h-16 flex items-center px-8 justify-between">
+        <a href="index.html" class="text-2xl font-black">SHOP EASE</a>
+        <div class="flex items-center space-x-6">
+            <a href="orders.html" class="text-sm font-medium">My Orders</a>
+            <button onclick="window.Auth.logout()" class="text-sm text-red-500 font-bold">Logout</button>
         </div>
-      </div>
+    </nav>
 
-      <div class="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 data-t="profile_orders" class="text-lg font-bold mb-4">Recent Orders</h3>
-        <div id="ordersContainer" class="space-y-4">
-          <p class="text-sm text-gray-500 italic">Loading your orders...</p>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 data-t="profile_shipping" class="text-lg font-bold mb-4">Shipping Information</h3>
-
-        <div id="addressDisplay" class="space-y-2">
-          <p class="text-sm text-gray-600">
-            <strong>Address:</strong> <span id="displayAddress">Not set</span>
-          </p>
-          <p class="text-sm text-gray-600">
-            <strong>Phone:</strong> <span id="displayPhone">Not set</span>
-          </p>
-          <br>
-          <button data-t="profile_edit" onclick="enableEdit()" class="mt-4 border px-5 py-2 rounded-full text-sm hover:bg-gray-50">
-            Edit Information
-          </button>
-        </div>
-
-        <div id="addressEdit" class="hidden space-y-4">
-          <div>
-            <label data-t="profile_address" class="block text-xs text-gray-400 mb-1">Shipping Address</label>
-            <textarea data-t="profile_address" id="inputAddress" rows="3" class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black" placeholder="Enter your full address"></textarea>
-          </div>
-          <div>
-            <label data-t="profile_phone" class="block text-xs text-gray-400 mb-1">Phone Number</label>
-            <input data-t="profile_phone" id="inputPhone" type="text" class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black" placeholder="Enter your phone number">
-          </div>
-          <div class="flex gap-2">
-            <button data-t="profile_save" id="saveInfoBtn" onclick="saveProfileInfo()" class="bg-black text-white px-6 py-2 rounded-full text-sm hover:bg-gray-800 transition">
-              Save Changes
-            </button>
-            <button data-t="profile_cancel" onclick="disableEdit()" class="border px-6 py-2 rounded-full text-sm hover:bg-gray-50 transition">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-
-        <div class="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 data-t="profile_payment" class="text-lg font-bold mb-4">Payment Methods</h3>
-        <div class="mt-2">
-
-  
-  <button onclick="togglePayments()" 
-    class="flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-
-    <span class="flex items-center gap-2">
-
-      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
-        <line x1="2" y1="10" x2="22" y2="10"/>
-      </svg>
-
-      <span data-t="profile_my_payments">My Payments</span>
-    </span>
-
-    <span>›</span>
-  </button>
-
-  <div id="paymentMenu" class="hidden flex flex-col mt-2 ml-6 gap-2 text-sm">
-
-    <a href="#" class="hover:text-black text-gray-600 mt-2">💳 Pay Later</a>
-
-    <a href="#" class="hover:text-black text-gray-600 mt-2">🏦 Bank & UPI Details</a>
-
-    <a href="#" class="hover:text-black text-gray-600 mt-2">💸 Payments & Refunds</a>
-
-  </div>
-
-</div>
-        </div>
-
-     
-      <div class="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 data-t="profile_settings" class="text-lg font-bold mb-4">Account Settings</h3>
-
-    <div class="flex flex-col gap-2">
-          <div class="border-t pt-4 mt-4 space-y-2">
-
- 
-  <div id="authButtons" class="hidden gap-6 flex flex-col md:flex-row">
-    <a href="login.html" data-t="login" class="text-center bg-black text-white py-2 px-6 rounded-lg text-sm">
-      Login
-    </a>
-    <a href="signup.html" data-t="signup" class="text-center border py-2 px-6 rounded-lg text-sm hover:bg-gray-100">
-      Sign Up
-    </a>
-  </div>
-
-  <button id="logoutBtn" onclick="logout()" 
-    class="w-full py-3 px-6 rounded-xl border border-red-100 text-red-600 font-bold text-sm hover:bg-red-50 hover:border-red-200 transition-all duration-300 flex items-center justify-center gap-2">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-    <span data-t="profile_signout">Sign Out</span>
-  </button>
-</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-  <script>
-    function togglePayments() {
-      document.getElementById("paymentMenu").classList.toggle("hidden");
-    }
-
-    function enableEdit() {
-      document.getElementById('addressDisplay').classList.add('hidden');
-      document.getElementById('addressEdit').classList.remove('hidden');
-      
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user) {
-        document.getElementById('inputAddress').value = user.address || '';
-        document.getElementById('inputPhone').value = user.phone || '';
-      }
-    }
-
-    function disableEdit() {
-      document.getElementById('addressDisplay').classList.remove('hidden');
-      document.getElementById('addressEdit').classList.add('hidden');
-    }
-
-    async function saveProfileInfo() {
-      const address = document.getElementById('inputAddress').value;
-      const phone = document.getElementById('inputPhone').value;
-      const saveBtn = document.getElementById('saveInfoBtn');
-      
-      saveBtn.innerText = "Saving...";
-      saveBtn.disabled = true;
-
-      try {
-        const response = await apiRequest('/profile/update', {
-          method: 'POST',
-          body: JSON.stringify({ address, phone })
-        });
-
-        if (response.ok) {
-          document.getElementById('displayAddress').innerText = address || 'Not set';
-          document.getElementById('displayPhone').innerText = phone || 'Not set';
-          
-          // Update local storage
-          const user = JSON.parse(localStorage.getItem('user'));
-          user.address = address;
-          user.phone = phone;
-          localStorage.setItem('user', JSON.stringify(user));
-
-          toast.success("Profile updated successfully!");
-          disableEdit();
-        } else {
-          toast.error("Update failed.");
-        }
-      } catch (err) {
-        toast.error("Server Error: " + err.message);
-      } finally {
-        saveBtn.innerText = "Save Changes";
-        saveBtn.disabled = false;
-      }
-    }
-
-    async function loadUserOrders() {
-      const container = document.getElementById('ordersContainer');
-      try {
-        const response = await apiRequest('/orders');
-        
-        if (!response.ok) throw new Error("Failed to fetch orders");
-        
-        const orders = await response.json();
-        
-        if (orders.length === 0) {
-          container.innerHTML = '<p class="text-sm text-gray-500 italic">No orders found yet.</p>';
-          return;
-        }
-
-        container.innerHTML = orders.map(order => {
-          const itemCount = order.items ? order.items.length : 0;
-          let statusColor = 'text-yellow-600';
-          if (order.status === 'Delivered') statusColor = 'text-green-600';
-          if (order.status === 'Cancelled') statusColor = 'text-red-600';
-          
-          const orderDate = new Date(order.created_at).toLocaleDateString();
-          const currentStatus = (order.status || "").toLowerCase();
-          const canCancel = currentStatus === 'pending';
-          
-          return `
-            <div class="flex justify-between items-center border-b pb-3 group">
-              <div>
-                <p class="font-medium">Order #${escapeHtml(order.id)}</p>
-                <p class="text-sm text-gray-500">${itemCount} Items • $${escapeHtml(order.total)} • ${orderDate}</p>
-              </div>
-              <div class="flex items-center gap-4">
-                <span class="${statusColor} text-sm font-medium">${escapeHtml(order.status)}</span>
-                ${canCancel ? `
-                  <button onclick="cancelOrder('${escapeHtml(order.id)}')" class="px-3 py-1 bg-red-50 text-red-600 text-[10px] uppercase tracking-wider font-bold rounded-full hover:bg-red-600 hover:text-white transition-colors border border-red-100">
-                    Cancel Order
-                  </button>
-                ` : ''}
-              </div>
+    <main class="max-w-4xl mx-auto py-12 px-4">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="bg-black p-8 text-white">
+                <h1 class="text-3xl font-black uppercase italic">My Profile</h1>
             </div>
-          `;
-        }).join('');
+            
+            <div class="p-8 md:p-12 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Full Name</label>
+                        <input type="text" id="prof-name" readonly class="w-full bg-gray-50 border-none rounded-xl py-4 px-6 text-gray-500 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Email Address</label>
+                        <input type="email" id="prof-email" readonly class="w-full bg-gray-50 border-none rounded-xl py-4 px-6 text-gray-500 cursor-not-allowed">
+                    </div>
+                </div>
 
-      } catch (err) {
-        container.innerHTML = '<p class="text-red-500 text-sm">Failed to load orders.</p>';
-      }
-    }
+                <hr class="border-gray-50">
 
-    async function cancelOrder(orderId) {
-      ui.confirm("Are you sure you want to cancel this order?", async () => {
-        try {
-          const response = await apiRequest(`/orders/${orderId}/cancel`, {
-            method: 'PUT'
-          });
-          
-          const data = await response.json();
-          if (response.ok) {
-            toast.success("Order cancelled successfully!");
-            loadUserOrders(); // Refresh list
-          } else {
-            toast.error(data.message || "Failed to cancel order");
-          }
-        } catch (err) {
-          toast.error("An error occurred. Please try again.");
-        }
-      });
-    }
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Phone Number</label>
+                        <input type="tel" id="prof-phone" class="w-full bg-gray-50 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Shipping Address</label>
+                        <textarea id="prof-address" rows="4" class="w-full bg-gray-50 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-black"></textarea>
+                    </div>
+                </div>
 
-    async function loadWishlist() {
-      const container = document.getElementById('wishlistContainer');
-      try {
-        const response = await apiRequest('/wishlist');
-        
-        if (!response.ok) throw new Error("Failed to fetch wishlist");
-        
-        const products = await response.json();
-        
-        if (products.length === 0) {
-          container.innerHTML = '<p class="text-sm text-gray-500 italic col-span-full">Your wishlist is empty.</p>';
-          return;
-        }
-
-        // Show only the first 3 items
-        const previewItems = products.slice(0, 3);
-
-        container.innerHTML = previewItems.map(p => {
-          const safeName = escapeHtml(p.name);
-          const safePrice = escapeHtml(p.price);
-          const safeImg = escapeHtml(p.image);
-          return `
-            <div class="product-card group cursor-pointer relative" onclick="viewProduct(this)" data-id="${p.id}">
-              <button onclick="event.stopPropagation(); removeFromWishlist('${p.id}', this)" 
-                class="absolute top-1 right-1 z-10 p-1 rounded-full bg-white shadow-sm hover:text-red-500 transition-all">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-              <div class="bg-[#F0EEED] rounded-xl overflow-hidden aspect-square flex items-center justify-center mb-2">
-                <img src="${safeImg}" class="object-cover w-full h-full" />
-              </div>
-              <div class="font-bold text-[10px] uppercase truncate">${safeName}</div>
-              <div class="font-black text-xs">$${safePrice}</div>
+                <div class="pt-6">
+                    <button onclick="saveProfile()" class="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold hover:bg-gray-800 transition shadow-lg">Save Changes</button>
+                </div>
             </div>
-          `;
-        }).join('');
+        </div>
+    </main>
 
-      } catch (err) {
-        container.innerHTML = '<p class="text-red-500 text-sm">Failed to load wishlist.</p>';
-      }
-    }
+    <script>
+        async function initProfile() {
+            const user = await window.Auth.requireAuth('profile.html');
+            if (!user) return;
 
-    async function removeFromWishlist(productId, btn) {
-      try {
-        const response = await apiRequest('/wishlist/toggle', {
-          method: 'POST',
-          body: JSON.stringify({ product_id: productId })
-        });
-        
-        if (response.ok) {
-          // Remove the card from UI
-          btn.closest('.product-card').remove();
-          
-          // Update local user object
-          const user = JSON.parse(localStorage.getItem('user'));
-          user.wishlist = user.wishlist.filter(id => id !== productId);
-          localStorage.setItem('user', JSON.stringify(user));
-
-          // If empty, show message
-          const container = document.getElementById('wishlistContainer');
-          if (container.children.length === 0) {
-            container.innerHTML = '<p class="text-sm text-gray-500 italic col-span-full">Your wishlist is empty.</p>';
-          }
+            document.getElementById('prof-name').value = user.name || '';
+            document.getElementById('prof-email').value = user.email || '';
+            document.getElementById('prof-phone').value = user.phone || '';
+            document.getElementById('prof-address').value = user.address || '';
         }
-      } catch (err) {
-        console.error(err);
-      }
-    }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const user = await checkAuth();
-      if (!user) {
-        window.location.href = 'login.html';
-        return;
-      }
+        async function saveProfile() {
+            const data = {
+                phone: document.getElementById('prof-phone').value,
+                address: document.getElementById('prof-address').value
+            };
 
-      document.getElementById('userName').innerText = user.name || 'User';
-      document.getElementById('userEmail').innerText = user.email;
-      document.getElementById('displayAddress').innerText = user.address || 'Not set';
-      document.getElementById('displayPhone').innerText = user.phone || 'Not set';
-      
-      if (user.created_at) {
-        const date = new Date(user.created_at);
-        document.getElementById('memberSince').innerText = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      }
+            const res = await window.API.updateProfile(data);
+            if (res) {
+                window.toast.success('Profile updated successfully');
+                await window.Auth.updateUI(); // Refresh session
+            } else {
+                window.toast.error('Failed to update profile');
+            }
+        }
 
-      // Load orders and wishlist
-      loadUserOrders();
-      loadWishlist();
+        window.addEventListener('DOMContentLoaded', initProfile);
+    </script>
 
-      // Set initial value for language select
-      const langSelect = document.getElementById('langSelect');
-      if (langSelect) langSelect.value = localStorage.getItem('lang') || 'en';
-    });
-  </script>
 </body>
 </html>

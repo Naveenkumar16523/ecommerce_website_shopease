@@ -1,146 +1,150 @@
 /**
- * api.js — Centralized API handler for SHOP EASE.
- * All fetch calls go through apiRequest(). Handles auth, rate-limits, errors.
+ * API Client & Methods
  */
 
-const _cache = {};
+const _cache = new Map();
 
-function getCached(key) {
-  const entry = _cache[key];
-  if (!entry) return null;
-  const ttl = window.SE_CONFIG?.CACHE_TTL ?? 5 * 60 * 1000;
-  if (Date.now() - entry.ts > ttl) { delete _cache[key]; return null; }
-  return entry.data;
-}
+const getCached = (key) => {
+    const cached = _cache.get(key);
+    if (cached && (Date.now() - cached.time < window.SE_CONFIG.CACHE_TTL)) {
+        return cached.data;
+    }
+    return null;
+};
 
-function setCache(key, data) {
-  _cache[key] = { data, ts: Date.now() };
-}
+const setCache = (key, data) => {
+    _cache.set(key, { data, time: Date.now() });
+};
 
-function clearCache(keyPrefix) {
-  Object.keys(_cache).filter(k => k.startsWith(keyPrefix)).forEach(k => delete _cache[k]);
-}
+const clearCache = (prefix) => {
+    if (!prefix) {
+        _cache.clear();
+        return;
+    }
+    for (const key of _cache.keys()) {
+        if (key.startsWith(prefix)) _cache.delete(key);
+    }
+};
 
-window.clearApiCache = clearCache;
-
-/**
- * Core API fetch wrapper. Returns the Response object.
- * Callers should check res.ok before calling res.json().
- */
 async function apiRequest(endpoint, options = {}) {
-  const base = window.SE_CONFIG?.API_BASE ?? window.API_BASE ?? '/api';
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+    const url = endpoint.startsWith('http') ? endpoint : `${window.SE_CONFIG.API_BASE}${endpoint}`;
+    
+    const defaultOptions = {
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        ...options
+    };
 
-  try {
-    const res = await fetch(`${base}${endpoint}`, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
+    try {
+        const response = await fetch(url, defaultOptions);
 
-    if (res.status === 401) {
-      const isProtected = (window.SE_CONFIG?.PROTECTED_PAGES ?? [])
-        .some(p => window.location.pathname.includes(p));
-      localStorage.removeItem('user');
-      sessionStorage.removeItem('auth_user');
-      if (isProtected) {
-        const path = window.location.pathname.split('/').pop();
-        window.location.href = `login.html?redirect=${path}`;
-      }
+        if (response.status === 401) {
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('auth_user');
+            const currentPage = window.location.pathname.split('/').pop();
+            if (window.SE_CONFIG.PROTECTED_PAGES.includes(currentPage)) {
+                window.location.href = 'login.html';
+            }
+            return null;
+        }
+
+        if (response.status === 429 || response.status === 423) {
+            const data = await response.json();
+            window.showRateLimitError(data.retry_after || 60, data.message);
+            return null;
+        }
+
+        return response;
+    } catch (error) {
+        console.error('API Request Failed:', error);
+        window.toast.error('Network error. Please try again.');
+        throw error;
     }
-
-    if (res.status === 429 || res.status === 423) {
-      const data = await res.clone().json().catch(() => ({}));
-      const seconds = data.retry_after || 60;
-      window.showRateLimitError?.(seconds, data.error || 'Rate Limited');
-    }
-
-    return res;
-  } catch (err) {
-    console.error(`[API] ${endpoint}:`, err);
-    if (err instanceof TypeError) {
-      window.toast?.error('Connection error — server may be offline.');
-    }
-    throw err;
-  }
 }
 
 window.apiRequest = apiRequest;
 
-// ─── Typed API methods ────────────────────────────────────────────────────────
+window.API = {
+    async getProducts(params = {}) {
+        const query = new URLSearchParams(params).toString();
+        const cacheKey = `products_${query}`;
+        const cached = getCached(cacheKey);
+        if (cached) return cached;
 
-const API = {
-  // Products
-  getProducts(params = {}) {
-    const qs = new URLSearchParams(params).toString();
-    const key = `products:${qs}`;
-    const cached = getCached(key);
-    if (cached) return Promise.resolve(cached);
-    return apiRequest(`/products${qs ? '?' + qs : ''}`)
-      .then(r => r.json())
-      .then(data => { setCache(key, data); return data; });
-  },
+        const res = await apiRequest(`/products?${query}`);
+        if (!res) return null;
+        const data = await res.json();
+        setCache(cacheKey, data);
+        return data;
+    },
 
-  getProduct(id) {
-    const key = `product:${id}`;
-    const cached = getCached(key);
-    if (cached) return Promise.resolve(cached);
-    return apiRequest(`/products/${id}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setCache(key, data); return data; });
-  },
+    async getProduct(id) {
+        const res = await apiRequest(`/products/${id}`);
+        if (!res) return null;
+        return res.json();
+    },
 
-  // Auth
-  login(email, password) {
-    return apiRequest('/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-  },
+    async login(email, password) {
+        const res = await apiRequest('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password })
+        });
+        if (!res) return null;
+        return res.json();
+    },
 
-  signup(name, email, password) {
-    return apiRequest('/signup', {
-      method: 'POST',
-      body: JSON.stringify({ name, email, password }),
-    });
-  },
+    async signup(name, email, password) {
+        const res = await apiRequest('/auth/signup', {
+            method: 'POST',
+            body: JSON.stringify({ name, email, password })
+        });
+        if (!res) return null;
+        return res.json();
+    },
 
-  logout() {
-    return apiRequest('/logout', { method: 'POST' });
-  },
+    async logout() {
+        await apiRequest('/auth/logout', { method: 'POST' });
+    },
 
-  getMe() {
-    return apiRequest('/me').then(r => r.ok ? r.json() : null);
-  },
+    async getMe() {
+        const res = await apiRequest('/auth/me');
+        if (!res || res.status !== 200) return null;
+        return res.json();
+    },
 
-  // Cart / Orders
-  placeOrder(orderData) {
-    clearCache('products:');
-    return apiRequest('/orders', {
-      method: 'POST',
-      body: JSON.stringify(orderData),
-    });
-  },
+    async placeOrder(orderData) {
+        const res = await apiRequest('/orders', {
+            method: 'POST',
+            body: JSON.stringify(orderData)
+        });
+        if (!res) return null;
+        clearCache('products'); // Invalidate products cache on order
+        return res.json();
+    },
 
-  getOrders() {
-    return apiRequest('/orders').then(r => r.ok ? r.json() : []);
-  },
+    async getOrders() {
+        const res = await apiRequest('/orders');
+        if (!res) return null;
+        return res.json();
+    },
 
-  // Wishlist
-  toggleWishlist(productId) {
-    return apiRequest('/wishlist/toggle', {
-      method: 'POST',
-      body: JSON.stringify({ product_id: productId }),
-    }).then(r => r.json());
-  },
+    async toggleWishlist(productId) {
+        const res = await apiRequest(`/wishlist/toggle/${productId}`, { method: 'POST' });
+        if (!res) return null;
+        return res.json();
+    },
 
-  // Profile
-  updateProfile(data) {
-    return apiRequest('/profile/update', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
+    async updateProfile(data) {
+        const res = await apiRequest('/auth/profile', {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+        if (!res) return null;
+        return res.json();
+    }
 };
 
-window.API = API;
+// Export cache helpers for debugging or internal use
+window.API_CACHE = { getCached, setCache, clearCache };

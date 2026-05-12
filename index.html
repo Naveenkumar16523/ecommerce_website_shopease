@@ -1,285 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SHOP EASE - Find Clothes That Match Your Style</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Integral+CF:wght@700&family=Satoshi:wght@400;500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/static/css/app.css">
-
-  <link rel="stylesheet" href="/static/css/output.css">
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
-    .brand-bar  { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.15em; }
-    .star       { color: #FFC633; }
-    .badge-sale { background: #FF3333; }
-    .badge-new  { background: #01AB31; }
-    .nav-link:hover { text-decoration: underline; }
-    input[type=email]:focus { outline: 2px solid #fff; }
-  </style>
-
-  <script src="/static/js/config.js"></script>
-  <script src="/static/js/ui.js"></script>
-  <script src="/static/js/api.js"></script>
-  <script src="/static/js/auth.js"></script>
-  <script src="/static/js/cart.js"></script>
-  <script src="/static/js/wishlist.js"></script>
-  <script src="/static/js/products.js"></script>
-  <script src="/static/js/app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHOP EASE | Premium E-commerce</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/cart.js"></script>
+    <script src="/static/js/wishlist.js"></script>
+    <script src="/static/js/products.js"></script>
+    <script src="/static/js/app.js" defer></script>
 </head>
-<body class="bg-white text-black overflow-x-hidden">
+<body class="bg-gray-50 text-gray-900 font-sans">
 
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
-      document.getElementById('nav-placeholder').innerHTML = html;
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-black tracking-tighter text-black">SHOP EASE</a>
+                    <div class="hidden md:ml-10 md:flex space-x-8">
+                        <a href="mens.html" class="text-sm font-medium hover:text-gray-500">Shop</a>
+                        <a href="on-sale.html" class="text-sm font-medium hover:text-gray-500">On Sale</a>
+                        <a href="new-arrivals.html" class="text-sm font-medium hover:text-gray-500">New Arrivals</a>
+                        <a href="brands.html" class="text-sm font-medium hover:text-gray-500">Brands</a>
+                    </div>
+                </div>
+                
+                <div class="flex-1 max-w-xs mx-8 relative hidden lg:block">
+                    <input type="text" id="searchInput" placeholder="Search products..." 
+                           class="w-full bg-gray-100 border-none rounded-full py-2 px-4 text-sm focus:ring-2 focus:ring-black">
+                </div>
 
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
-  </script>
-    
-  </header>
-
-   <section class="bg-[#F2F0F1] relative min-h-[500px] md:min-h-[660px] flex flex-col md:flex-row items-center px-6 md:px-16 overflow-hidden">
-    <div class="max-w-lg z-10 py-10 md:py-14 text-left w-full">
-      <h1 data-t="hero_title" class="hero-title text-4xl sm:text-5xl md:text-7xl leading-tight md:leading-none mb-4">
-        FIND CLOTHES THAT MATCHES YOUR STYLE
-      </h1>
-      <p data-t="hero_subtitle" class="text-gray-500 text-sm md:text-base mb-8 max-w-xs leading-relaxed">
-        Browse through our diverse range of meticulously crafted garments.
-      </p>
-      <button data-t="shop_now" class="w-full sm:w-auto bg-black text-white px-10 py-3.5 rounded-full text-sm font-medium hover:bg-gray-800 transition">
-        Shop Now
-      </button>
-      
-      
-      <div class="flex md:hidden flex-wrap gap-6 mt-10">
-        <div><p class="text-2xl font-bold">200+</p><p class="text-xs text-gray-500">International Brands</p></div>
-        <div><p class="text-2xl font-bold">2,000+</p><p class="text-xs text-gray-500">High-Quality Products</p></div>
-        <div><p class="text-2xl font-bold">30,000+</p><p class="text-xs text-gray-500">Happy Customers</p></div>
-      </div>
-    </div>
-
-    <div class="flex-1 self-stretch flex justify-center md:justify-end items-end relative w-full mt-6 md:mt-0">
-      <img src="assets/Rectangle2.jpg" alt="Fashion Model" class="relative z-10 w-full md:w-auto h-auto max-h-[380px] sm:max-h-[480px] md:max-h-[580px] object-contain object-bottom"/>
-    </div>
-  </section>
- 
-  <div class="bg-black py-4 overflow-hidden">
-    <div class="flex gap-16 animate-marquee whitespace-nowrap items-center brand-bar text-white text-xl md:text-2xl" style="animation: marquee 30s linear infinite;">
-      <span>VERSACE</span><br><span class="italic font-light">ZARA</span><br><span>GUCCI</span><br><span class="font-black tracking-widest">PRADA</span><br><span class="font-light">Calvin Klein</span><br>
-      <span>VERSACE</span><br><span class="italic font-light">ZARA</span><br><span>GUCCI</span><br><span class="font-black tracking-widest">PRADA</span><br><span class="font-light">Calvin Klein</span><br>
-      <span>VERSACE</span><br><span class="italic font-light">ZARA</span><br><span>GUCCI</span><br><span class="font-black tracking-widest">PRADA</span><br><span class="font-light">Calvin Klein</span> 
-    </div>
-  </div>
-  <style>
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .animate-marquee { display: inline-flex; }
-  </style>
- 
-  <section class="px-6 md:px-16 py-14">
-    <h2 data-t="new_arrivals" class="text-center text-3xl font-black tracking-tight mb-10 hero-title text-4xl">NEW ARRIVALS</h2>
-    <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-4 gap-5">
-      
-    </div>
-    <div class="text-center mt-10">
-      <a href="new-arrivals.html" data-t="view_all"
-   class="inline-block border border-gray-300 px-10 py-2.5 rounded-full text-sm font-medium hover:bg-gray-50 transition">
-  View All
-</a>
-    </div>
-  </section>
- 
-  <hr class="border-gray-200 mx-6 md:mx-16"/>
-  <section class="px-6 md:px-16 py-14">
-    <h2 data-t="top_selling" class="text-center text-3xl font-black tracking-tight mb-10 hero-title text-4xl">TOP SELLING</h2>
-
-    <div id="top-selling-container" class="grid grid-cols-2 md:grid-cols-4 gap-5">
-      
-    </div>
-</div>
-
-    </div>
-    <div class="text-center mt-10">
-      <a href="top-selling.html" data-t="view_all"
-   class="border border-gray-300 px-10 py-2.5 rounded-full text-sm font-medium hover:bg-gray-50 transition">
-  View All
-</a>
-    </div>
-  </section>
- 
-<section class="px-6 md:px-16 py-10">
-  <div class="bg-[#F0EEED] rounded-3xl p-8 md:p-12">
-    <h2 data-t="browse_style" class="text-center text-3xl md:text-4xl font-black mb-8 hero-title">BROWSE BY DRESS STYLE</h2>
-    <div class="grid grid-cols-2 gap-4">
-
-     
-      <a href="casual-category.html" class="style-card h-48 md:h-64 block">
-        <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Casual"/>
-        <div class="absolute inset-0 flex items-start p-5">
-          <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Casual</span>
+                <div class="flex items-center space-x-6">
+                    <a href="wishlist.html" class="relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <span id="wishlistBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+                    </a>
+                    <a href="cart.html" class="relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span id="cartBadge" class="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+                    </a>
+                    <a href="login.html" data-se="account-link" class="text-sm font-bold border-b-2 border-black">Login</a>
+                    <button data-se="logout-btn" class="hidden text-sm text-red-500 font-medium">Logout</button>
+                </div>
+            </div>
         </div>
-      </a>
+    </nav>
 
-      
-      <a href="formal-category.html" class="style-card h-48 md:h-64 block">
-        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Formal"/>
-        <div class="absolute inset-0 flex items-start p-5">
-          <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Formal</span>
+    <!-- Hero Section -->
+    <header class="bg-white border-b border-gray-100 overflow-hidden">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center">
+            <div class="p-8 md:p-16 md:w-1/2">
+                <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6">FIND CLOTHES THAT MATCH YOUR STYLE</h1>
+                <p class="text-gray-500 mb-8 max-w-md">Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style.</p>
+                <a href="mens.html" class="bg-black text-white px-10 py-4 rounded-full font-bold hover:bg-gray-800 transition shadow-lg inline-block">Shop Now</a>
+                <div class="grid grid-cols-3 gap-8 mt-12">
+                    <div><h4 class="text-3xl font-bold">200+</h4><p class="text-xs text-gray-500 uppercase">International Brands</p></div>
+                    <div><h4 class="text-3xl font-bold">2,000+</h4><p class="text-xs text-gray-500 uppercase">High Quality Products</p></div>
+                    <div><h4 class="text-3xl font-bold">30,000+</h4><p class="text-xs text-gray-500 uppercase">Happy Customers</p></div>
+                </div>
+            </div>
+            <div class="md:w-1/2 relative h-[400px] md:h-[600px] bg-gray-100">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000" 
+                     class="absolute inset-0 w-full h-full object-cover" alt="Fashion">
+            </div>
         </div>
-      </a>
+    </header>
 
-      
-      <a href="party-category.html" class="style-card h-48 md:h-64 block">
-        <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Party"/>
-        <div class="absolute inset-0 flex items-start p-5">
-          <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Party</span>
+    <!-- New Arrivals -->
+    <section class="max-w-7xl mx-auto py-16 px-4">
+        <h2 class="text-4xl font-black text-center mb-12 uppercase italic">New Arrivals</h2>
+        <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <!-- Loaded by products.js -->
         </div>
-      </a>
-
-      
-      <a href="gym-category.html" class="style-card h-48 md:h-64 block">
-        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=700&q=80" class="w-full h-full object-cover rounded-2xl" alt="Gym"/>
-        <div class="absolute inset-0 flex items-start p-5">
-          <span class="bg-white/80 backdrop-blur-sm font-bold text-lg px-4 py-1.5 rounded-full">Gym</span>
+        <div class="text-center mt-12">
+            <a href="new-arrivals.html" class="border border-gray-200 px-8 py-3 rounded-full font-medium hover:bg-gray-50">View All</a>
         </div>
-      </a>
+    </section>
 
-    </div>
-  </div>
-</section>
+    <hr class="max-w-7xl mx-auto border-gray-100">
 
-  <section class="px-6 md:px-16 py-14">
-    <div class="flex items-center justify-between mb-8">
-      <h2 class="text-3xl md:text-4xl font-black hero-title">OUR HAPPY CUSTOMERS</h2>
-      <div class="flex gap-2">
-        <button id="prevBtn" class="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button id="nextBtn" class="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </button>
-      </div>
-    </div>
-    <div id="reviewSlider" class="flex gap-5 overflow-x-auto scrollbar-hide review-slider pb-2">
-      
-      <div class="min-w-[280px] md:min-w-[320px] border border-gray-200 rounded-2xl p-6 flex-shrink-0">
-        <div class="flex star text-sm mb-2">★★★★★</div>
-        <div class="flex items-center gap-2 mb-3">
-          <span class="font-bold">Sarah M.</span>
-          <span class="w-4 h-4 bg-green-500 rounded-full text-white text-[9px] flex items-center justify-center">✓</span>
+    <!-- Top Selling -->
+    <section class="max-w-7xl mx-auto py-16 px-4">
+        <h2 class="text-4xl font-black text-center mb-12 uppercase italic">Top Selling</h2>
+        <div id="top-selling-container" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <!-- Loaded by products.js -->
         </div>
-        <p class="text-sm text-gray-500 leading-relaxed">"I'm blown away by the quality and style of the clothes I received from Shop EASE From casual wear to elegant dresses, every piece I've bought has exceeded my expectations."</p>
-      </div>
-      <div class="min-w-[280px] md:min-w-[320px] border border-gray-200 rounded-2xl p-6 flex-shrink-0">
-        <div class="flex star text-sm mb-2">★★★★★</div>
-        <div class="flex items-center gap-2 mb-3">
-          <span class="font-bold">Alex K.</span>
-          <span class="w-4 h-4 bg-green-500 rounded-full text-white text-[9px] flex items-center justify-center">✓</span>
+        <div class="text-center mt-12">
+            <a href="top-selling.html" class="border border-gray-200 px-8 py-3 rounded-full font-medium hover:bg-gray-50">View All</a>
         </div>
-        <p class="text-sm text-gray-500 leading-relaxed">"Finding clothes that align with my personal style used to be a challenge until I discovered Shop EASE The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."</p>
-      </div>
-      <div class="min-w-[280px] md:min-w-[320px] border border-gray-200 rounded-2xl p-6 flex-shrink-0">
-        <div class="flex star text-sm mb-2">★★★★★</div>
-        <div class="flex items-center gap-2 mb-3">
-          <span class="font-bold">James L.</span>
-          <span class="w-4 h-4 bg-green-500 rounded-full text-white text-[9px] flex items-center justify-center">✓</span>
+    </section>
+
+    <!-- Browse by Category -->
+    <section class="max-w-7xl mx-auto py-16 px-4 bg-gray-100 rounded-3xl mb-16">
+        <h2 class="text-4xl font-black text-center mb-12 uppercase italic">Browse by Style</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px]">
+            <a href="casual-category.html" class="md:col-span-1 bg-white rounded-2xl relative overflow-hidden group shadow-sm">
+                <img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                <div class="absolute top-6 left-6 text-2xl font-bold">Casual</div>
+            </a>
+            <a href="formal-category.html" class="md:col-span-2 bg-white rounded-2xl relative overflow-hidden group shadow-sm">
+                <img src="https://images.unsplash.com/photo-1594932224828-b4b05a832967?auto=format&fit=crop&q=80&w=1000" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                <div class="absolute top-6 left-6 text-2xl font-bold">Formal</div>
+            </a>
+            <a href="party-category.html" class="md:col-span-2 bg-white rounded-2xl relative overflow-hidden group shadow-sm">
+                <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&q=80&w=1000" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                <div class="absolute top-6 left-6 text-2xl font-bold">Party</div>
+            </a>
+            <a href="gym-category.html" class="md:col-span-1 bg-white rounded-2xl relative overflow-hidden group shadow-sm">
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                <div class="absolute top-6 left-6 text-2xl font-bold">Gym</div>
+            </a>
         </div>
-        <p class="text-sm text-gray-500 leading-relaxed">"As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop EASE The selection of clothes is not only diverse but also on-point with the latest trends."</p>
-      </div>
-      <div class="min-w-[280px] md:min-w-[320px] border border-gray-200 rounded-2xl p-6 flex-shrink-0">
-        <div class="flex star text-sm mb-2">★★★★☆</div>
-        <div class="flex items-center gap-2 mb-3">
-          <span class="font-bold">Moana R.</span>
-          <span class="w-4 h-4 bg-green-500 rounded-full text-white text-[9px] flex items-center justify-center">✓</span>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-5 gap-12 border-b border-gray-200 pb-12">
+            <div class="md:col-span-2">
+                <h3 class="text-3xl font-black mb-6">SHOP EASE</h3>
+                <p class="text-gray-500 mb-6 max-w-xs">We have clothes that suits your style and which you’re proud to wear. From women to men.</p>
+                <div class="flex space-x-4">
+                    <!-- Social icons -->
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase mb-4 text-xs tracking-widest">Company</h4>
+                <ul class="text-gray-500 space-y-2 text-sm">
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="works.html">Works</a></li>
+                    <li><a href="career.html">Career</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase mb-4 text-xs tracking-widest">Help</h4>
+                <ul class="text-gray-500 space-y-2 text-sm">
+                    <li><a href="support.html">Customer Support</a></li>
+                    <li><a href="delivery-details.html">Delivery Details</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase mb-4 text-xs tracking-widest">FAQ</h4>
+                <ul class="text-gray-500 space-y-2 text-sm">
+                    <li><a href="account.html">Account</a></li>
+                    <li><a href="delivery-details.html">Manage Deliveries</a></li>
+                    <li><a href="orders.html">Orders</a></li>
+                    <li><a href="payments.html">Payments</a></li>
+                </ul>
+            </div>
         </div>
-        <p class="text-sm text-gray-500 leading-relaxed">"Shop EASE has completely transformed my wardrobe. Their curated collections make it so easy to pull together outfits for any occasion. Highly recommend!"</p>
-      </div>
-    </div>
-  </section>
- 
- 
-  <footer class="bg-[#F0EEED] px-6 md:px-16 pt-12 pb-6">
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-10">
-      <div class="col-span-2 md:col-span-1">
-        <div class="hero-title text-2xl font-black mb-3">SHOP EASE</div>
-        <p class="text-xs text-gray-500 leading-relaxed mb-4">We have clothes that suits your style and which you are proud to wear. From women to men.</p>
-        <div class="flex gap-3">
-          <a href="#" class="w-8 h-8 border border-gray-400 rounded-full flex items-center justify-center hover:bg-gray-50 transition">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.56v14.91A4.56 4.56 0 0 1 19.44 24H4.56A4.56 4.56 0 0 1 0 19.44V4.56A4.56 4.56 0 0 1 4.56 0h14.88A4.56 4.56 0 0 1 24 4.56zM9 10H6v3h3v8h4v-8h3l.5-3H13V8.5c0-.8.4-1.5 1.5-1.5H17V4h-2.5C11.4 4 9 6.4 9 9.5V10z"/></svg>
-          </a>
-          <a href="#" class="w-8 h-8 border border-gray-400 rounded-full flex items-center justify-center hover:bg-gray-50 transition">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a href="#" class="w-8 h-8 border border-gray-400 rounded-full flex items-center justify-center hover:bg-gray-50 transition">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-
+        <div class="max-w-7xl mx-auto px-4 mt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+            <p>Shop Ease © 2000-2023, All Rights Reserved</p>
+            <div class="flex space-x-4 mt-4 md:mt-0 items-center">
+                <img src="/static/img/payment-methods.png" alt="Payments" class="h-8 object-contain">
+            </div>
         </div>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4 tracking-widest">COMPANY</div>
-        <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="about.html" data-t="footer_about" class="hover:text-black">About</a></li>
-          <li><a href="features.html" data-t="footer_features" class="hover:text-black">Features</a></li>
-          <li><a href="works.html" data-t="footer_works" class="hover:text-black">Works</a></li>
-          <li><a href="career.html" data-t="footer_career" class="hover:text-black">Career</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4 tracking-widest">HELP</div>
-        <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="support.html" data-t="footer_customer_support" class="hover:text-black">Customer Support</a></li>
-          <li><a href="delivery-details.html" data-t="footer_delivery_details" class="hover:text-black">Delivery Details</a></li>
-          <li><a href="terms.html" data-t="footer_terms" class="hover:text-black">Terms & Conditions</a></li>
-          <li><a href="privacy.html" data-t="footer_privacy" class="hover:text-black">Privacy Policy</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4 tracking-widest">FAQ</div>
-        <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="account.html" class="hover:text-black">Account</a></li>
-          <li><a href="delivery-details.html" class="hover:text-black">Manage Deliveries</a></li>
-          <li><a href="orders.html" class="hover:text-black">Orders</a></li>
-          <li><a href="payments.html" class="hover:text-black">Payments</a></li>
-        </ul>
-      </div>
-     
-    </div>
+    </footer>
 
-    <hr class="border-gray-300 mb-5"/>
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-      <p class="text-xs text-gray-500">SHOP EASE © 2025–2026, All Rights Reserved</p>
-  
-      <div class="flex items-center gap-2">
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500">VISA</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500">Paytm</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500">PayPal</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500">Phonepe</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500">G Pay</div>
-      </div>
-
-    </div>
-  </footer>
- 
-
-  <script>
-    
-    function viewProduct(btn) {
-      const name = btn.dataset.name;
-      const price = btn.dataset.price;
-      const img = btn.dataset.img || btn.dataset.image;
-      const category = btn.dataset.category || 'Shop';
-      window.location.href = `product-detail.html?name=${encodeURIComponent(name)}&price=${price}&img=${encodeURIComponent(img)}&category=${encodeURIComponent(category)}`;
-    }
-  </script>
 </body>
 </html>

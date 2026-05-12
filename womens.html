@@ -1,149 +1,25 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SHOP EASE – Women</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  
-  
-  
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-    .star { color: #FFC633; }
-    .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid #e5e7eb; transition: all 0.2s; position: relative; }
-    .color-dot.active { outline: 2px solid black; outline-offset: 2px; }
-    .size-btn { background: #F0F0F0; padding: 8px 16px; border-radius: 99px; font-size: 13px; color: #666; transition: all 0.2s; }
-    .size-btn.active { background: black; color: white; }
-    .filter-section { border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 20px; }
-  </style>
-
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-    <!-- Modular JS stack -->
-  <link rel="stylesheet" href="/static/css/app.css">
-  <link rel="stylesheet" href="/static/css/output.css">
-  <script src="/static/js/config.js"></script>
-  <script src="/static/js/ui.js"></script>
-  <script src="/static/js/api.js"></script>
-  <script src="/static/js/auth.js"></script>
-  <script src="/static/js/cart.js"></script>
-  <script src="/static/js/wishlist.js"></script>
-  <script src="/static/js/products.js"></script>
-  <script src="/static/js/app.js" defer></script>
+    <meta charset="UTF-8">
+    <title>Womens Shop | SHOP EASE</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/cart.js"></script>
+    <script src="/static/js/wishlist.js"></script>
+    <script src="/static/js/products.js"></script>
+    <script src="/static/js/app.js" defer></script>
 </head>
-<body class="bg-white text-black">
-
-  
-  <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
-      document.getElementById('nav-placeholder').innerHTML = html;
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
-  </script>
-
-
-  <div class="px-6 md:px-12 py-3 text-sm text-gray-400">
-    Home › <span class="text-black font-medium">Women</span>
-  </div>
-
-  <div class="flex gap-8 px-6 md:px-12 pb-20">
-   
-    <aside class="hidden md:block w-72 border rounded-[20px] p-6 h-fit bg-white sticky top-24">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="font-bold text-xl">Filters</h2>
-        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-      </div>
-
-      
-      <div class="filter-section">
-        <ul class="space-y-4 text-gray-500 text-sm">
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">T-shirts <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">Shorts <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">Shirts <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">Hoodie <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">Jeans <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-        </ul>
-      </div>
-
-      
-      <div class="filter-section">
-        <h3 class="font-bold text-sm mb-4">Price</h3>
-        <input type="range" min="50" max="500" value="200" class="w-full accent-black mb-2">
-        <div class="flex justify-between text-sm font-bold">
-          <span>$50</span>
-          <span>$200</span>
-        </div>
-      </div>
-
-     
-      <div class="filter-section">
-        <h3 class="font-bold text-sm mb-4">Colors</h3>
-        <div class="flex flex-wrap gap-2.5">
-          <div class="color-dot bg-green-500"></div>
-          <div class="color-dot bg-red-500"></div>
-          <div class="color-dot bg-yellow-400"></div>
-          <div class="color-dot bg-orange-500"></div>
-          <div class="color-dot bg-blue-400"></div>
-          <div class="color-dot bg-blue-700 active"></div>
-          <div class="color-dot bg-purple-500"></div>
-          <div class="color-dot bg-pink-400"></div>
-          <div class="color-dot bg-white"></div>
-          <div class="color-dot bg-black"></div>
-        </div>
-      </div>
-
-      
-      <div class="filter-section">
-        <h3 class="font-bold text-sm mb-4">Size</h3>
-        <div class="flex flex-wrap gap-2">
-          <button class="size-btn">XX-Small</button>
-          <button class="size-btn">X-Small</button>
-          <button class="size-btn">Small</button>
-          <button class="size-btn">Medium</button>
-          <button class="size-btn active">Large</button>
-          <button class="size-btn">X-Large</button>
-        </div>
-      </div>
-
-      
-      <div class="filter-section border-0 mb-0 pb-0">
-        <h3 class="font-bold text-sm mb-4">Sections</h3>
-        <ul class="space-y-4 text-gray-500 text-sm">
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">Men <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="flex items-center justify-between text-black font-medium cursor-pointer">Women <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="flex items-center justify-between hover:text-black cursor-pointer">Kids <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-        </ul>
-      </div>
-
-      <button class="w-full bg-black text-white py-3.5 rounded-full mt-6 font-bold text-sm hover:bg-gray-800 transition">Apply Filter</button>
-    </aside>
-
-    
-    <main class="flex-1">
-      <div class="flex items-center justify-between mb-8">
-        <h1 class="text-3xl font-black hero-title uppercase">Women's Collection</h1>
-        <div class="flex items-center gap-3 text-sm text-gray-400">
-          <span>Showing 1-10 of 100 Products</span>
-          <div class="hidden md:block">Sort by: <span class="text-black font-bold">Most Popular ▾</span></div>
-        </div>
-      </div>
-      <div id="category-products-container" data-category="Women" class="grid grid-cols-2 lg:grid-cols-3 gap-6">
-        
-      </div>
+<body class="bg-gray-50">
+    <nav class="bg-white h-16 flex items-center px-8 shadow-sm">
+        <a href="index.html" class="text-2xl font-black">SHOP EASE</a>
+    </nav>
+    <main class="max-w-7xl mx-auto py-12 px-4">
+        <h1 class="text-3xl font-black uppercase mb-10">Women's Collection</h1>
+        <div id="category-products-container" data-category="womens" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
     </main>
-  </div>
-
 </body>
 </html>

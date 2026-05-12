@@ -1,71 +1,93 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your Wishlist – SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-  </style>
-  
-
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-    <!-- Modular JS stack -->
-  <link rel="stylesheet" href="/static/css/app.css">
-  <link rel="stylesheet" href="/static/css/output.css">
-  <script src="/static/js/config.js"></script>
-  <script src="/static/js/ui.js"></script>
-  <script src="/static/js/api.js"></script>
-  <script src="/static/js/auth.js"></script>
-  <script src="/static/js/cart.js"></script>
-  <script src="/static/js/wishlist.js"></script>
-  <script src="/static/js/products.js"></script>
-  <script src="/static/js/app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist | SHOP EASE</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/cart.js"></script>
+    <script src="/static/js/wishlist.js"></script>
+    <script src="/static/js/products.js"></script>
+    <script src="/static/js/app.js" defer></script>
 </head>
-<body class="bg-[#F2F0F1] text-black">
-  
-  <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
-      document.getElementById('nav-placeholder').innerHTML = html;
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
-  </script>
+<body class="bg-gray-50">
 
+    <nav class="bg-white shadow-sm h-16 flex items-center px-8 justify-between">
+        <a href="index.html" class="text-2xl font-black">SHOP EASE</a>
+        <div class="flex items-center space-x-6">
+            <a href="cart.html" class="relative">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-width="2"></path></svg>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+            </a>
+            <a href="login.html" data-se="account-link" class="text-sm font-bold">Login</a>
+        </div>
+    </nav>
 
-  <section class="py-12 px-6 md:px-12 max-w-6xl mx-auto min-h-screen">
-    <h1 class="hero-title text-5xl font-black mb-8 tracking-wider italic">MY WISHLIST</h1>
-    
-    <div id="wishlistGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-      <!-- Wishlist items will be loaded here -->
-      <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
-        <p class="text-gray-500 italic">Loading your saved items...</p>
-      </div>
-    </div>
+    <main class="max-w-7xl mx-auto py-12 px-4">
+        <h1 class="text-4xl font-black uppercase mb-10 italic">My Wishlist</h1>
+        
+        <div id="wishlist-container" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <!-- Wishlist products injected here -->
+        </div>
 
-  </section>
+        <div id="empty-wishlist" class="hidden text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <p class="text-gray-400 mb-6 text-lg">Your wishlist is empty.</p>
+            <a href="index.html" class="bg-black text-white px-8 py-3 rounded-full font-bold shadow-lg">Discover Products</a>
+        </div>
+    </main>
 
-  <footer class="bg-black text-white py-12 px-6 md:px-12 mt-12">
-    <div class="max-w-7xl mx-auto text-center">
-      <h2 class="hero-title text-3xl font-black mb-4">SHOP EASE</h2>
-      <div class="border-t border-gray-800 mt-10 pt-6 text-xs text-gray-500">
-        © 2026 SHOP EASE. All Rights Reserved.
-      </div>
-    </div>
-  </footer>
+    <script>
+        async function loadWishlist() {
+            const container = document.getElementById('wishlist-container');
+            const emptyEl = document.getElementById('empty-wishlist');
+            const user = window.Auth.getUser();
+            let products = [];
 
-  <script src="/static/js/wishlist-page.js"></script>
+            try {
+                if (user) {
+                    // Fetch full product objects for user wishlist
+                    const res = await window.apiRequest('/wishlist');
+                    if (res && res.status === 200) {
+                        products = await res.json();
+                    }
+                } else {
+                    // Guest mode: fetch each product by ID from the guest list
+                    const ids = window.Wishlist._guestGet();
+                    if (ids.length > 0) {
+                        const allProducts = await window.API.getProducts();
+                        products = allProducts.filter(p => ids.includes(parseInt(p.id)));
+                    }
+                }
+
+                if (products.length === 0) {
+                    emptyEl.classList.remove('hidden');
+                    container.innerHTML = '';
+                } else {
+                    emptyEl.classList.add('hidden');
+                    window.Products.renderCards(products, container);
+                }
+            } catch (e) {
+                console.error('Wishlist load failed', e);
+                window.toast.error('Failed to load wishlist');
+            }
+        }
+
+        // Re-load on toggle
+        window.addEventListener('wishlist:updated', loadWishlist);
+        window.addEventListener('DOMContentLoaded', loadWishlist);
+        
+        // Handle the custom toggle logic if needed
+        const originalToggle = window.Wishlist.toggle;
+        window.Wishlist.toggle = async function(id, btn) {
+            await originalToggle.call(this, id, btn);
+            loadWishlist(); // Refresh the list
+        };
+    </script>
+
 </body>
 </html>

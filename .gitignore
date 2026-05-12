@@ -1,42 +1,9 @@
-# Environment variables
-.env
-
-# Local demo database (may contain user data)
 ecommerce_demo.db
-
-# Python Bytecode
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Workspace/Editor folders
-.vscode/
-.idea/
-
-# Scratch and Debug files
+ecommerce_demo.db.bak
+*.db
+*.db.bak
 scratch/
-test_*.py
-fix_*.py
-seed.py
-optimize_*.py
-
-# Vercel
-.vercel/
-
-# Node
+__pycache__/
+.env
 node_modules/
-static/css/output.css
-
-# Debug and Temporary Files
-debug*.py
-temp*.py
-scratch*.py
-*_backup.py
-*_old.py
-optimize_*.py
-refactor_*.py
-migrate_*.py
-seed.py
-test_backend.py
-load_test.py
+.DS_Store
