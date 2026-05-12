@@ -299,6 +299,25 @@ def health():
         "api": "SHOP EASE API"
     })
 
+@app.route('/api/admin/seed', methods=['POST', 'GET'])
+def secret_seed():
+    auth_key = request.args.get('key')
+    if auth_key != app.config['SECRET_KEY']:
+        return jsonify({"message": "Unauthorized"}), 401
+        
+    with db_config.get_db() as (conn, cursor):
+        for p in INITIAL_PRODUCTS:
+            cursor.execute("SELECT id FROM products WHERE name = %s", (p['name'],))
+            if not cursor.fetchone():
+                cursor.execute(
+                    "INSERT INTO products (name, price, category, image, rating) VALUES (%s, %s, %s, %s, %s)",
+                    (p['name'], p['price'], p['category'], p['image'], p['rating'])
+                )
+                pid = cursor.lastrowid
+                slug = generate_product_slug(pid, p['name'])
+                cursor.execute("UPDATE products SET slug = %s WHERE id = %s", (slug, pid))
+    return jsonify({"message": "Database seeded successfully"}), 200
+
 @app.route('/api/signup', methods=['POST'])
 @limiter.limit("3 per minute; 10 per hour")
 @validate_payload(schemas.SignupSchema)
