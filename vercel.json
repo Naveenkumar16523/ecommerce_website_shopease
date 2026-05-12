@@ -44,6 +44,30 @@
       "dest": "/$1.html"
     },
     {
+      "src": "/mens",
+      "dest": "/mens.html"
+    },
+    {
+      "src": "/womens",
+      "dest": "/womens.html"
+    },
+    {
+      "src": "/kids",
+      "dest": "/kids.html"
+    },
+    {
+      "src": "/new-arrivals",
+      "dest": "/new-arrivals.html"
+    },
+    {
+      "src": "/top-selling",
+      "dest": "/top-selling.html"
+    },
+    {
+      "src": "/on-sale",
+      "dest": "/on-sale.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
