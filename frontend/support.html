@@ -1,47 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Customer Support – SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  
-  
-  
-
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-  <script src="https://cdn.tailwindcss.com" defer></script>
-  <link rel="stylesheet" href="/static/css/app.css">
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('shopease-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-
-  <script>
-    window.addEventListener('load', () => {
-      if (window.tailwind) {
-        window.tailwind.config = {
-          theme: { extend: { colors: { clifford: '#da373d' } } }
-        }
-      }
-    });
-  </script>
-  <script src="/static/common.js?v=1.6" defer></script>
-
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Support — SHOP EASE</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/app.css">
+  
   <script>
     (function() {
       const savedTheme = localStorage.getItem('shopease-theme');
@@ -50,124 +16,94 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
-
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
   <style>
-    /* Custom Fonts & Base overrides */
-    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
-    
-    /* Scrollbar */
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* Marquee */
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
-    
-    /* Smooth Transitions */
-    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Glassmorphism utility */
-    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg-primary); color: var(--text-primary); }
+    .hero-title { font-family: 'Syne', sans-serif; }
+    .contact-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 2rem;
+      padding: 40px;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    .contact-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+    input, textarea {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 12px 20px;
+      width: 100%;
+      outline: none;
+      transition: all 0.3s ease;
+      color: var(--text-primary);
+    }
+    input:focus, textarea:focus {
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+    }
   </style>
-
 </head>
-<body class="bg-white text-black overflow-x-hidden">
+<body>
 
-  <nav class="flex items-center justify-between px-6 md:px-12 py-4 border-b border-gray-100 bg-white">
-    <a href="index.html" class="hero-title text-2xl font-black">SHOP EASE</a>
-    <a href="index.html" class="text-sm font-medium hover:underline">Back to Home</a>
-  </nav>
-
-  <section class="py-20 px-6 md:px-12 max-w-4xl mx-auto">
-    <h1 class="hero-title text-4xl md:text-5xl font-black mb-10 text-center">CUSTOMER SUPPORT</h1>
-    
-    <div class="grid md:grid-cols-2 gap-12">
-      <div class="space-y-8">
-        <div>
-          <h2 class="text-black font-bold text-xl mb-3 uppercase tracking-wide">Contact Us</h2>
-          <p class="text-gray-600">Have a question about your order or our products? We're here to help!</p>
-          <div class="mt-4 space-y-2 text-sm">
-            <p><strong>Email:</strong> support@shopease.com</p>
-            <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-            <p><strong>Hours:</strong> Mon - Fri, 9am - 6pm EST</p>
-          </div>
-        </div>
-
-        <div>
-          <h2 class="text-black font-bold text-xl mb-3 uppercase tracking-wide">FAQ Quick Links</h2>
-          <ul class="space-y-2 text-sm text-gray-500 underline">
-            <li><a href="#" class="hover:text-black">Where is my order?</a></li>
-            <li><a href="#" class="hover:text-black">How do I return an item?</a></li>
-            <li><a href="#" class="hover:text-black">Size Guide</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="bg-[#F0EEED] p-8 rounded-3xl shadow-sm">
-        <h2 class="text-black font-bold text-xl mb-6 uppercase tracking-wide">Send a Message</h2>
-        <form class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold mb-1">NAME</label>
-            <input type="text" placeholder="Your Name" class="w-full px-4 py-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-black">
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1">EMAIL</label>
-            <input type="email" placeholder="Your Email" class="w-full px-4 py-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-black">
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1">MESSAGE</label>
-            <textarea rows="4" placeholder="How can we help?" class="w-full px-4 py-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-black"></textarea>
-          </div>
-          <button class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-4 rounded-xl font-bold hover:bg-gray-800 transition">SEND MESSAGE</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <footer class="bg-[#F0EEED] py-10 text-center">
-    <p class="text-xs text-gray-500">© 2025–2026 SHOP EASE. All Rights Reserved.</p>
-  </footer>
-
-
-  <!-- Animation Scripts -->
+  <div id="nav-placeholder"></div>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
-              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
-          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
-          observer.observe(el);
-        });
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      const link = e.target.closest('a');
-      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
-        e.preventDefault();
-        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 300);
-      }
+    fetch('nav.html').then(r => r.text()).then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
     });
   </script>
-</body>
 
+  <main class="py-20 px-6 md:px-12 max-w-7xl mx-auto">
+    <div class="text-center mb-20">
+      <h1 class="hero-title text-6xl font-black mb-6">WE'RE HERE TO HELP</h1>
+      <p class="text-gray-500 text-lg max-w-2xl mx-auto font-light">Have a question? Our support team is available 24/7 to assist you with your orders and styling needs.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 mb-20">
+      <div class="contact-card text-center">
+        <div class="text-4xl mb-6">📧</div>
+        <h3 class="text-xl font-bold mb-2">Email Us</h3>
+        <p class="text-gray-500 mb-4 text-sm font-light">Response within 24 hours</p>
+        <a href="mailto:support@shopease.com" class="text-black font-bold underline">support@shopease.com</a>
+      </div>
+      <div class="contact-card text-center">
+        <div class="text-4xl mb-6">📞</div>
+        <h3 class="text-xl font-bold mb-2">Call Us</h3>
+        <p class="text-gray-500 mb-4 text-sm font-light">Mon-Fri, 9am - 6pm EST</p>
+        <a href="tel:+18005550123" class="text-black font-bold underline">+1 (800) 555-0123</a>
+      </div>
+      <div class="contact-card text-center">
+        <div class="text-4xl mb-6">💬</div>
+        <h3 class="text-xl font-bold mb-2">Live Chat</h3>
+        <p class="text-gray-500 mb-4 text-sm font-light">Instant support on our site</p>
+        <button class="text-black font-bold underline">Start Chat</button>
+      </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto bg-gray-50 rounded-[3rem] p-8 md:p-16 border border-gray-100" style="background: var(--bg-secondary)">
+      <h2 class="text-3xl font-black mb-10 text-center">SEND US A MESSAGE</h2>
+      <form class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-6">
+          <input type="text" placeholder="Your Name" required>
+          <input type="email" placeholder="Your Email" required>
+        </div>
+        <input type="text" placeholder="Order Number (Optional)">
+        <textarea placeholder="How can we help?" rows="5" required></textarea>
+        <button type="submit" class="w-full bg-black text-white py-4 rounded-2xl font-bold hover:scale-[1.02] transition-all">Send Message</button>
+      </form>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <script>
+    fetch('footer.html').then(r => r.text()).then(html => {
+      document.getElementById('footer-placeholder').innerHTML = html;
+    });
+  </script>
+  <script src="/static/common.js" defer></script>
+</body>
 </html>
