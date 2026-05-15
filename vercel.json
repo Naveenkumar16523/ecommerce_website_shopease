@@ -1,61 +1,71 @@
 {
   "version": 2,
-  "headers": [
-    {
-      "source": "/(.*).js",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/(.*).css",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-      ]
-    }
-  ],
   "builds": [
     {
       "src": "app.py",
       "use": "@vercel/python"
     },
     {
-      "src": "**/*.html",
+      "src": "*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "**/*.js",
+      "src": "static/**/*",
       "use": "@vercel/static"
     },
     {
-      "src": "**/*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "assets/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "translations/**/*.json",
+      "src": "assets/**/*",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/seed",
-      "status": 404
-    },
-    {
       "src": "/api/(.*)",
       "dest": "app.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/index.html",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/(.*).html",
+      "dest": "/$1.html"
+    },
+    {
+      "src": "/mens",
+      "dest": "/mens.html"
+    },
+    {
+      "src": "/womens",
+      "dest": "/womens.html"
+    },
+    {
+      "src": "/kids",
+      "dest": "/kids.html"
+    },
+    {
+      "src": "/new-arrivals",
+      "dest": "/new-arrivals.html"
+    },
+    {
+      "src": "/top-selling",
+      "dest": "/top-selling.html"
+    },
+    {
+      "src": "/on-sale",
+      "dest": "/on-sale.html"
     },
     {
       "src": "/(.*)",
