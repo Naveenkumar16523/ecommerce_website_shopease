@@ -136,9 +136,9 @@
     <div class="space-y-3">
       <p class="text-sm text-gray-500">Select Colors</p>
       <div class="flex gap-3">
-        <div class="w-8 h-8 rounded-full bg-[#4F4631] cursor-pointer ring-2 ring-offset-2 ring-black"></div>
-        <div class="w-8 h-8 rounded-full bg-[#314F4A] cursor-pointer"></div>
-        <div class="w-8 h-8 rounded-full bg-[#31344F] cursor-pointer"></div>
+        <div class="color-dot-detail w-8 h-8 rounded-full bg-[#4F4631] cursor-pointer ring-2 ring-offset-2 ring-black"></div>
+        <div class="color-dot-detail w-8 h-8 rounded-full bg-[#314F4A] cursor-pointer"></div>
+        <div class="color-dot-detail w-8 h-8 rounded-full bg-[#31344F] cursor-pointer"></div>
       </div>
     </div>
 
@@ -161,7 +161,7 @@
     <div class="flex items-center gap-4 pt-2">
       <div class="flex items-center bg-gray-100 rounded-full px-4 py-3 gap-6">
         <button onclick="updateQtyDetail(-1)" class="text-xl font-bold">−</button>
-        <span id="detail-qty" class="font-bold">0</span>
+        <span id="detail-qty" class="font-bold">1</span>
         <button onclick="updateQtyDetail(1)" class="text-xl font-bold">+</button>
       </div>
       <button onclick="handleAddToCartDetail()" class="checkout-btn flex-1 bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold">
@@ -171,41 +171,77 @@
   </div>
 </section>
 
-
 <section class="px-6 md:px-12 py-10 border-t mt-10">
   <div class="flex justify-around border-b text-gray-400 text-sm md:text-base">
-    <button class="pb-4 px-4">Product Details</button>
-    <button class="pb-4 px-4 tab-active">Rating & Reviews</button>
-    <button class="pb-4 px-4">FAQs</button>
+    <button onclick="switchTab('details')" id="tab-details" class="pb-4 px-4 border-b-2 border-transparent hover:text-black transition-all">Product Details</button>
+    <button onclick="switchTab('reviews')" id="tab-reviews" class="pb-4 px-4 border-b-2 border-black text-black font-bold transition-all">Rating & Reviews</button>
+    <button onclick="switchTab('faqs')" id="tab-faqs" class="pb-4 px-4 border-b-2 border-transparent hover:text-black transition-all">FAQs</button>
   </div>
 
   <div class="py-8">
-    <div class="flex justify-between items-center mb-8">
-      <h3 class="text-xl font-bold">All Reviews <span class="text-gray-400 text-sm font-normal">(451)</span></h3>
-      <div class="flex gap-3">
-        <button class="bg-gray-100 p-2 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-        <button class="checkout-btn bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-6 py-2 rounded-full text-sm font-bold">Write a Review</button>
+    <!-- Tab: Details -->
+    <div id="content-details" class="hidden animate-on-scroll space-y-6">
+      <div class="grid md:grid-cols-2 gap-10">
+        <div>
+          <h4 class="font-bold text-lg mb-4">Specifications</h4>
+          <ul class="space-y-3 text-sm text-gray-600">
+            <li class="flex justify-between border-b pb-2"><span>Material</span><span class="font-medium text-black">100% Premium Cotton</span></li>
+            <li class="flex justify-between border-b pb-2"><span>Weight</span><span class="font-medium text-black">180 GSM</span></li>
+            <li class="flex justify-between border-b pb-2"><span>Fit</span><span class="font-medium text-black">Regular Fit</span></li>
+            <li class="flex justify-between border-b pb-2"><span>Origin</span><span class="font-medium text-black">Made in Italy</span></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-4">Care Instructions</h4>
+          <ul class="space-y-2 text-sm text-gray-600 list-disc pl-5">
+            <li>Machine wash cold with like colors</li>
+            <li>Tumble dry low</li>
+            <li>Cool iron if needed</li>
+            <li>Do not bleach</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="border rounded-2xl p-6 space-y-3">
-        <div class="flex text-yellow-400 text-sm">★★★★★</div>
-        <p class="font-bold">Samantha D. ✅</p>
-        <p class="text-sm text-gray-500 italic">"I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. It's become my favorite go-to shirt."</p>
-        <p class="text-xs text-gray-400">Posted on August 14, 2023</p>
+    <!-- Tab: Reviews -->
+    <div id="content-reviews" class="animate-on-scroll">
+      <div class="flex justify-between items-center mb-8">
+        <h3 class="text-xl font-bold">All Reviews <span class="text-gray-400 text-sm font-normal">(451)</span></h3>
+        <div class="flex gap-3">
+          <button class="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+          <button class="checkout-btn bg-gradient-to-r from-slate-900 to-black text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg hover:shadow-xl transition-all">Write a Review</button>
+        </div>
       </div>
-      <div class="border rounded-2xl p-6 space-y-3">
-        <div class="flex text-yellow-400 text-sm">★★★★★</div>
-        <p class="font-bold">Alex M. ✅</p>
-        <p class="text-sm text-gray-500 italic">"The quality is top-notch. Being a UI/UX designer myself, I appreciate the aesthetics and this definitely gets a thumbs up from me!"</p>
-        <p class="text-xs text-gray-400">Posted on August 15, 2023</p>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="border rounded-2xl p-6 space-y-3 bg-white shadow-sm hover:shadow-md transition-all">
+          <div class="flex text-yellow-400 text-sm">★★★★★</div>
+          <p class="font-bold flex items-center gap-2">Samantha D. <span class="bg-green-500 text-white rounded-full p-0.5"><svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></span></p>
+          <p class="text-sm text-gray-500 italic">"I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. It's become my favorite go-to shirt."</p>
+          <p class="text-xs text-gray-400">Posted on August 14, 2023</p>
+        </div>
+        <div class="border rounded-2xl p-6 space-y-3 bg-white shadow-sm hover:shadow-md transition-all">
+          <div class="flex text-yellow-400 text-sm">★★★★★</div>
+          <p class="font-bold flex items-center gap-2">Alex M. <span class="bg-green-500 text-white rounded-full p-0.5"><svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></span></p>
+          <p class="text-sm text-gray-500 italic">"The quality is top-notch. Being a UI/UX designer myself, I appreciate the aesthetics and this definitely gets a thumbs up from me!"</p>
+          <p class="text-xs text-gray-400">Posted on August 15, 2023</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: FAQs -->
+    <div id="content-faqs" class="hidden animate-on-scroll space-y-4">
+      <div class="border rounded-xl p-4 cursor-pointer hover:bg-gray-50 transition">
+        <p class="font-bold text-sm">What is the return policy?</p>
+        <p class="text-xs text-gray-500 mt-2">We offer a 30-day return policy for all unworn and unwashed items with original tags attached.</p>
+      </div>
+      <div class="border rounded-xl p-4 cursor-pointer hover:bg-gray-50 transition">
+        <p class="font-bold text-sm">How long does shipping take?</p>
+        <p class="text-xs text-gray-500 mt-2">Standard shipping usually takes 3-5 business days. Express options are available at checkout.</p>
       </div>
     </div>
   </div>
 </section>
-
 
 <section class="px-6 md:px-16 py-20 bg-white">
   <div class="animate-on-scroll">
@@ -332,6 +368,42 @@
       document.getElementById('prod-name').innerText = "Error: " + err.message;
     }
   }
+
+  function switchTab(tab) {
+    const tabs = ['details', 'reviews', 'faqs'];
+    tabs.forEach(t => {
+      const btn = document.getElementById(`tab-${t}`);
+      const content = document.getElementById(`content-${t}`);
+      if (t === tab) {
+        btn.classList.add('border-black', 'text-black', 'font-bold');
+        btn.classList.remove('border-transparent');
+        content.classList.remove('hidden');
+      } else {
+        btn.classList.remove('border-black', 'text-black', 'font-bold');
+        btn.classList.add('border-transparent');
+        content.classList.add('hidden');
+      }
+    });
+  }
+
+  // Handle color/size selection
+  document.addEventListener('DOMContentLoaded', () => {
+    // Colors
+    document.querySelectorAll('.color-dot-detail').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('.color-dot-detail').forEach(d => d.classList.remove('ring-2', 'ring-offset-2', 'ring-black'));
+        dot.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+      });
+    });
+
+    // Sizes
+    document.querySelectorAll('.size-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
 
   async function loadRelatedProducts(category) {
     const container = document.getElementById('related-products-container');
