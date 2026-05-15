@@ -32,19 +32,49 @@
       transform: translateY(-5px);
       border-color: var(--accent);
     }
-    input, textarea {
+    .support-form-container {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      padding: 12px 20px;
+      border-radius: 3rem;
+      padding: 4rem;
+      box-shadow: 0 20px 50px var(--shadow);
+    }
+    input, textarea {
+      background: var(--bg-primary) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 1.25rem !important;
+      padding: 16px 24px !important;
       width: 100%;
       outline: none;
       transition: all 0.3s ease;
-      color: var(--text-primary);
+      color: var(--text-primary) !important;
     }
     input:focus, textarea:focus {
-      border-color: var(--text-primary);
+      border-color: var(--accent) !important;
       box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+    }
+    .btn-support-send {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      width: 100%;
+      padding: 18px;
+      border-radius: 1.25rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .btn-support-send:hover {
+      transform: scale(1.02);
+      box-shadow: 0 15px 30px var(--shadow);
+      opacity: 0.9;
+    }
+    [data-theme="dark"] .btn-support-send {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+    [data-theme="dark"] .btn-support-send:hover {
+      background: #f8fafc !important;
     }
   </style>
 </head>
@@ -84,8 +114,8 @@
       </div>
     </div>
 
-    <div class="max-w-4xl mx-auto bg-gray-50 rounded-[3rem] p-8 md:p-16 border border-gray-100" style="background: var(--bg-secondary)">
-      <h2 class="text-3xl font-black mb-10 text-center">SEND US A MESSAGE</h2>
+    <div class="max-w-4xl mx-auto support-form-container">
+      <h2 class="text-3xl font-black mb-10 text-center uppercase tracking-widest">Send Us a Message</h2>
       <form class="space-y-6">
         <div class="grid md:grid-cols-2 gap-6">
           <input type="text" placeholder="Your Name" required>
@@ -93,7 +123,7 @@
         </div>
         <input type="text" placeholder="Order Number (Optional)">
         <textarea placeholder="How can we help?" rows="5" required></textarea>
-        <button type="submit" class="w-full bg-black text-white py-4 rounded-2xl font-bold hover:scale-[1.02] transition-all">Send Message</button>
+        <button type="submit" class="btn-support-send">Send Message</button>
       </form>
     </div>
   </main>
