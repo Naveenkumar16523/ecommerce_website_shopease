@@ -379,17 +379,15 @@ function renderProductsInto(products, container) {
     
     return `
       <!-- Glow Card Wrapper -->
-      <div class="relative group cursor-pointer transition-all duration-500 hover:-translate-y-2 rounded-[2rem] z-10 animate-on-scroll" 
-           onclick="viewProduct(this)" 
-           data-id="${pid}" 
-           data-slug="${p.slug || ''}"
-           data-name="${safeName}" 
-           data-price="${safePrice}" 
-           data-category="${escapeHtml(p.category)}" 
-           data-img="${safeImg}">
+      <div class="relative group cursor-pointer transition-all duration-500 hover:-translate-y-2 rounded-[2rem] z-10" onclick="viewProduct(this)" data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-category="${escapeHtml(p.category)}" data-img="${safeImg}">
         
-        <!-- Animated Glow Elements -->
+        <!-- Animated Glow Elements (hidden by default, shown on hover) -->
+        <!-- Blur Glow -->
         <div class="absolute inset-[-3px] rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 blur-xl overflow-hidden">
+          <div class="absolute inset-[-50%] w-[200%] h-[200%] animate-[spin_4s_linear_infinite]" style="background: conic-gradient(from 0deg, transparent 0%, #00ff99 25%, #006aff 50%, #ff0095 75%, transparent 100%);"></div>
+        </div>
+        <!-- Solid Border Glow -->
+        <div class="absolute inset-[-3px] rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 overflow-hidden">
           <div class="absolute inset-[-50%] w-[200%] h-[200%] animate-[spin_4s_linear_infinite]" style="background: conic-gradient(from 0deg, transparent 0%, #00ff99 25%, #006aff 50%, #ff0095 75%, transparent 100%);"></div>
         </div>
         
@@ -410,20 +408,15 @@ function renderProductsInto(products, container) {
           </div>
           
           <div class="font-medium text-lg md:text-xl tracking-wide mb-2 line-clamp-1">${safeName}</div>
-          <div class="flex items-center gap-2 mb-4">
-            <div class="flex text-yellow-400 text-sm">★★★★☆</div>
-            <span class="text-xs text-gray-400 font-bold">${p.rating || '4.5'}/5</span>
-          </div>
+          <p class="text-gray-500 text-sm mb-4 line-clamp-3 leading-relaxed">
+            Experience premium quality with the ${safeName}. Crafted for style and performance, this item represents the pinnacle of our collection.
+          </p>
           
-          <div class="mt-auto flex items-center justify-between" onclick="event.stopPropagation()">
-            <div class="flex flex-col">
-              <span class="text-black font-black text-xl">$${safePrice}</span>
-              ${p.original_price ? `<span class="text-gray-300 line-through text-xs">$${p.original_price}</span>` : ''}
-            </div>
+          <div class="mt-auto flex items-center gap-3" onclick="event.stopPropagation()">
             <button onclick="addToCart(this)" 
               data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-img="${safeImg}"
-              class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition-all duration-300 shadow-sm">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              class="flex items-center gap-3 bg-black text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-[0_0_15px_rgba(0,0,0,0.1)]">
+              Buy now <span class="text-white/80"> $${safePrice}</span>
             </button>
           </div>
         </div>
@@ -689,12 +682,7 @@ function showToast(m, type) { toast.show(m, type); }
 
 function viewProduct(element) {
   const id = element.getAttribute('data-id');
-  const slug = element.getAttribute('data-slug');
-  if (id && slug) {
-    window.location.href = `/products/${id}/${slug}`;
-  } else if (id) {
-    window.location.href = `/product-detail.html?id=${id}`;
-  }
+  if (id) window.location.href = `product-detail.html?id=${id}`;
 }
 
 

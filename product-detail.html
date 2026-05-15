@@ -6,10 +6,18 @@
   <title>Product Details - SHOP EASE</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
   
+  
+  
+  
+  
+  
+
+  <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
 
   <script src="https://cdn.tailwindcss.com" defer></script>
   <link rel="stylesheet" href="/static/css/app.css">
@@ -22,501 +30,381 @@
     })();
   </script>
 
+  <script>
+    window.addEventListener('load', () => {
+      if (window.tailwind) {
+        window.tailwind.config = {
+          theme: { extend: { colors: { clifford: '#da373d' } } }
+        }
+      }
+    });
+  </script>
+  <script src="/static/common.js?v=1.6" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
   <style>
-    body { font-family: 'Outfit', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); }
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
     .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
     
+    /* Scrollbar */
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     
-    .page-transition { animation: fadeIn 0.6s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .thumbnail-active { border-color: var(--text-primary) !important; opacity: 1 !important; }
-    .color-swatch-active { ring: 2px solid var(--text-primary); ring-offset: 2px; }
-    
-    .tab-underline { position: absolute; bottom: -1px; left: 0; height: 2px; background: var(--text-primary); transition: all 0.3s ease; }
-    
-    .main-img-wrap { perspective: 1000px; }
-    #main-img { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; }
-    
-    .review-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .review-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
   </style>
 
-  <script src="/static/common.js?v=1.6" defer></script>
 </head>
 <body class="bg-white">
 
+
+  
   <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder" class="sticky top-0 z-50 glass shadow-sm"></div>
+  <div id="nav-placeholder"></div>
   <script>
     fetch('/nav.html').then(r => r.text()).then(html => {
       document.getElementById('nav-placeholder').innerHTML = html;
       if (typeof updateAuthUI === 'function') updateAuthUI();
       if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
   </script>
 
-  <main class="page-transition max-w-7xl mx-auto pb-20">
-    <!-- Breadcrumb -->
-    <div class="px-6 md:px-12 py-6 text-sm text-gray-500">
-      <nav class="flex gap-2 items-center">
-        <a href="/index.html" class="hover:text-black">Home</a>
-        <span>&gt;</span>
-        <a href="/index.html#shop" class="hover:text-black">Shop</a>
-        <span>&gt;</span>
-        <span id="breadcrumb-category" class="capitalize">Category</span>
-        <span>&gt;</span>
-        <span id="breadcrumb-name" class="text-black font-semibold">Product</span>
-      </nav>
+  <div class="px-6 md:px-12 py-4 text-sm text-gray-500">
+    <a href="/index.html" class="hover:text-black">Home</a> › <span id="breadcrumb-category">Shop</span> › <span id="breadcrumb-name" class="text-black font-medium">Product</span>
+  </div>
+
+
+<section class="px-6 md:px-12 py-6 grid md:grid-cols-2 gap-10">
+  
+  
+  <div class="flex flex-col-reverse md:flex-row gap-4">
+    <div class="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto scrollbar-hide">
+      <img src="" id="thumb1" class="min-w-[80px] w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover border cursor-pointer hover:border-black transition">
+      <img src="" id="thumb2" class="min-w-[80px] w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover border cursor-pointer hover:border-black transition">
+      <img src="" id="thumb3" class="min-w-[80px] w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover border cursor-pointer hover:border-black transition">
+    </div>
+    <div class="flex-1">
+      <img src="" id="main-img" class="w-full h-[350px] md:h-[500px] rounded-2xl object-cover bg-gray-100 shadow-sm">
+    </div>
+  </div>
+
+  
+  <div class="space-y-6">
+    <h1 id="prod-name" class="text-4xl font-black hero-title leading-tight uppercase">Loading Product...</h1>
+    <div class="flex items-center gap-2">
+      <div class="flex text-yellow-400">★★★★☆</div>
+      <span class="text-sm text-gray-500">4.5/5</span>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <span id="prod-price" class="text-3xl font-bold">$0</span>
+      <span class="text-2xl text-gray-300 line-through" id="old-price"></span>
+      <span class="bg-red-100 text-red-500 text-xs px-2 py-1 rounded-full font-bold" id="discount-tag">-40%</span>
     </div>
 
-    <!-- Product Detail Section -->
-    <section class="px-6 md:px-12 grid md:grid-cols-2 gap-12 lg:gap-20">
-      
-      <!-- Left Column: Gallery -->
-      <div class="flex flex-col-reverse md:flex-row gap-5">
-        <!-- Thumbnails -->
-        <div id="thumbnail-gallery" class="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto scrollbar-hide md:max-h-[500px]">
-          <!-- Populated by JS -->
-        </div>
-        <!-- Main Image -->
-        <div class="flex-1 main-img-wrap relative rounded-3xl overflow-hidden bg-gray-50 border border-gray-100 group">
-          <img src="" id="main-img" class="w-full aspect-[4/5] object-cover group-hover:scale-105" alt="Main Product Image">
-          <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-        </div>
-      </div>
+    <p class="text-gray-500 text-sm leading-relaxed">
+      This premium garment is crafted from soft and breathable fabric, offering superior comfort and style for any occasion.
+    </p>
 
-      <!-- Right Column: Info -->
-      <div class="space-y-8">
-        <div class="space-y-4">
-          <h1 id="prod-name" class="text-4xl md:text-5xl font-black hero-title leading-[1.1] uppercase tracking-tight">Loading...</h1>
-          <div class="flex items-center gap-3">
-            <div id="star-rating" class="flex text-yellow-400 text-xl tracking-tighter"></div>
-            <span class="text-sm font-medium"><span id="rating-score">0</span>/5</span>
-          </div>
-          
-          <div class="flex items-center gap-4">
-            <span id="prod-price" class="text-3xl font-black text-black tracking-tight">$0</span>
-            <span id="old-price" class="text-2xl text-gray-300 line-through font-light"></span>
-            <span id="discount-tag" class="bg-red-50 text-red-500 text-xs px-3 py-1 rounded-full font-bold border border-red-100 hidden"></span>
-          </div>
+    <hr class="border-gray-100">
 
-          <p id="prod-desc" class="text-gray-500 text-base leading-relaxed max-w-lg">
-            Loading description...
-          </p>
-        </div>
-
-        <hr class="border-gray-100">
-
-        <!-- Color Selector -->
-        <div class="space-y-4">
-          <p class="text-sm font-bold uppercase tracking-widest text-gray-400">Select Colors</p>
-          <div id="color-selector" class="flex gap-4">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <hr class="border-gray-100">
-
-        <!-- Size Selector -->
-        <div class="space-y-4">
-          <p class="text-sm font-bold uppercase tracking-widest text-gray-400">Choose Size</p>
-          <div id="size-selector" class="flex flex-wrap gap-3">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <hr class="border-gray-100">
-
-        <!-- Action Bar -->
-        <div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
-          <div class="flex items-center bg-gray-100 rounded-full px-6 py-4 gap-8 w-full sm:w-auto justify-between sm:justify-center">
-            <button onclick="updateQtyDetail(-1)" class="text-2xl font-bold hover:text-gray-500 transition">−</button>
-            <span id="detail-qty" class="text-xl font-black min-w-[20px] text-center">1</span>
-            <button onclick="updateQtyDetail(1)" class="text-2xl font-bold hover:text-gray-500 transition">+</button>
-          </div>
-          <button onclick="handleAddToCartDetail()" class="checkout-btn flex-1 w-full bg-black text-white hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 py-4.5 rounded-full font-black uppercase tracking-widest flex items-center justify-center gap-3 group">
-            Add to Cart
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tabs Section -->
-    <section class="px-6 md:px-12 mt-20">
-      <div class="relative flex justify-around border-b border-gray-100">
-        <button onclick="switchTab('details')" id="tab-details" class="tab-btn pb-6 px-4 text-gray-400 font-bold transition-colors">Product Details</button>
-        <button onclick="switchTab('reviews')" id="tab-reviews" class="tab-btn pb-6 px-4 text-black font-bold border-b-2 border-black transition-colors relative">
-          Rating & Reviews
-        </button>
-        <button onclick="switchTab('faqs')" id="tab-faqs" class="tab-btn pb-6 px-4 text-gray-400 font-bold transition-colors">FAQs</button>
-      </div>
-
-      <div id="tab-content" class="py-12 transition-opacity duration-300">
-        <!-- Rating & Reviews (Default) -->
-        <div id="content-reviews" class="space-y-10">
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-6">
-            <h3 class="text-2xl font-black">All Reviews <span id="review-count-header" class="text-gray-400 text-sm font-normal">(0)</span></h3>
-            <div class="flex gap-3 w-full sm:w-auto">
-              <button class="bg-gray-100 p-3 rounded-full hover:bg-gray-200 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-              <button onclick="openReviewModal()" class="checkout-btn bg-black text-white px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest flex-1 sm:flex-none">Write a Review</button>
-            </div>
-          </div>
-
-          <div id="reviews-grid" class="grid md:grid-cols-2 gap-8">
-            <!-- Populated by JS -->
-          </div>
-
-          <div class="text-center pt-8">
-            <button class="border border-gray-200 px-10 py-3 rounded-full text-sm font-bold hover:bg-black hover:text-white transition-all duration-300">Load More Reviews</button>
-          </div>
-        </div>
-
-        <div id="content-details" class="hidden">
-           <div class="max-w-2xl mx-auto space-y-6">
-             <h4 class="text-xl font-bold">Key Features</h4>
-             <ul class="list-disc pl-5 space-y-3 text-gray-600">
-               <li>Premium quality fabric blend for durability and comfort</li>
-               <li>Modern fit designed for versatility</li>
-               <li>Breathable material suitable for all seasons</li>
-               <li>Machine washable and easy to maintain</li>
-             </ul>
-           </div>
-        </div>
-
-        <div id="content-faqs" class="hidden">
-          <div class="max-w-2xl mx-auto space-y-4">
-            <div class="border rounded-2xl p-6 bg-gray-50">
-              <p class="font-bold mb-2">What is the return policy?</p>
-              <p class="text-gray-500 text-sm">We offer a 30-day hassle-free return policy for all unworn items with tags attached.</p>
-            </div>
-            <div class="border rounded-2xl p-6 bg-gray-50">
-              <p class="font-bold mb-2">How do I track my order?</p>
-              <p class="text-gray-500 text-sm">Once your order ships, you'll receive an email with a tracking link and unique code.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Related Products -->
-    <section class="px-6 md:px-12 mt-10">
-      <h2 class="text-4xl md:text-5xl font-black text-center hero-title mb-16 uppercase">You might also like</h2>
-      <div id="related-products-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-        <!-- Populated by JS -->
-      </div>
-    </section>
-  </main>
-
-  <!-- Newsletter & Footer (copied from index) -->
-  <section class="px-6 md:px-12 py-12">
-    <div class="bg-black rounded-[3rem] p-10 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10">
-      <h2 class="text-white text-3xl md:text-5xl font-black max-w-md leading-tight uppercase hero-title">STAY UP TO DATE ABOUT OUR LATEST OFFERS</h2>
-      <div class="w-full lg:max-w-sm space-y-4">
-        <div class="relative">
-          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          <input type="email" placeholder="Enter your email address" class="w-full bg-white rounded-full py-4 pl-12 pr-6 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-        </div>
-        <button class="w-full bg-white text-black font-black uppercase py-4 rounded-full hover:bg-yellow-400 transition-colors tracking-widest">Subscribe to Newsletter</button>
+    
+    <div class="space-y-3">
+      <p class="text-sm text-gray-500">Select Colors</p>
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-[#4F4631] cursor-pointer ring-2 ring-offset-2 ring-black"></div>
+        <div class="w-8 h-8 rounded-full bg-[#314F4A] cursor-pointer"></div>
+        <div class="w-8 h-8 rounded-full bg-[#31344F] cursor-pointer"></div>
       </div>
     </div>
-  </section>
 
-  <footer class="bg-[#F0EEED] px-6 md:px-12 pt-20 pb-10 mt-10">
+    <hr class="border-gray-100">
+
+    
+    <div class="space-y-3">
+      <p class="text-sm text-gray-500">Choose Size</p>
+      <div class="flex flex-wrap gap-3">
+        <button class="size-btn">Small</button>
+        <button class="size-btn">Medium</button>
+        <button class="size-btn active">Large</button>
+        <button class="size-btn">X-Large</button>
+      </div>
+    </div>
+
+    <hr class="border-gray-100">
+
+    
+    <div class="flex items-center gap-4 pt-2">
+      <div class="flex items-center bg-gray-100 rounded-full px-4 py-3 gap-6">
+        <button onclick="updateQtyDetail(-1)" class="text-xl font-bold">−</button>
+        <span id="detail-qty" class="font-bold">0</span>
+        <button onclick="updateQtyDetail(1)" class="text-xl font-bold">+</button>
+      </div>
+      <button onclick="handleAddToCartDetail()" class="checkout-btn flex-1 bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<section class="px-6 md:px-12 py-10 border-t mt-10">
+  <div class="flex justify-around border-b text-gray-400 text-sm md:text-base">
+    <button class="pb-4 px-4">Product Details</button>
+    <button class="pb-4 px-4 tab-active">Rating & Reviews</button>
+    <button class="pb-4 px-4">FAQs</button>
+  </div>
+
+  <div class="py-8">
+    <div class="flex justify-between items-center mb-8">
+      <h3 class="text-xl font-bold">All Reviews <span class="text-gray-400 text-sm font-normal">(451)</span></h3>
+      <div class="flex gap-3">
+        <button class="bg-gray-100 p-2 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <button class="checkout-btn bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-6 py-2 rounded-full text-sm font-bold">Write a Review</button>
+      </div>
+    </div>
+
+    
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="border rounded-2xl p-6 space-y-3">
+        <div class="flex text-yellow-400 text-sm">★★★★★</div>
+        <p class="font-bold">Samantha D. ✅</p>
+        <p class="text-sm text-gray-500 italic">"I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. It's become my favorite go-to shirt."</p>
+        <p class="text-xs text-gray-400">Posted on August 14, 2023</p>
+      </div>
+      <div class="border rounded-2xl p-6 space-y-3">
+        <div class="flex text-yellow-400 text-sm">★★★★★</div>
+        <p class="font-bold">Alex M. ✅</p>
+        <p class="text-sm text-gray-500 italic">"The quality is top-notch. Being a UI/UX designer myself, I appreciate the aesthetics and this definitely gets a thumbs up from me!"</p>
+        <p class="text-xs text-gray-400">Posted on August 15, 2023</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="px-6 md:px-16 py-20 bg-white">
+  <div class="animate-on-scroll">
+    <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight mb-14 hero-title uppercase">YOU MIGHT ALSO LIKE</h2>
+  </div>
+  <div id="related-products-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 animate-on-scroll">
+    <!-- Dynamically populated -->
+  </div>
+</section>
+
+  
+  <footer class="bg-gray-900 text-white px-6 md:px-16 pt-20 pb-8 mt-10 rounded-t-[3rem] animate-on-scroll">
     <div class="grid grid-cols-2 md:grid-cols-5 gap-12 mb-16">
-      <div class="col-span-2 md:col-span-1 space-y-6">
-        <div class="hero-title text-4xl font-black tracking-tight">SHOP EASE</div>
-        <p class="text-sm text-gray-500 leading-relaxed font-light">We have clothes that suit your style and which you are proud to wear. From women to men.</p>
+      <div class="col-span-2 md:col-span-1">
+        <div class="hero-title text-4xl mb-4 tracking-wider">SHOP EASE</div>
+        <p class="text-sm text-gray-400 leading-relaxed mb-6 font-light">Elevate your style with our premium collection of modern fashion.</p>
         <div class="flex gap-4">
-          <a href="#" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.56v14.91A4.56 4.56 0 0 1 19.44 24H4.56A4.56 4.56 0 0 1 0 19.44V4.56A4.56 4.56 0 0 1 4.56 0h14.88A4.56 4.56 0 0 1 24 4.56z"/></svg></a>
-          <a href="#" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919"/></svg></a>
-          <a href="#" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26"/></svg></a>
+          <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.56v14.91A4.56 4.56 0 0 1 19.44 24H4.56A4.56 4.56 0 0 1 0 19.44V4.56A4.56 4.56 0 0 1 4.56 0h14.88A4.56 4.56 0 0 1 24 4.56zM9 10H6v3h3v8h4v-8h3l.5-3H13V8.5c0-.8.4-1.5 1.5-1.5H17V4h-2.5C11.4 4 9 6.4 9 9.5V10z"/></svg>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
         </div>
       </div>
       <div>
-        <h4 class="font-black text-sm mb-6 tracking-widest uppercase">Company</h4>
-        <ul class="space-y-4 text-sm text-gray-500 font-light">
-          <li><a href="#" class="hover:text-black transition">About</a></li>
-          <li><a href="#" class="hover:text-black transition">Features</a></li>
-          <li><a href="#" class="hover:text-black transition">Works</a></li>
-          <li><a href="#" class="hover:text-black transition">Career</a></li>
+        <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">COMPANY</div>
+        <ul class="space-y-4 text-sm font-light text-gray-400">
+          <li><a href="/about.html" class="hover:text-white transition">About</a></li>
+          <li><a href="/features.html" class="hover:text-white transition">Features</a></li>
+          <li><a href="/works.html" class="hover:text-white transition">Works</a></li>
+          <li><a href="/career.html" class="hover:text-white transition">Career</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="font-black text-sm mb-6 tracking-widest uppercase">Help</h4>
-        <ul class="space-y-4 text-sm text-gray-500 font-light">
-          <li><a href="#" class="hover:text-black transition">Customer Support</a></li>
-          <li><a href="#" class="hover:text-black transition">Delivery Details</a></li>
-          <li><a href="#" class="hover:text-black transition">Terms & Conditions</a></li>
-          <li><a href="#" class="hover:text-black transition">Privacy Policy</a></li>
+        <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">HELP</div>
+        <ul class="space-y-4 text-sm font-light text-gray-400">
+          <li><a href="/support.html" class="hover:text-white transition">Customer Support</a></li>
+          <li><a href="/delivery-details.html" class="hover:text-white transition">Delivery Details</a></li>
+          <li><a href="/terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
+          <li><a href="/privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="font-black text-sm mb-6 tracking-widest uppercase">FAQ</h4>
-        <ul class="space-y-4 text-sm text-gray-500 font-light">
-          <li><a href="#" class="hover:text-black transition">Account</a></li>
-          <li><a href="#" class="hover:text-black transition">Manage Deliveries</a></li>
-          <li><a href="#" class="hover:text-black transition">Orders</a></li>
-          <li><a href="#" class="hover:text-black transition">Payments</a></li>
+        <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">FAQ</div>
+        <ul class="space-y-4 text-sm font-light text-gray-400">
+          <li><a href="/account.html" class="hover:text-white transition">Account</a></li>
+          <li><a href="/delivery-details.html" class="hover:text-white transition">Manage Deliveries</a></li>
+          <li><a href="/orders.html" class="hover:text-white transition">Orders</a></li>
+          <li><a href="/payments.html" class="hover:text-white transition">Payments</a></li>
         </ul>
       </div>
     </div>
-    <hr class="border-gray-200 mb-8">
+
+    <hr class="border-gray-800 mb-8"/>
     <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-      <p class="text-xs text-gray-400 font-light tracking-wide">SHOP EASE © 2025–2026, All Rights Reserved</p>
-      <div class="flex items-center gap-2 grayscale opacity-50">
-        <div class="bg-white rounded px-3 py-1.5 text-xs font-bold shadow-sm">VISA</div>
-        <div class="bg-white rounded px-3 py-1.5 text-xs font-bold shadow-sm">MasterCard</div>
-        <div class="bg-white rounded px-3 py-1.5 text-xs font-bold shadow-sm">PayPal</div>
-        <div class="bg-white rounded px-3 py-1.5 text-xs font-bold shadow-sm">G Pay</div>
+      <p class="text-xs text-gray-400">SHOP EASE © 2025–2026, All Rights Reserved</p>
+      <div class="flex items-center gap-3">
+        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">VISA</div>
+        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">Paytm</div>
+        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">PayPal</div>
+        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">G Pay</div>
       </div>
     </div>
   </footer>
 
-  <!-- Review Modal -->
-  <div id="review-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeReviewModal()"></div>
-    <div class="relative bg-white rounded-[2.5rem] p-8 md:p-12 w-full max-w-xl shadow-2xl space-y-6">
-      <h3 class="text-3xl font-black hero-title uppercase">Write a Review</h3>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Rating</label>
-          <div id="modal-rating" class="flex gap-2 text-2xl text-gray-200">
-            <span class="cursor-pointer hover:text-yellow-400" onclick="setModalRating(1)">★</span>
-            <span class="cursor-pointer hover:text-yellow-400" onclick="setModalRating(2)">★</span>
-            <span class="cursor-pointer hover:text-yellow-400" onclick="setModalRating(3)">★</span>
-            <span class="cursor-pointer hover:text-yellow-400" onclick="setModalRating(4)">★</span>
-            <span class="cursor-pointer hover:text-yellow-400" onclick="setModalRating(5)">★</span>
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Your Name</label>
-          <input type="text" id="review-name" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-black">
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Comment</label>
-          <textarea id="review-comment" rows="4" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-black"></textarea>
-        </div>
-        <button onclick="submitReview()" class="w-full bg-black text-white font-black uppercase py-4 rounded-full hover:bg-gray-800 transition-all tracking-widest">Post Review</button>
-      </div>
-    </div>
-  </div>
+<script>
+  let currentProduct = null;
 
-  <script>
-    let currentProduct = null;
-    let selectedColor = null;
-    let selectedSize = null;
-    let modalRating = 5;
+  async function loadProductDetail() {
+    const params = new URLSearchParams(window.location.search);
+    let id = params.get('id');
+    
+    // Fallback: Extract from path /products/<id>/<slug>
+    if (!id) {
+      const parts = window.location.pathname.split('/');
+      const idx = parts.indexOf('products');
+      if (idx !== -1 && parts[idx+1]) {
+        id = parts[idx+1];
+      }
+    }
+    
+    if (!id) {
+      document.body.innerHTML = `<div class="p-20 text-center"><h1 class="text-2xl font-bold">Product not found</h1><p class="mb-6">We couldn't identify the product ID.</p><a href="/index.html" class="underline">Go Home</a></div>`;
+      return;
+    }
 
-    async function loadProductDetail() {
-      const params = new URLSearchParams(window.location.search);
-      let id = params.get('id');
-      
-      // Fallback path handling
-      if (!id) {
-        const parts = window.location.pathname.split('/');
-        const pIdx = parts.indexOf('products');
-        if (pIdx !== -1 && parts[pIdx+1]) id = parts[pIdx+1];
+    try {
+      const response = await apiRequest(`/products/${id}`);
+      if (!response.ok) {
+        if (response.status === 404) throw new Error("Product not found");
+        throw new Error("Failed to load product");
       }
       
-      if (!id) {
-        window.location.href = '/index.html';
-        return;
+      const product = await response.json();
+      currentProduct = product;
+
+      // Update UI
+      document.getElementById('prod-name').innerText = product.name;
+      document.getElementById('breadcrumb-name').innerText = product.name;
+      document.getElementById('breadcrumb-category').innerText = product.category;
+      document.getElementById('prod-price').innerText = "$" + product.price;
+      document.getElementById('main-img').src = product.image;
+      document.getElementById('thumb1').src = product.image;
+      document.getElementById('thumb2').src = product.image;
+      document.getElementById('thumb3').src = product.image;
+      
+      if(parseFloat(product.price) > 150) {
+        document.getElementById('old-price').innerText = "$" + (parseFloat(product.price) + 50);
+      } else {
+        document.getElementById('discount-tag').style.display = 'none';
       }
+      
+      document.getElementById('detail-qty').innerText = "1";
 
-      try {
-        const response = await apiRequest(`/products/${id}`);
-        if (!response.ok) throw new Error("Product not found");
-        
-        const product = await response.json();
-        currentProduct = product;
+      // Load related products
+      loadRelatedProducts(product.category);
 
-        // Parse JSON fields
-        const images = product.images ? JSON.parse(product.images) : [product.image];
-        const colors = product.colors ? JSON.parse(product.colors) : [];
-        const sizes = product.sizes ? JSON.parse(product.sizes) : ["Small", "Medium", "Large", "X-Large"];
-        const relatedIds = product.related_products ? JSON.parse(product.related_products) : [];
+    } catch (err) {
+      console.error(err);
+      document.getElementById('prod-name').innerText = "Error: " + err.message;
+    }
+  }
 
-        // Update Text Content
-        document.getElementById('prod-name').innerText = product.name;
-        document.getElementById('breadcrumb-name').innerText = product.name;
-        document.getElementById('breadcrumb-category').innerText = product.category || 'Shop';
-        document.getElementById('prod-price').innerText = "$" + product.price;
-        document.getElementById('rating-score').innerText = product.rating || '4.5';
-        document.getElementById('prod-desc').innerText = product.description || "No description available.";
-        document.getElementById('review-count-header').innerText = `(${product.review_count || 0})`;
-        
-        // Stars
-        const stars = Math.round(product.rating || 4.5);
-        document.getElementById('star-rating').innerHTML = '★'.repeat(stars) + '☆'.repeat(5 - stars);
-
-        // Prices & Discount
-        if (product.original_price) {
-          document.getElementById('old-price').innerText = "$" + product.original_price;
-          document.getElementById('discount-tag').innerText = product.discount_tag || "-0%";
-          document.getElementById('discount-tag').classList.remove('hidden');
-        }
-
-        // Gallery
-        const thumbCont = document.getElementById('thumbnail-gallery');
-        thumbCont.innerHTML = images.map((img, i) => `
-          <img src="${img}" class="min-w-[80px] w-20 h-20 md:w-24 md:h-32 rounded-2xl object-cover border-2 border-transparent cursor-pointer opacity-60 hover:opacity-100 transition-all duration-300 ${i === 0 ? 'thumbnail-active' : ''}" 
-               onclick="setMainImage(this, '${img}')">
-        `).join('');
-        document.getElementById('main-img').src = images[0];
-
-        // Colors
-        const colorCont = document.getElementById('color-selector');
-        colorCont.innerHTML = colors.map((c, i) => `
-          <div class="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center transition-all duration-300 ${i === 0 ? 'ring-2 ring-black ring-offset-2' : ''}" 
-               style="background-color: ${c}" onclick="selectColor(this, '${c}')">
-            <svg class="w-4 h-4 text-white ${i === 0 ? '' : 'hidden'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+  async function loadRelatedProducts(category) {
+    const container = document.getElementById('related-products-container');
+    if (!container) return;
+    
+    try {
+      const response = await fetch(`/products?category=${category}&limit=4`);
+      if (!response.ok) return;
+      const products = await response.json();
+      
+      container.innerHTML = products.map(p => `
+        <div class="product-card group cursor-pointer animate-on-scroll" onclick="window.location.href='product-detail.html?id=${p.id}'">
+          <div class="aspect-square rounded-3xl overflow-hidden bg-gray-50 mb-4 relative">
+            <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
           </div>
-        `).join('');
-        selectedColor = colors[0];
-
-        // Sizes
-        const sizeCont = document.getElementById('size-selector');
-        sizeCont.innerHTML = sizes.map((s, i) => `
-          <button class="size-btn ${i === 2 ? 'active' : ''}" onclick="selectSize(this, '${s}')">${s}</button>
-        `).join('');
-        selectedSize = sizes[2];
-
-        // Mock Reviews
-        renderMockReviews();
-
-        // Related Products
-        loadRelatedProducts(relatedIds);
-
-      } catch (err) {
-        console.error(err);
-        showToast("Error loading product", "error");
-      }
-    }
-
-    function setMainImage(el, src) {
-      document.querySelectorAll('#thumbnail-gallery img').forEach(t => t.classList.remove('thumbnail-active'));
-      el.classList.add('thumbnail-active');
-      const main = document.getElementById('main-img');
-      main.style.opacity = '0.4';
-      setTimeout(() => {
-        main.src = src;
-        main.style.opacity = '1';
-      }, 150);
-    }
-
-    function selectColor(el, color) {
-      document.querySelectorAll('#color-selector > div').forEach(c => {
-        c.classList.remove('ring-2', 'ring-black', 'ring-offset-2');
-        c.querySelector('svg').classList.add('hidden');
-      });
-      el.classList.add('ring-2', 'ring-black', 'ring-offset-2');
-      el.querySelector('svg').classList.remove('hidden');
-      selectedColor = color;
-    }
-
-    function selectSize(el, size) {
-      document.querySelectorAll('#size-selector button').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      selectedSize = size;
-    }
-
-    function updateQtyDetail(change) {
-      const el = document.getElementById('detail-qty');
-      let val = parseInt(el.innerText) + change;
-      if (val < 1) val = 1;
-      el.innerText = val;
-    }
-
-    function handleAddToCartDetail() {
-      if (!currentProduct) return;
-      const qty = parseInt(document.getElementById('detail-qty').innerText);
-      const productToStore = {
-        ...currentProduct,
-        selectedColor,
-        selectedSize
-      };
-      cartStore.add(productToStore, qty);
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('text-black', 'border-b-2', 'border-black');
-        btn.classList.add('text-gray-400');
-      });
-      document.getElementById(`tab-${tab}`).classList.remove('text-gray-400');
-      document.getElementById(`tab-${tab}`).classList.add('text-black', 'border-b-2', 'border-black');
-
-      const content = document.getElementById('tab-content');
-      content.style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('content-reviews').classList.add('hidden');
-        document.getElementById('content-details').classList.add('hidden');
-        document.getElementById('content-faqs').classList.add('hidden');
-        document.getElementById(`content-${tab}`).classList.remove('hidden');
-        content.style.opacity = '1';
-      }, 150);
-    }
-
-    function renderMockReviews() {
-      const reviews = [
-        { name: "Samantha D.", date: "August 14, 2023", text: "I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. It's become my favorite go-to shirt." },
-        { name: "Alex M.", date: "August 15, 2023", text: "The quality is top-notch. Being a UI/UX designer myself, I appreciate the aesthetics and this definitely gets a thumbs up from me!" },
-        { name: "Ethan R.", date: "August 16, 2023", text: "Fast shipping and great fit. The colors are exactly as shown in the pictures. Highly recommend." },
-        { name: "Olivia P.", date: "August 17, 2023", text: "Perfect for casual outings. I've received so many compliments on the tape details. Will buy again!" }
-      ];
-      const grid = document.getElementById('reviews-grid');
-      grid.innerHTML = reviews.map(r => `
-        <div class="review-card border border-gray-100 rounded-3xl p-8 space-y-4 bg-white">
-          <div class="flex justify-between">
-            <div class="flex text-yellow-400 text-sm">★★★★★</div>
-            <button class="text-gray-300">•••</button>
-          </div>
-          <div class="flex items-center gap-2">
-            <p class="font-black uppercase tracking-tight">${r.name}</p>
-            <div class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-[8px] text-white">✓</div>
-          </div>
-          <p class="text-gray-500 text-sm leading-relaxed italic">"${r.text}"</p>
-          <p class="text-xs text-gray-400 font-bold uppercase tracking-widest pt-2">Posted on ${r.date}</p>
+          <h3 class="font-bold text-base mb-1 truncate">${p.name}</h3>
+          <div class="flex text-yellow-400 text-xs mb-2">★★★★☆</div>
+          <p class="font-black text-xl">$${p.price}</p>
         </div>
       `).join('');
+    } catch (err) {
+      console.error("Related products failed:", err);
     }
+  }
 
-    async function loadRelatedProducts(ids) {
-      if (!ids.length) return;
-      const grid = document.getElementById('related-products-grid');
-      try {
-        const response = await apiRequest('/products');
-        const data = await response.json();
-        const all = data.data || data;
-        const related = all.filter(p => ids.includes(p.id)).slice(0, 4);
-        
-        if (related.length) {
-          renderProductsInto(related, grid);
-        }
-      } catch (err) { console.error(err); }
-    }
+  window.onload = loadProductDetail;
 
-    // Modal
-    function openReviewModal() { document.getElementById('review-modal').classList.remove('hidden'); }
-    function closeReviewModal() { document.getElementById('review-modal').classList.add('hidden'); }
-    function setModalRating(r) {
-      modalRating = r;
-      const stars = document.querySelectorAll('#modal-rating span');
-      stars.forEach((s, i) => s.style.color = i < r ? '#fbbf24' : '#e5e7eb');
-    }
-    function submitReview() {
-      showToast("Review submitted successfully!");
-      closeReviewModal();
-    }
+  function updateQtyDetail(change) {
+    const qtySpan = document.getElementById('detail-qty');
+    let val = parseInt(qtySpan.innerText) + change;
+    if(val < 1) val = 1;
+    qtySpan.innerText = val;
+  }
 
-    window.onload = loadProductDetail;
+  function handleAddToCartDetail() {
+    if (!currentProduct) return;
+    const qty = parseInt(document.getElementById('detail-qty').innerText);
+    cartStore.add(currentProduct, qty);
+  }
+</script>
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
   </script>
 </body>
 </html>
+
