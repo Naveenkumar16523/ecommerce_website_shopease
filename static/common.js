@@ -1,6 +1,4 @@
-var API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
-  ? "http://127.0.0.1:5000/api" 
-  : "https://ecommerce-website-shopease.vercel.app/api";
+var API_BASE = "/api";
 
 // --- Cart Store (ID-Keyed Operations) ---
 const cartStore = {
@@ -156,14 +154,17 @@ async function apiRequest(endpoint, options = {}) {
     });
     
     if (res.status === 401) {
-      console.warn("Unauthorized! Clearing session.");
-      localStorage.removeItem('user');
-      sessionStorage.removeItem('auth_user');
-      
-      const protectedPages = ['profile.html', 'wishlist.html', 'orders.html', 'checkout.html'];
-      if (protectedPages.some(page => window.location.pathname.includes(page))) {
-        const currentPath = window.location.pathname.split('/').pop();
-        window.location.href = `login.html?redirect=${currentPath}`;
+      // Only warn and redirect if we thought we were logged in
+      if (localStorage.getItem('user')) {
+        console.warn("Session expired. Clearing local state.");
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('auth_user');
+        
+        const protectedPages = ['profile.html', 'wishlist.html', 'orders.html', 'checkout.html'];
+        if (protectedPages.some(page => window.location.pathname.includes(page))) {
+          const currentPath = window.location.pathname.split('/').pop();
+          window.location.href = `login.html?redirect=${currentPath}`;
+        }
       }
     }
     
@@ -282,7 +283,15 @@ async function loadDynamicProducts() {
     try {
       const res = await apiRequest('/products');
       if (!res.ok) throw new Error('API failed');
-      products = await res.json();
+      const responseData = await res.json();
+      console.log('API Response:', responseData);
+      // Handle both direct array (legacy) and paginated object (current)
+      products = responseData.data || responseData;
+      console.log('Processed Products:', products);
+      if (!Array.isArray(products)) {
+          console.warn('Products is not an array, using fallback');
+          products = fallbackProducts;
+      }
       sessionStorage.setItem('products_cache', JSON.stringify(products));
       sessionStorage.setItem('products_cache_time', Date.now().toString());
     } catch (err) {
@@ -290,6 +299,8 @@ async function loadDynamicProducts() {
       products = fallbackProducts;
     }
   }
+
+  console.log('Rendering products:', products.length);
 
   // Render containers
   const arrivalsContainer = document.getElementById('new-arrivals-container');
@@ -335,39 +346,47 @@ function renderProductsInto(products, container) {
     const safeImg = escapeHtml(p.image);
     
     return `
-      <div class="product-card group cursor-pointer relative" onclick="viewProduct(this)"
-           data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-category="${escapeHtml(p.category)}"
-           data-img="${safeImg}">
+      <!-- Glow Card Wrapper -->
+      <div class="relative group cursor-pointer transition-all duration-500 hover:-translate-y-2 rounded-[2rem] z-10" onclick="viewProduct(this)" data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-category="${escapeHtml(p.category)}" data-img="${safeImg}">
         
-        <!-- Wishlist Heart -->
-        <button onclick="event.stopPropagation(); toggleWishlist(this)" 
-          data-id="${pid}"
-          class="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur shadow-sm hover:bg-white transition-all">
-          <svg class="w-4 h-4 ${isWishlisted ? 'fill-red-500 stroke-red-500' : 'fill-none stroke-black'}" 
-               viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-        </button>
-
-        <div class="bg-[#F0EEED] rounded-2xl overflow-hidden aspect-square flex items-center justify-center mb-3">
-          <img src="${safeImg}" loading="lazy" decoding="async" width="400" height="400"
-               class="product-img object-cover w-full h-full" alt="${safeName}"/>
+        <!-- Animated Glow Elements (hidden by default, shown on hover) -->
+        <!-- Blur Glow -->
+        <div class="absolute inset-[-3px] rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 blur-xl overflow-hidden">
+          <div class="absolute inset-[-50%] w-[200%] h-[200%] animate-[spin_4s_linear_infinite]" style="background: conic-gradient(from 0deg, transparent 0%, #00ff99 25%, #006aff 50%, #ff0095 75%, transparent 100%);"></div>
         </div>
-        <div class="font-semibold text-sm">${safeName}</div>
-        <div class="flex items-center gap-1 my-1">
-          <div class="flex star text-xs">★★★★☆</div>
-          <span class="text-xs text-gray-400">4.5/5</span>
+        <!-- Solid Border Glow -->
+        <div class="absolute inset-[-3px] rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 overflow-hidden">
+          <div class="absolute inset-[-50%] w-[200%] h-[200%] animate-[spin_4s_linear_infinite]" style="background: conic-gradient(from 0deg, transparent 0%, #00ff99 25%, #006aff 50%, #ff0095 75%, transparent 100%);"></div>
         </div>
-        <div class="font-bold mb-3">$${safePrice}</div>
-        <div class="flex items-center justify-between gap-2" onclick="event.stopPropagation()">
-          <div class="flex items-center border rounded-full bg-gray-50">
-            <button onclick="updateQty(this, -1)" class="px-3 py-1 hover:text-red-500 transition">−</button>
-            <span class="px-2 text-xs font-medium qty-val">1</span>
-            <button onclick="updateQty(this, 1)" class="px-3 py-1 hover:text-green-500 transition">+</button>
-          </div>
-          <button onclick="addToCart(this)" 
-            data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-img="${safeImg}"
-            class="flex-1 bg-black text-white text-xs py-2 rounded-full hover:bg-gray-800 transition">
-            Add to Cart
+        
+        <!-- Inner Card Content -->
+        <div class="product-card h-full bg-white text-black rounded-[2rem] p-4 relative z-10 border border-gray-100 group-hover:border-transparent transition-colors flex flex-col">
+          
+          <!-- Wishlist Heart -->
+          <button onclick="event.stopPropagation(); toggleWishlist(this)" 
+            data-id="${pid}"
+            class="absolute top-6 right-6 z-20 p-2 rounded-full bg-white/60 backdrop-blur-md shadow-sm hover:bg-gray-100 hover:scale-110 transition-all duration-300">
+            <svg class="w-5 h-5 ${isWishlisted ? 'fill-red-500 stroke-red-500' : 'fill-none stroke-black'}" 
+                 viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
           </button>
+
+          <div class="bg-[#f8f9fa] rounded-2xl overflow-hidden aspect-square flex items-center justify-center mb-5 relative border border-gray-50">
+            <img src="${safeImg}" loading="lazy" decoding="async" width="400" height="400"
+                 class="product-img object-contain p-4 w-full h-full group-hover:scale-105 transition-transform duration-700 drop-shadow-sm" alt="${safeName}"/>
+          </div>
+          
+          <div class="font-medium text-lg md:text-xl tracking-wide mb-2 line-clamp-1">${safeName}</div>
+          <p class="text-gray-500 text-sm mb-4 line-clamp-3 leading-relaxed">
+            Experience premium quality with the ${safeName}. Crafted for style and performance, this item represents the pinnacle of our collection.
+          </p>
+          
+          <div class="mt-auto flex items-center gap-3" onclick="event.stopPropagation()">
+            <button onclick="addToCart(this)" 
+              data-id="${pid}" data-name="${safeName}" data-price="${safePrice}" data-img="${safeImg}"
+              class="flex items-center gap-3 bg-black text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-[0_0_15px_rgba(0,0,0,0.1)]">
+              Buy now <span class="text-white/80"> $${safePrice}</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -443,6 +462,11 @@ async function checkAuth() {
       return null;
     }
     const user = await res.json();
+    if (user.authenticated === false) {
+      sessionStorage.removeItem('auth_user');
+      localStorage.removeItem('user');
+      return null;
+    }
     sessionStorage.setItem('auth_user', JSON.stringify(user));
     localStorage.setItem('user', JSON.stringify(user));
     return user;
@@ -509,6 +533,21 @@ async function placeOrder(name, email, extraDetails = {}) {
       method: extraDetails.paymentMethod || 'Not Selected'
     }
   };
+
+  try {
+    const res = await apiRequest('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData)
+    });
+    if (!res.ok) throw new Error('Order submission failed');
+    const result = await res.json();
+    cartStore.clear();
+    return result;
+  } catch (err) {
+    console.error("Order failed:", err);
+    throw err;
+  }
+}
 
 // --- UI Utility: Toasts, Confirmations, Prompts ---
 const toast = {

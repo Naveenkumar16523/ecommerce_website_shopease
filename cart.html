@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,18 +7,8 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
   
   
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
-    .nav-link:hover { text-decoration: underline; }
-    .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: all .15s; background: white; }
-    .qty-btn:hover { background: #f5f5f5; }
-    .delete-btn { color: #e74c3c; cursor: pointer; transition: opacity .15s; }
-    .delete-btn:hover { opacity: 0.7; }
-    .promo-input:focus { outline: none; }
-    #mobileSidebar { transition: transform 0.3s ease-in-out; }
-  </style>
+  
+  
   
 
   <!-- Resource Hints -->
@@ -38,173 +28,148 @@
       }
     });
   </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/common.js?v=1.6" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.8s ease-out forwards; }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
 </head>
-<body class="bg-white text-black overflow-x-hidden">
- 
-  <div id="announcementBar" class="bg-black text-white text-center text-xs py-2 px-4 relative">
-    Sign up and get 20% off to your first order.
-  </div>
- 
+<body class="bg-gray-50 text-gray-900 font-sans h-screen overflow-hidden flex flex-col md:flex-row">
 
-   
-  
-  <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
-      document.getElementById('nav-placeholder').innerHTML = html;
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
-    });
-  </script>
-
-
- 
-  
-  </div>
- 
-  <div class="px-6 md:px-12 py-3 text-sm text-gray-400 flex items-center gap-1">
-    <a href="index.html" class="hover:text-black">Home</a>
-    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    <span class="text-black font-medium">Cart</span>
-  </div>
- 
-  <div class="px-6 md:px-12 mb-6">
-    <h1 class="hero-title text-4xl font-black tracking-wide">YOUR CART</h1>
-  </div>
- 
-  
-  <div class="flex flex-col lg:flex-row gap-6 px-6 md:px-12 pb-14 items-start">
- 
-   
-    <div class="flex-1 min-w-0">
-      <div id="cart-container" class="border border-gray-200 rounded-2xl overflow-hidden divide-y divide-gray-100">
-        
-        <div class="border-t border-gray-100"></div>
-  
-        <div class="border-t border-gray-100"></div>
-
-      </div>
+  <!-- Left Panel: Order Summary & Checkout -->
+  <div class="md:w-2/5 bg-white border-r border-gray-100 relative overflow-y-auto flex-col p-8 lg:p-12 text-gray-900 scrollbar-hide z-10 hidden md:flex shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+    <!-- Floating Orbs -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+      <div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-gray-100 rounded-full blur-3xl animate-[spin_20s_linear_infinite]"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] bg-yellow-50 rounded-full blur-3xl animate-[pulse_10s_ease-in-out_infinite]"></div>
     </div>
-  
-    <div class="w-full lg:w-[380px] flex-shrink-0">
-      <div class="border border-gray-200 rounded-2xl p-6 space-y-4">
-        <h2 class="font-bold text-lg">Order Summary</h2>
- 
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-500">Subtotal</span>
-            <span class="font-semibold" id="subtotal">$565</span>
-          </div>
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-500">Discount (-20%)</span>
-            <span class="font-semibold text-red-500" id="discount">-$113</span>
-          </div>
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-500">Delivery Fee</span>
-            <span class="font-semibold" id="delivery-fee">$15</span>
-          </div>
-        </div>
- 
-        <hr class="border-gray-100"/>
- 
-        <div class="flex items-center justify-between">
-          <span class="font-bold text-base">Total</span>
-          <span class="font-bold text-xl" id="total">$467</span>
-        </div>
- 
-        
-        <div class="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2 mt-1">
-          <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M3 12l9 9 9-9-9-9-9 9z"/></svg>
-          <input type="text" placeholder="Add promo code" class="promo-input flex-1 text-sm bg-transparent placeholder-gray-400 outline-none"/>
-          <button class="bg-black text-white text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-gray-800 transition">Apply</button>
-        </div>
 
-        <a href="checkout.html">
-  <button class="w-full bg-black text-white py-3 rounded-full mt-4 hover:bg-gray-800 transition">
-    Go to Checkout →
-  </button>
-</a>
-      </div>
+    <!-- Header -->
+    <div class="relative z-10 mb-12 animate-fadeUp opacity-0" style="animation-delay: 0.1s;">
+      <a href="/index.html" class="text-3xl font-black tracking-tight hero-title text-black hover:text-gray-500 transition-colors">SHOP EASE</a>
+      <p class="text-xs text-gray-400 tracking-widest uppercase mt-2 font-bold">Your Cart</p>
     </div>
- 
-  </div>
- 
-  <footer class="bg-[#F0EEED] px-6 md:px-12 pt-12 pb-6">
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-10">
-      <div class="col-span-2 md:col-span-1">
-        <div class="hero-title text-2xl font-black mb-3">SHOP ease</div>
-        <p class="text-xs text-gray-500 leading-relaxed mb-4">We have clothes that suits your style and which you are proud to wear. From women to men.</p>
-        <div class="flex gap-3">
-          <a href="#" class="w-8 h-8 border border-gray-300 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition">
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.56v14.91A4.56 4.56 0 0 1 19.44 24H4.56A4.56 4.56 0 0 1 0 19.44V4.56A4.56 4.56 0 0 1 4.56 0h14.88A4.56 4.56 0 0 1 24 4.56zM9 10H6v3h3v8h4v-8h3l.5-3H13V8.5c0-.8.4-1.5 1.5-1.5H17V4h-2.5C11.4 4 9 6.4 9 9.5V10z"/></svg>
-          </a>
-          <a href="#" class="w-8 h-8 border border-gray-300 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition">
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a href="#" class="w-8 h-8 border border-gray-300 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition">
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
+
+    <!-- Order Summary -->
+    <div class="relative z-10 flex-1 flex flex-col animate-fadeUp opacity-0" style="animation-delay: 0.2s;">
+      <h2 class="text-2xl font-bold mb-8 text-black tracking-tight">Order Summary</h2>
+      
+      <div class="space-y-4 text-sm mb-8 font-medium">
+        <div class="flex justify-between text-gray-500 items-center p-3 rounded-xl hover:bg-gray-50 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🛍️</span> Subtotal</span>
+          <span id="subtotal" class="text-gray-900 font-bold">$0</span>
+        </div>
+        <div class="flex justify-between text-red-500 items-center p-3 rounded-xl hover:bg-red-50 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🏷️</span> Discount (-20%)</span>
+          <span id="discount" class="font-bold">-$0</span>
+        </div>
+        <div class="flex justify-between text-gray-500 items-center p-3 rounded-xl hover:bg-gray-50 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🚚</span> Delivery Fee</span>
+          <span id="delivery-fee" class="text-gray-900 font-bold">$15</span>
         </div>
       </div>
-      <div>
-        <div class="font-bold text-sm mb-4 tracking-widest">COMPANY</div>
-        <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="about.html" class="hover:text-black">About</a></li>
-          <li><a href="features.html" class="hover:text-black">Features</a></li>
-          <li><a href="works.html" class="hover:text-black">Works</a></li>
-          <li><a href="career.html" class="hover:text-black">Career</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4 tracking-widest">HELP</div>
-        <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="support.html" class="hover:text-black">Customer Support</a></li>
-          <li><a href="delivery-details.html" class="hover:text-black">Delivery Details</a></li>
-          <li><a href="terms.html" class="hover:text-black">Terms & Conditions</a></li>
-          <li><a href="privacy.html" class="hover:text-black">Privacy Policy</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4 tracking-widest">FAQ</div>
-        <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="account.html" class="hover:text-black">Account</a></li>
-          <li><a href="delivery-details.html" class="hover:text-black">Manage Deliveries</a></li>
-          <li><a href="orders.html" class="hover:text-black">Orders</a></li>
-          <li><a href="payments.html" class="hover:text-black">Payments</a></li>
-        </ul>
+
+      <hr class="border-gray-100 mb-8">
+
+      <div class="flex justify-between font-bold text-2xl mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+        <span>Total</span>
+        <span id="total" class="text-black">$0</span>
       </div>
       
+      <div class="flex items-center gap-2 border-2 border-gray-100 rounded-2xl px-4 py-2 mb-8 bg-white focus-within:border-black transition-colors shadow-sm">
+        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M3 12l9 9 9-9-9-9-9 9z"/></svg>
+        <input type="text" placeholder="Add promo code" class="promo-input flex-1 text-sm bg-transparent placeholder-gray-400 outline-none font-medium"/>
+        <button class="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:scale-105 transition-transform shadow-md">Apply</button>
+      </div>
+      
+      <a href="/checkout.html" class="block mt-auto pb-8">
+        <button class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 border border-black/10">
+          Go to Checkout <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M3 12h18"/></svg>
+        </button>
+      </a>
     </div>
-    <hr class="border-gray-300 mb-5"/>
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-      <p class="text-xs text-gray-500">SHOP EASE © 2025–2026, All Rights Reserved</p>
-      <div class="flex items-center gap-2">
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500 border border-gray-200">VISA</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500 border border-gray-200">Paytm</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500 border border-gray-200">PayPal</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500 border border-gray-200">Phonepe</div>
-        <div class="bg-white rounded px-2 py-1 text-xs font-bold text-black-500 border border-gray-200">G Pay</div>
+  </div>
+
+  <!-- Mobile Top Nav -->
+  <div class="md:hidden bg-white border-b border-gray-100 text-black p-6 flex items-center justify-between z-20 relative">
+    <a href="/index.html" class="text-2xl font-black tracking-tight hero-title">SHOP EASE</a>
+    <a href="/checkout.html" class="text-xs font-bold text-white bg-black px-4 py-2 rounded-full shadow-md">Checkout</a>
+  </div>
+  
+  <div class="md:hidden bg-gray-50 text-black px-6 py-4 border-b border-gray-100 flex justify-between items-center text-sm font-bold shadow-inner z-20 relative">
+    <span>Total to Pay:</span>
+    <span id="total-mobile" class="text-lg">$0</span>
+  </div>
+
+  <!-- Right Panel: Cart Items -->
+  <div class="md:w-3/5 bg-gray-50 flex-1 relative overflow-y-auto scrollbar-hide">
+    
+    <!-- Desktop Navbar Inside Right Panel -->
+    <nav class="hidden md:flex sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 p-6 items-center justify-between z-20">
+      <div class="text-sm font-medium text-gray-500">
+        <span class="text-black font-bold">Your Cart Items</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="/index.html" class="text-sm font-bold text-gray-500 hover:text-black transition">Continue Shopping</a>
+      </div>
+    </nav>
+    
+    <div class="p-6 md:p-12 lg:p-16 max-w-3xl mx-auto pb-32 animate-fadeUp opacity-0" style="animation-delay: 0.3s;">
+      <!-- Cart Container -->
+      <div id="cart-container" class="space-y-4">
+        <!-- JS will populate items here -->
       </div>
     </div>
-  </footer>
+  </div>
+ 
  <script>
 const container = document.getElementById('cart-container');
 
 function renderCart() {
   const cart = cartStore.get();
+  console.log('Rendering Cart:', cart);
   container.innerHTML = "";
 
   if (cart.length === 0) {
     container.innerHTML = `
-      <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
-        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-          <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      <div class="flex flex-col items-center justify-center py-20 px-6 text-center bg-white rounded-3xl shadow-sm border border-gray-100">
+        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+          <span class="text-4xl">🛒</span>
         </div>
-        <h3 class="text-lg font-bold text-black mb-1">Your cart is empty</h3>
-        <p class="text-gray-400 text-sm mb-6 max-w-xs">Looks like you haven't added anything to your cart yet.</p>
-        <a href="index.html" class="inline-flex items-center justify-center bg-black text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-gray-800 transition shadow-lg shadow-black/5">
+        <h3 class="text-xl font-bold text-black mb-2">Your cart is empty</h3>
+        <p class="text-gray-400 text-sm mb-8 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
+        <a href="/index.html" class="inline-flex items-center justify-center bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition shadow-lg shadow-black/5">
           Continue Shopping
         </a>
       </div>
@@ -218,28 +183,29 @@ function renderCart() {
     const imgUrl = item.image || 'https://via.placeholder.com/400?text=Product';
     
     container.innerHTML += `
-      <div class="flex items-start gap-4 p-4 md:p-5 border-b last:border-b-0" data-product-id="${pid}">
-        <div class="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-[#F0EEED] flex-shrink-0">
-          <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/400?text=Product'" class="w-full h-full object-cover"/>
+      <div class="flex items-start gap-5 p-6 bg-white rounded-3xl shadow-sm border border-gray-100 group hover:shadow-md transition-shadow relative overflow-hidden" data-product-id="${pid}">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        <div class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-gray-50 flex-shrink-0">
+          <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/400?text=Product'" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"/>
         </div>
 
         <div class="flex-1 flex flex-col justify-between h-full">
           <div class="flex justify-between items-start">
             <div>
-              <h2 class="font-bold text-sm md:text-base">${item.name}</h2>
-              <p class="text-xs text-gray-400">ID: ${pid}</p>
+              <h2 class="font-bold text-base md:text-lg mb-1">${item.name}</h2>
+              <p class="text-xs text-gray-400 uppercase tracking-widest font-bold">ID: ${pid}</p>
             </div>
-            <button onclick="removeItem(${pid})" class="text-red-500 p-1 hover:opacity-70 transition">
+            <button onclick="removeItem(${pid})" class="text-gray-300 hover:text-red-500 p-2 hover:bg-red-50 rounded-full transition-colors">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/></svg>
             </button>
           </div>
 
-          <div class="flex justify-between items-center mt-2 md:mt-4">
-            <p class="font-bold text-lg">$${item.price}</p>
-            <div class="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-4">
-              <button onclick="changeQty(${pid}, -1)" class="text-lg font-medium hover:text-red-500">−</button>
+          <div class="flex justify-between items-center mt-4">
+            <p class="font-black text-xl">$${item.price}</p>
+            <div class="flex items-center bg-gray-50 border border-gray-100 rounded-full px-2 py-1 gap-4 shadow-sm">
+              <button onclick="changeQty(${pid}, -1)" class="w-8 h-8 flex items-center justify-center text-lg font-bold hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">−</button>
               <span class="text-sm font-bold min-w-[20px] text-center">${item.qty}</span>
-              <button onclick="changeQty(${pid}, 1)" class="text-lg font-medium hover:text-green-500">+</button>
+              <button onclick="changeQty(${pid}, 1)" class="w-8 h-8 flex items-center justify-center text-lg font-bold hover:text-green-500 hover:bg-green-50 rounded-full transition-colors">+</button>
             </div>
           </div>
         </div>
@@ -273,10 +239,14 @@ function updateSummary() {
   const delivery = subtotal > 0 ? 15 : 0;
   const total = subtotal - discount + delivery;
 
-  document.getElementById('subtotal').innerText = '$' + subtotal;
-  document.getElementById('discount').innerText = '-$' + discount;
-  document.getElementById('delivery-fee').innerText = '$' + delivery;
-  document.getElementById('total').innerText = '$' + total;
+  document.getElementById('subtotal').innerText = '$' + subtotal.toFixed(2);
+  document.getElementById('discount').innerText = '-$' + discount.toFixed(2);
+  document.getElementById('delivery-fee').innerText = '$' + delivery.toFixed(2);
+  document.getElementById('total').innerText = '$' + total.toFixed(2);
+  
+  // Update mobile summary if it exists
+  const mobileTotal = document.getElementById('total-mobile');
+  if(mobileTotal) mobileTotal.innerText = '$' + total.toFixed(2);
 }
 
 // Listen for global cart updates
@@ -284,8 +254,43 @@ document.addEventListener('cart:updated', () => {
   renderCart();
 });
 
-// Initial render
-renderCart();
+document.addEventListener('DOMContentLoaded', () => {
+  renderCart();
+});
 </script>
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 </html>

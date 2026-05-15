@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,17 +9,8 @@
   
   
   
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-    .star { color: #FFC633; }
-    .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid #e5e7eb; transition: all 0.2s; position: relative; }
-    .color-dot.active { outline: 2px solid black; outline-offset: 2px; }
-    .size-btn { background: #F0F0F0; padding: 8px 16px; border-radius: 99px; font-size: 13px; color: #666; transition: all 0.2s; }
-    .size-btn.active { background: black; color: white; }
-    .filter-section { border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 20px; }
-  </style>
+  
+  
 
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -38,7 +29,36 @@
       }
     });
   </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/common.js?v=1.4" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
 </head>
 <body class="bg-white text-black">
 
@@ -127,7 +147,7 @@
         </ul>
       </div>
 
-      <button class="w-full bg-black text-white py-3.5 rounded-full mt-6 font-bold text-sm hover:bg-gray-800 transition">Apply Filter</button>
+      <button class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full mt-6 font-bold text-sm hover:bg-gray-800 transition">Apply Filter</button>
     </aside>
 
     
@@ -145,5 +165,39 @@
     </main>
   </div>
 
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 </html>

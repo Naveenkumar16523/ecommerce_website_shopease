@@ -28,7 +28,7 @@
           grid.innerHTML = `
             <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
               <p class="text-gray-500 mb-6">Please login to view your wishlist.</p>
-              <a href="login.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
+              <a href="login.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
             </div>
           `;
           return;
@@ -42,7 +42,7 @@
           grid.innerHTML = `
             <div class="col-span-full bg-white p-12 rounded-3xl text-center shadow-sm">
               <p class="text-gray-500 mb-6">Your wishlist is empty.</p>
-              <a href="index.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Explore Products</a>
+              <a href="index.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full font-bold inline-block">Explore Products</a>
             </div>
           `;
           return;
@@ -69,7 +69,7 @@
               
               <button onclick="addToCartFromWishlist(this)" 
                 data-name="${safeName}" data-price="${safePrice}" data-img="${safeImg}"
-                class="w-full mt-4 bg-black text-white py-3 rounded-xl text-xs font-bold hover:bg-gray-800 transition-all">
+                class="w-full mt-4 bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3 rounded-xl text-xs font-bold hover:bg-gray-800 transition-all">
                 Move to Cart
               </button>
             </div>

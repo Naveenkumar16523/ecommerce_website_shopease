@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
   
   
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-  </style>
+  
 
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -30,115 +26,174 @@
       }
     });
   </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/common.js?v=1.6" defer></script>
+  
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.8s ease-out forwards; }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
 </head>
 
-<body class="bg-[#F2F0F1]">
+<body class="bg-gray-50 text-gray-900 font-sans h-screen overflow-hidden flex flex-col md:flex-row">
 
-<nav class="flex items-center px-6 md:px-12 py-4 bg-white border-b sticky top-0 z-50">
-  <a href="index.html" class="text-xl font-black hero-title">SHOP EASE</a>
-</nav>
-
-<div class="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8">
-
- 
-  <div class="md:col-span-2 space-y-8">
-    
-   
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-      <h2 class="text-lg font-bold mb-5">Shipping Address</h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        <input id="ship-name" type="text" placeholder="Enter Your Name" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
-        <input id="ship-phone" type="text" placeholder="Enter Your Phone" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
-        <input id="ship-address" type="text" placeholder="Enter Your Address" class="w-full border rounded-xl px-4 py-3 text-sm md:col-span-2 focus:border-black outline-none bg-gray-50">
-        <input id="ship-city" type="text" placeholder="Enter Your City" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
-        <input id="ship-pincode" type="text" placeholder="Enter Your Pincode" class="w-full border rounded-xl px-4 py-3 text-sm focus:border-black outline-none bg-gray-50">
-      </div>
+  <!-- Left Panel: Order Summary -->
+  <div class="md:w-2/5 bg-white border-r border-gray-100 relative overflow-y-auto flex-col p-8 lg:p-12 text-gray-900 scrollbar-hide z-10 hidden md:flex shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+    <!-- Floating Orbs (Light theme) -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+      <div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-gray-100 rounded-full blur-3xl animate-[spin_20s_linear_infinite]"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] bg-yellow-50 rounded-full blur-3xl animate-[pulse_10s_ease-in-out_infinite]"></div>
     </div>
 
-    
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-      <h2 class="text-lg font-bold mb-5">Payment Method</h2>
-      <div class="space-y-3">
-        
-        <label class="flex items-center justify-between p-4 border rounded-xl cursor-not-allowed opacity-50 bg-gray-50">
-          <div class="flex items-center gap-3">
-            <input type="radio" name="paymentMethod" value="UPI" disabled class="w-4 h-4 accent-black">
-            <span class="text-sm font-medium">UPI</span>
-          </div>
-          <span class="text-[10px] text-gray-400">GPay / PhonePe (Coming Soon)</span>
-        </label>
-
-        <label class="flex items-center justify-between p-4 border rounded-xl cursor-not-allowed opacity-50 bg-gray-50">
-          <div class="flex items-center gap-3">
-            <input type="radio" name="paymentMethod" value="Card" disabled class="w-4 h-4 accent-black">
-            <span class="text-sm font-medium">Card</span>
-          </div>
-          <span class="text-[10px] text-gray-400">Visa / MasterCard (Coming Soon)</span>
-        </label>
-
-        <label onclick="showQRModal()" class="flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:border-black transition bg-gray-50">
-          <div class="flex items-center gap-3">
-            <input type="radio" name="paymentMethod" value="QR Code" class="w-4 h-4 accent-black">
-            <span class="text-sm font-medium">QR Payment</span>
-          </div>
-          <span class="text-[10px] text-gray-400">Scan & Pay</span>
-        </label>
-
-        <label class="flex items-center justify-between p-4 border-2 border-black bg-gray-50 rounded-xl cursor-pointer">
-          <div class="flex items-center gap-3">
-            <input type="radio" name="paymentMethod" value="Cash on Delivery" checked class="w-4 h-4 accent-black">
-            <span class="text-sm font-medium">Cash on Delivery</span>
-          </div>
-        </label>
-
-        <label class="flex items-center justify-between p-4 border rounded-xl cursor-not-allowed opacity-50 bg-gray-50">
-          <div class="flex items-center gap-3">
-            <input type="radio" name="paymentMethod" value="Pay Later" disabled class="w-4 h-4 accent-black">
-            <span class="text-sm font-medium">Pay Later</span>
-          </div>
-          <span class="text-[10px] text-gray-400">(Coming Soon)</span>
-        </label>
-
-      </div>
+    <!-- Header -->
+    <div class="relative z-10 mb-12 animate-fadeUp opacity-0" style="animation-delay: 0.1s;">
+      <a href="/index.html" class="text-3xl font-black tracking-tight hero-title text-black hover:text-gray-500 transition-colors">SHOP EASE</a>
+      <p class="text-xs text-gray-400 tracking-widest uppercase mt-2 font-bold">Secure Checkout</p>
     </div>
 
-  </div>
-
- 
-  <div class="space-y-6">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
-      <h2 class="text-lg font-bold mb-5">Order Summary</h2>
+    <!-- Order Summary -->
+    <div class="relative z-10 flex-1 animate-fadeUp opacity-0" style="animation-delay: 0.2s;">
+      <h2 class="text-2xl font-bold mb-8 text-black tracking-tight">Order Summary</h2>
       
-      <div class="space-y-3 text-sm mb-5">
-        <div class="flex justify-between text-gray-500">
-          <span>Subtotal</span>
-          <span id="summary-subtotal">$0</span>
+      <div class="space-y-4 text-sm mb-8 font-medium">
+        <div class="flex justify-between text-gray-500 items-center p-3 rounded-xl hover:bg-gray-50 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🛍️</span> Subtotal</span>
+          <span id="summary-subtotal" class="text-gray-900 font-bold">$0</span>
         </div>
-        <div class="flex justify-between text-red-500">
-          <span>Discount (-20%)</span>
-          <span id="summary-discount">-$0</span>
+        <div class="flex justify-between text-red-500 items-center p-3 rounded-xl hover:bg-red-50 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🏷️</span> Discount (-20%)</span>
+          <span id="summary-discount" class="font-bold">-$0</span>
         </div>
-        <div class="flex justify-between text-gray-500">
-          <span>Delivery Fee</span>
-          <span id="summary-delivery">$15</span>
+        <div class="flex justify-between text-gray-500 items-center p-3 rounded-xl hover:bg-gray-50 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🚚</span> Delivery Fee</span>
+          <span id="summary-delivery" class="text-gray-900 font-bold">$15</span>
         </div>
       </div>
 
-      <hr class="mb-5">
+      <hr class="border-gray-100 mb-8">
 
-      <div class="flex justify-between font-bold text-lg mb-6">
+      <div class="flex justify-between font-bold text-2xl mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
         <span>Total</span>
-        <span id="summary-total">$0</span>
+        <span id="summary-total" class="text-black">$0</span>
       </div>
-
-      <button onclick="submitOrder()" class="w-full bg-black text-white py-4 rounded-full font-bold hover:bg-gray-800 transition flex items-center justify-center gap-2">
-        Place Order <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M3 12h18"/></svg>
-      </button>
+      
+      <div class="flex items-center justify-center gap-2 mt-auto text-xs text-gray-400 font-medium pb-8">
+        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        256-Bit SSL Encrypted Checkout
+      </div>
     </div>
   </div>
 
-</div>
+  <!-- Mobile Top Nav -->
+  <div class="md:hidden bg-white border-b border-gray-100 text-black p-6 flex items-center justify-between">
+    <a href="/index.html" class="text-2xl font-black tracking-tight hero-title">SHOP EASE</a>
+    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Checkout</span>
+  </div>
+  
+  <div class="md:hidden bg-gray-50 text-black px-6 py-4 border-b border-gray-100 flex justify-between items-center text-sm font-bold shadow-inner">
+    <span>Total to Pay:</span>
+    <span id="summary-total-mobile" class="text-lg">$0</span>
+  </div>
+
+  <!-- Right Panel: Forms -->
+  <div class="md:w-3/5 bg-gray-50 flex-1 relative overflow-y-auto scrollbar-hide">
+    <div class="p-6 md:p-12 lg:p-20 max-w-3xl mx-auto space-y-8 animate-fadeUp opacity-0" style="animation-delay: 0.3s;">
+      
+      <!-- Shipping Address -->
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative group overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-black transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-3"><span class="text-2xl">📍</span> Shipping Address</h2>
+        <div class="grid md:grid-cols-2 gap-5">
+          <input id="ship-name" type="text" placeholder="Full Name" class="w-full border-2 border-gray-100 rounded-xl px-5 py-3.5 text-sm focus:border-black outline-none bg-gray-50/50 focus:bg-white transition-colors font-medium">
+          <input id="ship-phone" type="text" placeholder="Phone Number" class="w-full border-2 border-gray-100 rounded-xl px-5 py-3.5 text-sm focus:border-black outline-none bg-gray-50/50 focus:bg-white transition-colors font-medium">
+          <input id="ship-address" type="text" placeholder="Street Address" class="w-full border-2 border-gray-100 rounded-xl px-5 py-3.5 text-sm md:col-span-2 focus:border-black outline-none bg-gray-50/50 focus:bg-white transition-colors font-medium">
+          <input id="ship-city" type="text" placeholder="City" class="w-full border-2 border-gray-100 rounded-xl px-5 py-3.5 text-sm focus:border-black outline-none bg-gray-50/50 focus:bg-white transition-colors font-medium">
+          <input id="ship-pincode" type="text" placeholder="ZIP / Pincode" class="w-full border-2 border-gray-100 rounded-xl px-5 py-3.5 text-sm focus:border-black outline-none bg-gray-50/50 focus:bg-white transition-colors font-medium">
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative group overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-yellow-400 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-3"><span class="text-2xl">💳</span> Payment Method</h2>
+        <div class="space-y-4">
+          
+          <label class="flex items-center justify-between p-5 border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-black transition-colors bg-white group/label">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="UPI" class="w-5 h-5 accent-black">
+              <span class="text-base font-bold group-hover/label:text-black">UPI / NetBanking</span>
+            </div>
+            <span class="text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 px-2 py-1 rounded shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse">Fast Pay</span>
+          </label>
+
+          <label class="flex items-center justify-between p-5 border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-black transition-colors bg-white group/label">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="Card" class="w-5 h-5 accent-black">
+              <span class="text-base font-bold group-hover/label:text-black">Credit/Debit Card</span>
+            </div>
+            <span class="text-xs font-bold text-white bg-gradient-to-r from-blue-500 to-cyan-500 px-2 py-1 rounded shadow-[0_0_10px_rgba(59,130,246,0.5)] animate-pulse">Secure</span>
+          </label>
+
+          <label onclick="showQRModal()" class="flex items-center justify-between p-5 border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-black transition-colors bg-white group/label">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="QR Code" class="w-5 h-5 accent-black">
+              <span class="text-base font-bold group-hover/label:text-black">QR Payment</span>
+            </div>
+            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">Scan & Pay</span>
+          </label>
+
+          <label class="flex items-center justify-between p-5 border-2 border-black bg-gray-50 rounded-2xl cursor-pointer shadow-[0_0_0_2px_rgba(0,0,0,0.05)]">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="Cash on Delivery" checked class="w-5 h-5 accent-black">
+              <span class="text-base font-bold">Cash on Delivery</span>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Action -->
+      <div class="pt-6 pb-20 md:pb-6">
+        <button id="placeOrderBtn" onclick="submitOrder()" class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-[0_0_20px_rgba(0,100,255,0.4)] hover:-translate-y-1 transition-all duration-300 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 border border-black/10 relative overflow-hidden">
+          <span class="relative z-10">Place Order Securely</span> 
+          <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M3 12h18"/></svg>
+        </button>
+      </div>
+      
+    </div>
+  </div>
 
 <script>
   let qrPaymentConfirmed = false;
@@ -168,6 +223,10 @@
     document.getElementById('summary-discount').innerText = '-$' + discount.toFixed(2);
     document.getElementById('summary-delivery').innerText = '$' + delivery.toFixed(2);
     document.getElementById('summary-total').innerText = '$' + total.toFixed(2);
+    
+    // Also update mobile view if it exists
+    const mobileTotal = document.getElementById('summary-total-mobile');
+    if (mobileTotal) mobileTotal.innerText = '$' + total.toFixed(2);
   }
 
   async function submitOrder() {
@@ -194,17 +253,79 @@
       return;
     }
 
-    const btn = document.querySelector('button[onclick="submitOrder()"]');
+    const btn = document.getElementById('placeOrderBtn') || document.querySelector('button[onclick="submitOrder()"]');
     const originalText = btn.innerHTML;
-    btn.innerHTML = 'Processing...';
+    btn.innerHTML = '<span class="relative z-10">Processing...</span>';
     btn.disabled = true;
 
     try {
       const extraDetails = { phone, address, city, pincode, paymentMethod };
-      await placeOrder(name, "Customer", extraDetails); 
+      
+      if (paymentMethod === 'Card' || paymentMethod === 'UPI') {
+        const totalAmount = parseFloat(document.getElementById('summary-total').innerText.replace('$', ''));
+        
+        var options = {
+          // 1. The key from your Razorpay Dashboard
+          "key": "rzp_test_SpEf15KaCAj2po", 
+          
+          // 2. Amount is in currency subunits (cents/paise). Multiply by 100
+          "amount": Math.round(totalAmount * 100), 
+          
+          // 3. Currency code
+          "currency": "USD", 
+          
+          // 4. Your business or website name
+          "name": "SHOP EASE", 
+          
+          // 5. Short description of the transaction
+          "description": "Zero-Gravity Checkout Payment", 
+          
+          // 6. Handler function called when payment is successful
+          "handler": async function (response) {
+              console.log("Razorpay Payment ID:", response.razorpay_payment_id);
+              // On success, proceed to the backend order submission
+              const result = await placeOrder(name, "Customer", extraDetails);
+              if (result) {
+                toast.success("Order placed successfully!");
+                setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+              }
+          },
+          
+          // 7. Prefill data for the customer
+          "prefill": {
+              "name": name,
+              "contact": phone,
+              "method": paymentMethod === 'UPI' ? 'upi' : 'card'
+          },
+          "theme": {
+              "color": "#0F172A" // Deep navy/black aesthetic
+          },
+          "modal": {
+              "ondismiss": function(){
+                  btn.innerHTML = originalText;
+                  btn.disabled = false;
+              }
+          }
+        };
+        
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+            alert("Payment failed! " + response.error.description);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+        
+        rzp1.open();
+        
+      } else {
+        const result = await placeOrder(name, "Customer", extraDetails); 
+        if (result) {
+          toast.success("Order placed successfully!");
+          setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+        }
+      }
     } catch (err) {
-      alert("Error: " + err.message);
-    } finally {
+      console.error("Order failed:", err);
       btn.innerHTML = originalText;
       btn.disabled = false;
     }
@@ -252,11 +373,45 @@
       Please scan the QR code above with any UPI app to complete your payment. Once done, click the button below.
     </p>
     
-    <button onclick="hideQRModal()" class="w-full bg-black text-white py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
+    <button onclick="hideQRModal()" class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
       I've Paid
     </button>
   </div>
 </div>
 
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 </html>

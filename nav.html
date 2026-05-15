@@ -1,21 +1,27 @@
 <!-- Top Banner -->
-<div class="bg-black text-white text-center text-xs py-2 px-4 relative">
+<div class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-center text-xs py-2 px-4 relative">
   Sign up and get 20% off to your first order.
-  <a href="signup.html" class="underline font-semibold ml-1">Sign Up Now</a>
+  <a href="/signup.html" class="underline font-semibold ml-1">Sign Up Now</a>
 </div>
 
 <!-- Main Header -->
-<header class="bg-white sticky top-0 z-50 shadow-sm">
-  <div class="max-w-[1440px] mx-auto px-6 md:px-12 py-3 flex items-center justify-between gap-8 border-b border-gray-50">
-    <div class="flex items-center gap-4 md:gap-6 text-[15px] font-semibold">
+<header class="bg-white/70 backdrop-blur-xl sticky top-0 z-50 border-b border-gray-100 animate-[slideDown_0.6s_ease-out_forwards]">
+  <style>
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+  <div class="max-w-[1440px] mx-auto px-6 md:px-12 py-3 md:py-4 flex items-center justify-between gap-6 md:gap-8">
+    <div class="flex items-center gap-4 md:gap-8 text-[15px] font-semibold">
       <button onclick="toggleMobileMenu()" class="md:hidden p-1 text-gray-600 hover:text-black">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <a href="index.html" class="text-2xl font-black hero-title mr-4 hidden sm:block">SHOP EASE</a>
+      <a href="/index.html" class="text-2xl font-black hero-title mr-4 hidden sm:block">SHOP EASE</a>
       <div class="hidden lg:flex items-center gap-6">
-        <a href="index.html" data-t="nav_home" class="text-gray-800 hover:text-black transition py-4">Home</a>
+        <a href="/index.html" data-t="nav_home" class="text-gray-800 hover:text-black transition py-4">Home</a>
         <div class="group relative py-4">
-          <a href="womens.html" data-t="nav_women" class="text-black cursor-pointer">Women</a>
+          <a href="/womens.html" data-t="nav_women" class="text-black cursor-pointer">Women</a>
           <div class="absolute top-full left-0 w-[800px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-4 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
             <div>
               <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
@@ -50,7 +56,7 @@
 
         <!-- Men Mega Menu -->
         <div class="group relative py-4">
-          <a href="mens.html" data-t="nav_men" class="text-gray-800 hover:text-black transition cursor-pointer">Men</a>
+          <a href="/mens.html" data-t="nav_men" class="text-gray-800 hover:text-black transition cursor-pointer">Men</a>
           <div class="absolute top-full left-0 w-[800px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-4 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
             <div>
               <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
@@ -84,7 +90,7 @@
         </div>
 
         <div class="group relative py-4">
-          <a href="kids.html" data-t="nav_kids" class="text-gray-800 hover:text-black transition cursor-pointer">Kids</a>
+          <a href="/kids.html" data-t="nav_kids" class="text-gray-800 hover:text-black transition cursor-pointer">Kids</a>
           <div class="absolute top-full left-0 w-[600px] bg-white shadow-2xl rounded-b-2xl border border-gray-100 p-8 grid grid-cols-3 gap-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
             <div>
               <h3 class="font-bold text-black mb-4 uppercase text-xs tracking-widest">Categories</h3>
@@ -106,47 +112,44 @@
           </div>
         </div>
 
-        <a href="brands.html" data-t="nav_brands" class="text-gray-800 hover:text-black transition py-4">All Brands</a>
+        <a href="/brands.html" data-t="nav_brands" class="text-gray-800 hover:text-black transition py-4">All Brands</a>
         <a href="#" class="text-gray-800 hover:text-black transition flex items-center gap-1 py-4">More</a>
       </div>
     </div>
 
-    <div class="flex-1 max-w-xl">
+    <div class="flex-1 max-w-md hidden md:block ml-auto">
       <div class="relative group">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-4 w-4 text-gray-400 group-focus-within:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
-        <input type="text" data-t="search_placeholder" placeholder="Search for products, styles, brands..." 
-          class="block w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded bg-[#F5F7F9] text-sm focus:bg-white focus:ring-1 focus:ring-gray-300 outline-none transition-all">
-        <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400 hover:text-black">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <input type="text" data-t="search_placeholder" placeholder="Search..." 
+          class="block w-full pl-11 pr-12 py-2 border-2 border-transparent rounded-full bg-gray-100 text-sm focus:bg-white focus:border-black focus:shadow-[0_0_0_4px_rgba(0,0,0,0.05)] outline-none transition-all duration-300 md:w-64 focus:md:w-full placeholder-gray-500">
+        <div class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-black transition-colors">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         </div>
       </div>
     </div>
 
-    <div class="flex items-center gap-6">
-      <a href="profile.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group">
-        <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
-        <span data-t="account">Account</span>
+    <div class="flex items-center gap-2 md:gap-4">
+      <a href="/profile.html" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors group" title="Account">
+        <svg class="w-5 h-5 text-gray-700 group-hover:text-black group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
       </a>
-      <a href="wishlist.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group">
-        <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-        <span data-t="wishlist">Wishlist</span>
+      <a href="/wishlist.html" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors group" title="Wishlist">
+        <svg class="w-5 h-5 text-gray-700 group-hover:text-black group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
       </a>
-      <a href="cart.html" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black group relative">
+      <a href="/cart.html" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors group relative" title="Cart">
         <div class="relative">
-          <svg class="w-5 h-5 text-gray-400 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
-          <span id="cartBadge" class="absolute -top-2 -right-2 bg-[#A52A4E] text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold">0</span>
+          <svg class="w-5 h-5 text-gray-700 group-hover:text-black group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+          <span id="cartBadge" class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] rounded-full min-w-[16px] h-4 flex items-center justify-center font-bold px-1 animate-[bounce_1s_ease-in-out_infinite]">0</span>
         </div>
-        <span data-t="cart">Cart</span>
       </a>
     </div>
   </div>
 
   <div class="bg-white border-b border-gray-100 overflow-hidden group">
     <div class="max-w-[1440px] mx-auto px-6 md:px-12 relative">
-      <div id="categoryScroll" class="flex items-center gap-10 py-3 overflow-x-auto scrollbar-hide whitespace-nowrap text-[13px] font-medium text-gray-600">
-        <a href="#" class="flex items-center gap-1 hover:text-black transition"><span data-t="cat_sale">Sale</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <div id="categoryScroll" class="flex items-center gap-10 py-2 overflow-x-auto scrollbar-hide whitespace-nowrap text-[13px] font-medium text-gray-600">
+        <a href="/on-sale.html" class="flex items-center hover:scale-105 transition-transform"><span data-t="cat_sale" class="bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest shadow-sm shadow-red-500/30">Sale</span></a>
         <a href="#" class="flex items-center gap-1 hover:text-black transition"><span data-t="cat_indian">Indian Wear</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <a href="#" class="flex items-center gap-1 hover:text-black transition"><span data-t="cat_western">Western Wear</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <a href="#" class="flex items-center gap-1 hover:text-black transition"><span data-t="cat_footwear">Footwear</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -185,25 +188,25 @@
       </button>
     </div>
     <nav class="flex flex-col gap-5 text-lg font-medium">
-      <a href="index.html" data-t="nav_home" class="hover:text-gray-500">Home</a>
+      <a href="/index.html" data-t="nav_home" class="hover:text-gray-500">Home</a>
       <div class="border-b pb-2">
         <p data-t="shop_categories" class="text-xs text-gray-400 uppercase tracking-widest mb-3">Shop Categories</p>
         <div class="flex flex-col gap-3 pl-2">
-          <a href="mens.html" data-t="nav_men" class="hover:text-gray-500">Men</a>
-          <a href="womens.html" data-t="nav_women" class="hover:text-gray-500">Women</a>
-          <a href="kids.html" data-t="nav_kids" class="hover:text-gray-500">Kids</a>
+          <a href="/mens.html" data-t="nav_men" class="hover:text-gray-500">Men</a>
+          <a href="/womens.html" data-t="nav_women" class="hover:text-gray-500">Women</a>
+          <a href="/kids.html" data-t="nav_kids" class="hover:text-gray-500">Kids</a>
         </div>
       </div>
-      <a href="new-arrivals.html" data-t="nav_new_arrivals" class="hover:text-gray-500">New Arrivals</a>
+      <a href="/new-arrivals.html" data-t="nav_new_arrivals" class="hover:text-gray-500">New Arrivals</a>
       <a href="#" data-t="cat_on_sale" class="hover:text-gray-500">On Sale</a>
-      <a href="brands.html" data-t="nav_brands" class="hover:text-gray-500">Brands</a>
+      <a href="/brands.html" data-t="nav_brands" class="hover:text-gray-500">Brands</a>
     </nav>
     <div class="mt-auto pt-10 border-t">
-      <a href="profile.html" class="flex items-center gap-3 hover:text-gray-500 mb-4">
+      <a href="/profile.html" class="flex items-center gap-3 hover:text-gray-500 mb-4">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
         <span data-t="profile">Profile</span>
       </a>
-      <a href="cart.html" class="flex items-center gap-3 hover:text-gray-500">
+      <a href="/cart.html" class="flex items-center gap-3 hover:text-gray-500">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
         <span data-t="my_cart">My Cart</span>
       </a>

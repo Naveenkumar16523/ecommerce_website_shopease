@@ -1,3 +1,4 @@
+import decimal
 from flask import Flask, request, jsonify, send_from_directory, make_response, render_template, g
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -32,7 +33,8 @@ limiter = Limiter(
     key_func=get_remote_address,
     app=app,
     default_limits=["200 per day", "50 per hour"],
-    storage_uri=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
+    storage_uri=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://"),
+    enabled=os.getenv("FLASK_ENV") != "development"
 )
 
 # --- STRICT CORS CONFIGURATION ---
@@ -121,6 +123,7 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS orders (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT,
+                    items TEXT,
                     total DECIMAL(10, 2),
                     status VARCHAR(50) DEFAULT 'Pending',
                     shipping_name VARCHAR(255),
@@ -212,22 +215,26 @@ def token_required(f):
         token = request.cookies.get('auth_token')
         
         if not token:
+            # Silent 200 for auth check endpoint to avoid console errors
+            if request.path == "/api/me":
+                return jsonify({'authenticated': False}), 200
             return jsonify({'message': 'Authentication cookie is missing!'}), 401
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            with get_db() as conn:
-                cursor = conn.cursor()
+            with get_db() as (conn, cursor):
                 cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
                 user = format_row(cursor, cursor.fetchone())
                 if not user:
+                    if request.path == "/api/me":
+                        return jsonify({'authenticated': False}), 200
                     return jsonify({'message': 'User not found!'}), 401
-                cursor.close()
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Session expired. Please login again.'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Invalid authentication token.'}), 401
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            if request.path == "/api/me":
+                return jsonify({'authenticated': False}), 200
+            return jsonify({'message': 'Session expired or invalid.'}), 401
         except Exception as e:
             return jsonify({'message': f'Authentication error: {str(e)}'}), 401
+        
         return f(user, *args, **kwargs)
     return decorated
 
@@ -317,16 +324,14 @@ def paginate_collection(base_query, count_query, params, schema=None, order_by="
 
 # --- API ROUTES ---
 
-@app.route("/")
 @app.route("/api/health")
 def health_check():
     """Public health check and uptime monitor endpoint"""
     db_status = "Connected"
     try:
-        with get_db() as conn:
-            cursor = conn.cursor()
+        with get_db() as (conn, cursor):
             cursor.execute("SELECT 1")
-            cursor.close()
+            cursor.fetchone()
     except:
         db_status = "Disconnected"
 
@@ -398,7 +403,8 @@ def login(data):
                     }
                 }))
                 
-                resp.set_cookie('auth_token', token, httponly=True, secure=True, samesite='Lax', max_age=24 * 60 * 60)
+                # secure=False is required for localhost HTTP
+                resp.set_cookie('auth_token', token, httponly=True, secure=False, samesite='Lax', max_age=24 * 60 * 60)
                 return resp
             else:
                 # Failure: Increment attempts
@@ -424,7 +430,9 @@ def logout_api():
 @app.route("/api/me", methods=["GET"])
 @token_required
 def get_me(current_user):
+    # If we reached here, the user IS authenticated (via decorator)
     if 'password' in current_user: del current_user['password']
+    current_user['authenticated'] = True
     try:
         with get_db() as (conn, cursor):
             cursor.execute("SELECT product_id FROM wishlist WHERE user_id = %s", (current_user['id'],))
@@ -644,11 +652,13 @@ def place_order(data, current_user):
     try:
         with get_db() as (conn, cursor):
             # 1. Create the Order header
+            items_json = json.dumps(items)
             cursor.execute("""
-                INSERT INTO orders (user_id, total, shipping_name, shipping_address, shipping_phone, shipping_method)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO orders (user_id, items, total, shipping_name, shipping_address, shipping_phone, shipping_method)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (
                 current_user['id'],
+                items_json,
                 data.get('total', 0),
                 data.get('shipping', {}).get('name', ''),
                 data.get('shipping', {}).get('address', ''),
@@ -671,6 +681,8 @@ def place_order(data, current_user):
         app.logger.info(f"ORDER PLACED: ID {order_id} | User {current_user['id']} | Items: {len(items)}")
         return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"message": f"Error placing order: {str(e)}"}), 500
 
 @app.route("/api/orders/<order_id>/cancel", methods=["DELETE", "PUT"])
@@ -689,6 +701,7 @@ def cancel_order(current_user, order_id):
 @click.option('--force', is_flag=True, help="Skip confirmation prompt")
 def seed_db_command(force):
     """Seeds the database with initial products (Terminal only)"""
+    init_db()
     if not force:
         if not click.confirm("This will DELETE all existing products. Continue?"):
             logger.info("Database seed aborted by user.")
@@ -703,23 +716,15 @@ def seed_db_command(force):
                         INSERT INTO products (name, price, category, image, rating)
                         VALUES (%s, %s, %s, %s, %s)
                     """, (p['name'], p['price'], p['category'], p['image'], p.get('rating', 4.5)))
-        logger.info("Database seeded successfully! ✅")
+        logger.info("Database seeded successfully! [OK]")
     except Exception as e:
         logger.error(f"Seeding error: {e}")
 
-# --- STATIC FILE SERVING (MUST BE LAST) ---
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('.', path)
-
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    retry_after = e.description.split("at ")[-1] if "at" in e.description else "60"
-    # Attempt to extract numeric retry after if possible
     import re
-    seconds = re.search(r'\d+', e.description)
+    seconds = re.search(r'\d+', str(e.description))
     seconds = seconds.group() if seconds else "60"
-    
     resp = jsonify({
         "error": "Too Many Requests",
         "message": "You have exceeded the rate limit. Please slow down.",
@@ -728,23 +733,23 @@ def ratelimit_handler(e):
     })
     return make_response(resp, 429)
 
+from werkzeug.exceptions import HTTPException
+
 @app.errorhandler(Exception)
 def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return jsonify({"message": str(e)}), e.code
     return jsonify({"message": str(e)}), 500
-
-@app.route("/<path:filename>")
-def serve_pages(filename):
-    if filename.endswith(".html"):
-        # Strip .html and try to render from templates
-        template_name = filename
-        active_page = filename.replace(".html", "")
-        if os.path.exists(os.path.join(app.template_folder, template_name)):
-            return render_template(template_name, active_page=active_page)
-    return send_from_directory(".", filename)
 
 @app.route("/")
 def index_page():
-    return render_template("index.html", active_page="home")
+    """Serve the main index page"""
+    return send_from_directory('.', 'index.html')
+
+# --- STATIC FILE SERVING (MUST BE LAST) ---
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
 
 @app.route("/api/sync", methods=["GET"])
 def sync_data():

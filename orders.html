@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="UTF-8" />
@@ -8,17 +8,8 @@
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
 
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap"
-    rel="stylesheet" />
-  <style>
-    body {
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .hero-title {
-      font-family: 'Bebas Neue', sans-serif;
-    }
-  </style>
+  
+  
 
 
   <!-- Resource Hints -->
@@ -38,7 +29,36 @@
       }
     });
   </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/common.js?v=1.6" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
 </head>
 
 <body class="bg-[#F2F0F1] text-black">
@@ -66,7 +86,7 @@
 
   </section>
 
-  <footer class="bg-black text-white py-12 px-6 md:px-12 mt-12">
+  <footer class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-12 px-6 md:px-12 mt-12">
     <div class="max-w-7xl mx-auto text-center">
       <h2 class="hero-title text-3xl font-black mb-4">SHOP EASE</h2>
 
@@ -120,7 +140,7 @@
           list.innerHTML = `
             <div class="bg-white p-12 rounded-3xl text-center shadow-sm">
               <p class="text-gray-500 mb-6">Please login to view your orders.</p>
-              <a href="login.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
+              <a href="login.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full font-bold inline-block">Login Now</a>
             </div>
           `;
           return;
@@ -128,7 +148,9 @@
 
         if (!response.ok) throw new Error("Failed to fetch");
 
-        let orders = await response.json();
+        const responseData = await response.json();
+        let orders = responseData.data || responseData;
+        
         // Only show active orders (Pending/Shipped/Delivered)
         orders = orders.filter(o => (o.status || '').toLowerCase() !== 'cancelled');
 
@@ -136,7 +158,7 @@
           list.innerHTML = `
             <div class="bg-white p-12 rounded-3xl text-center shadow-sm">
               <p class="text-gray-500 mb-6">You haven't placed any orders yet.</p>
-              <a href="index.html" class="bg-black text-white px-8 py-3 rounded-full font-bold inline-block">Start Shopping</a>
+              <a href="index.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full font-bold inline-block">Start Shopping</a>
             </div>
           `;
           return;
@@ -235,8 +257,9 @@
                     ${items.map(item => {
             const safeItemName = escapeHtml(item.name);
             const safeItemImg = escapeHtml(item.image);
-            const safeItemPrice = escapeHtml(item.price);
-            const safeItemQty = escapeHtml(item.qty);
+            const safeItemPrice = escapeHtml(item.unit_price || item.price);
+            const safeItemQty = escapeHtml(item.quantity || item.qty);
+            const itemTotal = (Number(safeItemPrice) * Number(safeItemQty)).toFixed(2);
             return `
                         <div class="flex items-center justify-between group">
                           <div class="flex items-center gap-4">
@@ -248,7 +271,7 @@
                               <p class="text-xs text-gray-400">Quantity: ${safeItemQty}</p>
                             </div>
                           </div>
-                          <p class="text-sm font-bold text-gray-600">$${Number(safeItemPrice) * Number(safeItemQty)}</p>
+                          <p class="text-sm font-bold text-gray-600">$${itemTotal}</p>
                         </div>
                       `;
           }).join('')}
@@ -266,6 +289,40 @@
 
     document.addEventListener('DOMContentLoaded', loadOrders);
   </script>
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 
 </html>

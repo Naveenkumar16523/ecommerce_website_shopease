@@ -37,3 +37,8 @@ migrate_*.py
 seed.py
 test_backend.py
 load_test.py
+
+# Database files
+*.db
+*.db-shm
+*.db-wal

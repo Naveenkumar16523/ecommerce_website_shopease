@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +9,8 @@
   
   
   
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-    .tab-active { border-bottom: 2px solid black; font-weight: 700; color: black; }
-    #mobileSidebar { transition: transform 0.3s ease-in-out; }
-  </style>
+  
+  
 
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -34,7 +29,36 @@
       }
     });
   </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/common.js?v=1.6" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
 </head>
 <body class="bg-white">
 
@@ -43,7 +67,7 @@
   <!-- Shared Navigation Partial -->
   <div id="nav-placeholder"></div>
   <script>
-    fetch('nav.html').then(r => r.text()).then(html => {
+    fetch('/nav.html').then(r => r.text()).then(html => {
       document.getElementById('nav-placeholder').innerHTML = html;
       if (typeof updateAuthUI === 'function') updateAuthUI();
       if (typeof updateCartBadge === 'function') updateCartBadge();
@@ -57,7 +81,7 @@
 
 
 <div class="px-6 md:px-12 py-4 text-sm text-gray-500">
-  <a href="index.html">Home</a> > <span id="breadcrumb-category">Shop</span> > <span id="breadcrumb-name" class="text-black">Product</span>
+  <a href="/index.html">Home</a> > <span id="breadcrumb-category">Shop</span> > <span id="breadcrumb-name" class="text-black">Product</span>
 </div>
 
 
@@ -113,7 +137,7 @@
       <div class="flex flex-wrap gap-3">
         <button class="px-6 py-2 rounded-full bg-gray-100 text-sm hover:bg-black hover:text-white transition">Small</button>
         <button class="px-6 py-2 rounded-full bg-gray-100 text-sm hover:bg-black hover:text-white transition">Medium</button>
-        <button class="px-6 py-2 rounded-full bg-black text-white text-sm">Large</button>
+        <button class="px-6 py-2 rounded-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-sm">Large</button>
         <button class="px-6 py-2 rounded-full bg-gray-100 text-sm hover:bg-black hover:text-white transition">X-Large</button>
       </div>
     </div>
@@ -127,7 +151,7 @@
         <span id="detail-qty" class="font-bold">0</span>
         <button onclick="updateQtyDetail(1)" class="text-xl font-bold">+</button>
       </div>
-      <button onclick="handleAddToCartDetail()" class="flex-1 bg-black text-white py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
+      <button onclick="handleAddToCartDetail()" class="flex-1 bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
         Add to Cart
       </button>
     </div>
@@ -147,7 +171,7 @@
       <h3 class="text-xl font-bold">All Reviews <span class="text-gray-400 text-sm font-normal">(451)</span></h3>
       <div class="flex gap-3">
         <button class="bg-gray-100 p-2 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-        <button class="bg-black text-white px-6 py-2 rounded-full text-sm font-bold">Write a Review</button>
+        <button class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-6 py-2 rounded-full text-sm font-bold">Write a Review</button>
       </div>
     </div>
 
@@ -190,28 +214,28 @@
       <div>
         <div class="font-bold text-sm mb-4 tracking-widest">COMPANY</div>
         <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="about.html" class="hover:text-black">About</a></li>
-          <li><a href="features.html" class="hover:text-black">Features</a></li>
-          <li><a href="works.html" class="hover:text-black">Works</a></li>
-          <li><a href="career.html" class="hover:text-black">Career</a></li>
+          <li><a href="/about.html" class="hover:text-black">About</a></li>
+          <li><a href="/features.html" class="hover:text-black">Features</a></li>
+          <li><a href="/works.html" class="hover:text-black">Works</a></li>
+          <li><a href="/career.html" class="hover:text-black">Career</a></li>
         </ul>
       </div>
       <div>
         <div class="font-bold text-sm mb-4 tracking-widest">HELP</div>
         <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="support.html" class="hover:text-black">Customer Support</a></li>
-          <li><a href="delivery-details.html" class="hover:text-black">Delivery Details</a></li>
-          <li><a href="terms.html" class="hover:text-black">Terms & Conditions</a></li>
-          <li><a href="privacy.html" class="hover:text-black">Privacy Policy</a></li>
+          <li><a href="/support.html" class="hover:text-black">Customer Support</a></li>
+          <li><a href="/delivery-details.html" class="hover:text-black">Delivery Details</a></li>
+          <li><a href="/terms.html" class="hover:text-black">Terms & Conditions</a></li>
+          <li><a href="/privacy.html" class="hover:text-black">Privacy Policy</a></li>
         </ul>
       </div>
       <div>
         <div class="font-bold text-sm mb-4 tracking-widest">FAQ</div>
         <ul class="space-y-3 text-sm text-gray-500">
-          <li><a href="account.html" class="hover:text-black">Account</a></li>
-          <li><a href="delivery-details.html" class="hover:text-black">Manage Deliveries</a></li>
-          <li><a href="orders.html" class="hover:text-black">Orders</a></li>
-          <li><a href="payments.html" class="hover:text-black">Payments</a></li>
+          <li><a href="/account.html" class="hover:text-black">Account</a></li>
+          <li><a href="/delivery-details.html" class="hover:text-black">Manage Deliveries</a></li>
+          <li><a href="/orders.html" class="hover:text-black">Orders</a></li>
+          <li><a href="/payments.html" class="hover:text-black">Payments</a></li>
         </ul>
       </div>
     </div>
@@ -234,10 +258,19 @@
 
   async function loadProductDetail() {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    let id = params.get('id');
+    
+    // Fallback: Extract from path /products/<id>/<slug>
+    if (!id) {
+      const parts = window.location.pathname.split('/');
+      const idx = parts.indexOf('products');
+      if (idx !== -1 && parts[idx+1]) {
+        id = parts[idx+1];
+      }
+    }
     
     if (!id) {
-      document.body.innerHTML = `<div class="p-20 text-center"><h1 class="text-2xl font-bold">Product not found</h1><a href="index.html" class="underline">Go Home</a></div>`;
+      document.body.innerHTML = `<div class="p-20 text-center"><h1 class="text-2xl font-bold">Product not found</h1><p class="mb-6">We couldn't identify the product ID.</p><a href="/index.html" class="underline">Go Home</a></div>`;
       return;
     }
 
@@ -304,28 +337,28 @@
       </button>
     </div>
     <nav class="flex flex-col gap-5 text-lg font-medium">
-      <a href="index.html" class="hover:text-gray-500">Home</a>
+      <a href="/index.html" class="hover:text-gray-500">Home</a>
       <div class="border-b pb-2">
         <p class="text-xs text-gray-400 uppercase tracking-widest mb-3">Shop Categories</p>
         <div class="flex flex-col gap-3 pl-2 text-black">
-          <a href="mens.html" class="hover:text-gray-500">Men</a>
-          <a href="womens.html" class="hover:text-gray-500">Women</a>
-          <a href="kids.html" class="hover:text-gray-500">Kids</a>
+          <a href="/mens.html" class="hover:text-gray-500">Men</a>
+          <a href="/womens.html" class="hover:text-gray-500">Women</a>
+          <a href="/kids.html" class="hover:text-gray-500">Kids</a>
         </div>
       </div>
-      <a href="new-arrivals.html" class="hover:text-gray-500">New Arrivals</a>
-      <a href="casual-category.html" class="hover:text-gray-500">Casual</a>
-      <a href="formal-category.html" class="hover:text-gray-500">Formal</a>
-      <a href="party-category.html" class="hover:text-gray-500">Party</a>
-      <a href="gym-category.html" class="hover:text-gray-500">Gym</a>
-      <a href="brands.html" class="hover:text-gray-500">Brands</a>
+      <a href="/new-arrivals.html" class="hover:text-gray-500">New Arrivals</a>
+      <a href="/casual-category.html" class="hover:text-gray-500">Casual</a>
+      <a href="/formal-category.html" class="hover:text-gray-500">Formal</a>
+      <a href="/party-category.html" class="hover:text-gray-500">Party</a>
+      <a href="/gym-category.html" class="hover:text-gray-500">Gym</a>
+      <a href="/brands.html" class="hover:text-gray-500">Brands</a>
     </nav>
     <div class="mt-auto pt-10 border-t">
-      <a href="profile.html" class="flex items-center gap-3 hover:text-gray-500 mb-4">
+      <a href="/profile.html" class="flex items-center gap-3 hover:text-gray-500 mb-4">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
         Profile
       </a>
-      <a href="cart.html" class="flex items-center gap-3 hover:text-gray-500">
+      <a href="/cart.html" class="flex items-center gap-3 hover:text-gray-500">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
         My Cart
       </a>
@@ -333,5 +366,39 @@
   </div>
 </div>
 
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 </html>

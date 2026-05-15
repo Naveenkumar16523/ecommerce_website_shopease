@@ -1,18 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Our Brands – SHOP EASE</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
   
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
-  <style>
-    body { font-family: 'DM Sans', sans-serif; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; }
-    .brand-card:hover .brand-logo { transform: scale(1.1); }
-    .brand-logo { transition: transform 0.4s ease; }
-  </style>
+  
+  
   
 
   <!-- Resource Hints -->
@@ -32,7 +27,36 @@
       }
     });
   </script>
-  <script src="common.js?v=1.2" defer></script>
+  <script src="/static/common.js?v=1.4" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
 </head>
 <body class="bg-white text-black overflow-x-hidden">
 
@@ -49,7 +73,7 @@
 
 
  
-  <section class="bg-black text-white py-24 px-6 md:px-12 text-center">
+  <section class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-24 px-6 md:px-12 text-center">
     <h1 class="hero-title text-5xl md:text-8xl font-black mb-6 tracking-tight">GLOBAL BRANDS</h1>
     <p class="max-w-2xl mx-auto text-gray-400 text-lg">
       We partner with the world's most prestigious fashion houses to bring you authentic, high-quality style.
@@ -65,7 +89,7 @@
         <div class="z-10 text-center">
           <h2 class="hero-title text-4xl md:text-6xl mb-4">VERSACE</h2>
           <p class="text-xs tracking-[0.3em] font-bold text-gray-500 mb-8 uppercase">Italian Luxury</p>
-          <a href="casual-category.html" class="bg-black text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
+          <a href="casual-category.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
         </div>
         <div class="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
@@ -75,7 +99,7 @@
         <div class="z-10 text-center">
           <h2 class="hero-title text-4xl md:text-6xl mb-4 italic font-light">ZARA</h2>
           <p class="text-xs tracking-[0.3em] font-bold text-gray-500 mb-8 uppercase">Contemporary Style</p>
-          <a href="casual-category.html" class="bg-black text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
+          <a href="casual-category.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
         </div>
         <div class="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
@@ -85,7 +109,7 @@
         <div class="z-10 text-center">
           <h2 class="hero-title text-4xl md:text-6xl mb-4">GUCCI</h2>
           <p class="text-xs tracking-[0.3em] font-bold text-gray-500 mb-8 uppercase">High Fashion</p>
-          <a href="casual-category.html" class="bg-black text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
+          <a href="casual-category.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
         </div>
         <div class="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
@@ -95,7 +119,7 @@
         <div class="z-10 text-center">
           <h2 class="hero-title text-4xl md:text-6xl mb-4 font-black tracking-widest">PRADA</h2>
           <p class="text-xs tracking-[0.3em] font-bold text-gray-500 mb-8 uppercase">Minimalist Luxury</p>
-          <a href="casual-category.html" class="bg-black text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
+          <a href="casual-category.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
         </div>
         <div class="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
@@ -105,7 +129,7 @@
         <div class="z-10 text-center">
           <h2 class="hero-title text-4xl md:text-6xl mb-4 font-light">Calvin Klein</h2>
           <p class="text-xs tracking-[0.3em] font-bold text-gray-500 mb-8 uppercase">Essential Fashion</p>
-          <a href="casual-category.html" class="bg-black text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
+          <a href="casual-category.html" class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">View Collection</a>
         </div>
         <div class="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
@@ -126,5 +150,39 @@
     </div>
   </footer>
 
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 </html>
