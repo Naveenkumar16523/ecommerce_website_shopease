@@ -12,15 +12,15 @@
 }
 
 [data-theme="dark"] {
-  --bg-primary: #0f0f0f;
-  --bg-secondary: #1a1a1a;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
   --text-primary: #f0f0f0;
   --text-secondary: #bbbbbb;
-  --nav-bg: #111111;
-  --card-bg: #1e1e1e;
-  --border-color: #2e2e2e;
+  --nav-bg: #0a0a0a;
+  --card-bg: #111111;
+  --border-color: #1e1e1e;
   --accent: #ffffff;
-  --shadow: rgba(0,0,0,0.4);
+  --shadow: rgba(0,0,0,0.6);
 }
 
 body {
@@ -73,6 +73,15 @@ footer { background-color: var(--bg-secondary) !important; }
 }
 [data-theme="dark"] .bg-gray-200 { background-color: var(--bg-secondary) !important; color: var(--text-primary); }
 [data-theme="dark"] .hover\:bg-gray-300:hover { background-color: var(--border-color) !important; }
+
+.nav-banner {
+  background: #111111;
+}
+
+[data-theme="dark"] .nav-banner {
+  background: #000000;
+  border-bottom: 1px solid #1a1a1a;
+}
 
 .theme-toggle {
   width: 44px;
