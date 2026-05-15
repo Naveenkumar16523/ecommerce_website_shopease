@@ -1,47 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>About Us – SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
-  
-  
-  
-  
-
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-  <script src="https://cdn.tailwindcss.com" defer></script>
-  <link rel="stylesheet" href="/static/css/app.css">
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('shopease-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-
-  <script>
-    window.addEventListener('load', () => {
-      if (window.tailwind) {
-        window.tailwind.config = {
-          theme: { extend: { colors: { clifford: '#da373d' } } }
-        }
-      }
-    });
-  </script>
-  <script src="/static/common.js?v=1.6" defer></script>
-
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — SHOP EASE</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/app.css">
+  
+  <!-- Theme Initialization Script (Prevents Flash) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('shopease-theme');
@@ -50,166 +17,182 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
-
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
   <style>
-    /* Custom Fonts & Base overrides */
-    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .hero-title { font-family: 'Syne', sans-serif; }
     
-    /* Scrollbar */
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .about-hero {
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--bg-secondary);
+      border-radius: 0 0 3rem 3rem;
+      margin-bottom: 80px;
+      position: relative;
+      overflow: hidden;
+    }
     
-    /* Marquee */
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
-    
-    /* Smooth Transitions */
-    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .floating-orb {
+      position: absolute;
+      width: 300px; height: 300px;
+      background: var(--accent);
+      filter: blur(120px);
+      opacity: 0.1;
+      border-radius: 50%;
+      z-index: 0;
+    }
 
-    /* Glassmorphism utility */
-    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 2rem;
+      padding: 40px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px var(--shadow);
+    }
   </style>
-
 </head>
-<body class="bg-white text-black overflow-x-hidden">
+<body class="overflow-x-hidden">
 
-  
-  <nav class="flex items-center justify-between px-6 md:px-12 py-4 border-b border-gray-100 sticky top-0 bg-white z-50">
-    <div class="flex items-center gap-4 md:gap-8">
-      <button onclick="toggleMobileMenu()" class="md:hidden p-1">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <a href="index.html" class="hero-title text-2xl font-black">SHOP EASE</a>
-      <div class="hidden md:flex gap-6 text-sm font-medium">
-        <a href="index.html" class="hover:underline">Home</a>
-        <a href="casual-category.html" class="hover:underline">Shop</a>
-        <a href="new-arrivals.html" class="hover:underline">New Arrivals</a>
-        <a href="#" class="hover:underline">Brands</a>
-      </div>
-    </div>
-    <div class="flex items-center gap-3 md:gap-5">
-      <a href="cart.html" class="relative">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
-        <span id="cartBadge" class="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-[9px] rounded-full w-4 h-4 flex items-center justify-center">0</span>
-      </a>
-    </div>
-  </nav>
-
-  
-  <section class="bg-[#F0EEED] py-20 px-6 md:px-12 text-center">
-    <h1 class="hero-title text-5xl md:text-7xl font-black mb-6">OUR STORY</h1>
-    <p class="max-w-2xl mx-auto text-gray-600 text-lg">
-      At SHOP EASE, we believe that fashion is more than just clothes. It's a way to express who you are and how you feel.
-    </p>
-  </section>
-
- 
-  <section class="py-20 px-6 md:px-12 max-w-4xl mx-auto space-y-12">
-    <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div>
-        <h2 class="hero-title text-3xl font-bold mb-4">WHO WE ARE</h2>
-        <p class="text-gray-500 leading-relaxed">
-          Founded in 2025, SHOP EASE started with a simple mission: to provide high-quality, stylish, and affordable clothing for everyone. We carefully curate our collections to ensure that every piece meets our standards of comfort and style.
-        </p>
-      </div>
-      <div class="rounded-3xl overflow-hidden shadow-2xl">
-        <img src="https://images.unsplash.com/photo-1521335629791-ce4aec67dd16?w=800&q=80" class="w-full h-full object-cover" alt="Fashion Image">
-      </div>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-12 items-center md:flex-row-reverse">
-      <div class="md:order-2">
-        <h2 class="hero-title text-3xl font-bold mb-4">OUR MISSION</h2>
-        <p class="text-gray-500 leading-relaxed">
-          Our mission is to empower individuals through fashion. Whether you're dressing for a casual day out, a formal event, or a session at the gym, we have something that will make you look and feel your best.
-        </p>
-      </div>
-      <div class="rounded-3xl overflow-hidden shadow-2xl md:order-1">
-        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" class="w-full h-full object-cover" alt="Fashion Store">
-      </div>
-    </div>
-  </section>
-
-  
-  <footer class="bg-[#F0EEED] px-6 md:px-16 pt-12 pb-6">
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-10">
-      <div class="col-span-2 md:col-span-1">
-        <div class="hero-title text-2xl font-black mb-3">SHOP EASE</div>
-        <p class="text-xs text-gray-500 leading-relaxed">© 2025–2026, All Rights Reserved</p>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4">COMPANY</div>
-        <ul class="space-y-2 text-xs text-gray-500">
-          <li><a href="about.html" class="hover:text-black">About</a></li>
-          <li><a href="#" class="hover:text-black">Features</a></li>
-          <li><a href="#" class="hover:text-black">Works</a></li>
-          <li><a href="#" class="hover:text-black">Career</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-4">HELP</div>
-        <ul class="space-y-2 text-xs text-gray-500">
-          <li><a href="support.html" class="hover:text-black">Customer Support</a></li>
-          <li><a href="#" class="hover:text-black">Delivery Details</a></li>
-          <li><a href="terms.html" class="hover:text-black">Terms & Conditions</a></li>
-          <li><a href="privacy.html" class="hover:text-black">Privacy Policy</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
-
-  
-  
-    <div class="absolute left-0 top-0 bottom-0 w-4/5 max-w-xs bg-white p-6 shadow-2xl">
-      <span class="hero-title text-xl font-black">SHOP EASE</span>
-      <nav class="flex flex-col gap-5 mt-10">
-        <a href="index.html">Home</a>
-        <a href="casual-category.html">Shop</a>
-        <a href="about.html">About</a>
-      </nav>
-    </div>
-  </div>
-
-
-  <!-- Animation Scripts -->
+  <!-- PROJECT NAVBAR -->
+  <div id="nav-placeholder"></div>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
-              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
-          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
-          observer.observe(el);
-        });
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      const link = e.target.closest('a');
-      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
-        e.preventDefault();
-        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 300);
-      }
+    fetch('nav.html').then(r => r.text()).then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
+      if (typeof updateAuthUI === 'function') updateAuthUI();
+      if (typeof updateCartBadge === 'function') updateCartBadge();
     });
   </script>
-</body>
 
+  <main class="animate-on-scroll">
+    
+    <!-- Hero -->
+    <section class="about-hero">
+      <div class="floating-orb top-[-50px] left-[-50px]"></div>
+      <div class="floating-orb bottom-[-50px] right-[-50px]"></div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-[0.4em] mb-6 block text-gray-500">Our Story</span>
+        <h1 class="section-title text-6xl md:text-8xl leading-none mb-8">ELEVATING <br> MODERN STYLE</h1>
+        <p class="text-xl text-gray-500 max-w-2xl mx-auto font-light leading-relaxed">
+          Founded in 2025, SHOP EASE was born out of a desire to bridge the gap between luxury fashion and everyday wearability.
+        </p>
+      </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-8 mb-32">
+      <div class="card">
+        <h3 class="text-3xl font-bold mb-6 flex items-center gap-4">
+          <span class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-xl">01</span>
+          Our Mission
+        </h3>
+        <p class="text-gray-500 leading-relaxed text-lg font-light">
+          To empower individuals through fashion that inspires confidence, creativity, and self-expression. We believe quality clothing should be accessible to everyone who values exceptional design.
+        </p>
+      </div>
+      <div class="card">
+        <h3 class="text-3xl font-bold mb-6 flex items-center gap-4">
+          <span class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-xl">02</span>
+          Our Vision
+        </h3>
+        <p class="text-gray-500 leading-relaxed text-lg font-light">
+          To become the world's most innovative fashion destination, setting new standards for sustainable production, digital shopping experiences, and inclusive style.
+        </p>
+      </div>
+    </section>
+
+    <!-- Content Row -->
+    <section class="max-w-7xl mx-auto px-6 md:px-12 mb-32">
+      <div class="grid md:grid-cols-2 items-center gap-20">
+        <div class="rounded-[3rem] overflow-hidden shadow-2xl h-[600px]">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" alt="Boutique" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <h2 class="text-5xl font-black mb-8 hero-title leading-tight">QUALITY WITHOUT COMPROMISE</h2>
+          <div class="space-y-6">
+            <div class="flex gap-6">
+              <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-2xl">🌿</div>
+              <div>
+                <h4 class="font-bold text-xl mb-2">Sustainable Sourcing</h4>
+                <p class="text-gray-500">We partner with ethical factories that prioritize environmental impact and fair labor practices.</p>
+              </div>
+            </div>
+            <div class="flex gap-6">
+              <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-2xl">✨</div>
+              <div>
+                <h4 class="font-bold text-xl mb-2">Meticulous Detail</h4>
+                <p class="text-gray-500">Every stitch, button, and fabric choice is scrutinized to ensure your garment lasts for years, not seasons.</p>
+              </div>
+            </div>
+            <div class="flex gap-6">
+              <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-2xl">⚡</div>
+              <div>
+                <h4 class="font-bold text-xl mb-2">Modern Innovation</h4>
+                <p class="text-gray-500">Utilizing advanced fabrics and digital design to create the perfect fit for every body type.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="bg-black text-white py-24 rounded-[4rem] mx-6 md:mx-12 mb-32">
+      <div class="max-w-7xl mx-auto px-12 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+        <div>
+          <div class="text-5xl font-black mb-2">250k+</div>
+          <div class="text-gray-400 uppercase text-xs tracking-widest">Happy Customers</div>
+        </div>
+        <div>
+          <div class="text-5xl font-black mb-2">50+</div>
+          <div class="text-gray-400 uppercase text-xs tracking-widest">Store Locations</div>
+        </div>
+        <div>
+          <div class="text-5xl font-black mb-2">12k+</div>
+          <div class="text-gray-400 uppercase text-xs tracking-widest">Exclusive Designs</div>
+        </div>
+        <div>
+          <div class="text-5xl font-black mb-2">100%</div>
+          <div class="text-gray-400 uppercase text-xs tracking-widest">Eco-Friendly</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+  <script>
+    // Since we need to update footer links globally, I'll fetch it from a central place if possible
+    // But for now, I'll just use a standard one or update index.html's footer
+    fetch('footer.html').then(r => r.text()).then(html => {
+      document.getElementById('footer-placeholder').innerHTML = html;
+    }).catch(() => {
+        // Fallback or handle missing footer.html
+    });
+  </script>
+
+  <script src="/static/common.js" defer></script>
+</body>
 </html>

@@ -31,10 +31,10 @@ window.Products = {
 
     renderCards(products, container) {
         if (!container) return;
-        
+
         const user = JSON.parse(localStorage.getItem('user')) || {};
         const wishlistIds = new Set((user.wishlist || []).map(Number));
-        
+
         container.innerHTML = products.map(p => {
             const inWishlist = wishlistIds.has(parseInt(p.id));
             const heartFill = inWishlist ? '#ef4444' : 'none';
@@ -113,7 +113,7 @@ window.Products = {
         if (els.mainImg) els.mainImg.src = product.image;
         if (els.thumb1) els.thumb1.src = product.image;
         if (els.rating) els.rating.textContent = `★ ${product.rating || '4.5'}`;
-        
+
         if (els.addToCartBtn) {
             const setBtnData = (btn) => {
                 btn.dataset.id = product.id;
@@ -121,18 +121,18 @@ window.Products = {
                 btn.dataset.price = product.price;
                 btn.dataset.img = product.image;
             };
-            
+
             setBtnData(els.addToCartBtn);
-            
+
             const stickyBtn = document.getElementById('sticky-add-cart');
             if (stickyBtn) setBtnData(stickyBtn);
-            
+
             const wishlistBtn = document.querySelector('.btn-wishlist');
             if (wishlistBtn) wishlistBtn.dataset.id = product.id;
-            
+
             const stickyName = document.querySelector('.sticky-name');
             if (stickyName) stickyName.textContent = product.name;
-            
+
             const stickyPrice = document.querySelector('.sticky-price');
             if (stickyPrice) stickyPrice.textContent = `₹${parseFloat(product.price).toFixed(2)}`;
         }
@@ -147,12 +147,12 @@ window.Products = {
             const hasDiscount = p.id % 2 === 0;
 
             return `
-                <div class="product-card">
-                    <div class="img-box" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <div class="rel-card">
+                    <div class="rel-img-box" onclick="window.location.href='product-detail.html?id=${p.id}'">
                         <img src="${p.image}" alt="${p.name}">
                     </div>
                     <div class="rel-info">
-                        <h3 class="rel-name" onclick="window.location.href='product-detail.html?id=${p.id}'" style="cursor:pointer">${p.name}</h3>
+                        <h3 class="rel-name" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.name}</h3>
                         <div class="rel-rating">
                             <span class="rel-stars">★★★★★</span>
                             <span class="rel-score">${rating}/<span>5</span></span>
@@ -199,21 +199,21 @@ window.Products = {
             if (!res.ok) throw new Error('Product not found');
             const product = await res.json();
             this.renderDetail(product);
-            
+
             // Also load related products if container exists
             const relatedContainer = document.getElementById('related-products-container');
             if (relatedContainer) {
                 const allProducts = await this.load();
                 // Filter current product out
                 let related = allProducts.filter(p => p.id != productId);
-                
+
                 // Prioritize same category
                 const sameCategory = related.filter(p => p.category === product.category);
                 const differentCategory = related.filter(p => p.category !== product.category);
-                
+
                 // Combine and take 4
                 related = [...sameCategory, ...differentCategory].slice(0, 4);
-                
+
                 this.renderRelatedCards(related, relatedContainer);
             }
         } catch (e) {
