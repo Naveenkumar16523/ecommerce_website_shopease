@@ -304,8 +304,19 @@ input[type="range"]:active::-webkit-slider-thumb {
 .style-card:hover img { transform: scale(1.05); }
 .style-card img { transition: transform 0.4s ease; }
 
+/* Product Detail Redesign Elements */
+.footer-bg { background-color: #F0F0F0; }
+[data-theme="dark"] .footer-bg { background-color: #000000; border-top: 1px solid #111; }
+
+.review-card { background: white; }
+[data-theme="dark"] .review-card { background: #0a0a0a !important; border-color: #1a1a1a !important; }
+
+.newsletter-banner { background: #000; }
+[data-theme="dark"] .newsletter-banner { background: #111111 !important; border: 1px solid #222222; }
+
 /* Focus styles for accessibility */
 button:focus-visible, a:focus-visible, input:focus-visible {
   outline: 2px solid #000;
   outline-offset: 2px;
 }
+[data-theme="dark"] button:focus-visible { outline-color: #fff; }
