@@ -741,16 +741,6 @@ def handle_exception(e):
         return jsonify({"message": str(e)}), e.code
     return jsonify({"message": str(e)}), 500
 
-@app.route("/")
-def index_page():
-    """Serve the main index page"""
-    return send_from_directory('.', 'index.html')
-
-# --- STATIC FILE SERVING (MUST BE LAST) ---
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('.', path)
-
 @app.route("/api/sync", methods=["GET"])
 def sync_data():
     """Incremental sync endpoint for products"""
@@ -796,6 +786,19 @@ def health_db():
             "status": "unhealthy",
             "error": str(e)
         }), 503
+
+@app.route("/")
+def index_page():
+    """Serve the main index page"""
+    return send_from_directory('.', 'index.html')
+
+# --- STATIC FILE SERVING (MUST BE LAST) ---
+@app.route('/<path:path>')
+def serve_static(path):
+    # Guard: Don't let the static server catch intended API routes
+    if path.startswith('api/'):
+        return jsonify({"message": f"API route not found: /{path}"}), 404
+    return send_from_directory('.', path)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
