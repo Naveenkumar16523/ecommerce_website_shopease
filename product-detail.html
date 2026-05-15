@@ -1,482 +1,258 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="antigravity">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Details - SHOP EASE</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+  <title>Orbital Detail - SHOP EASE</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
   
-  
-  
-  
-  
-  
-
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
-
-  <script src="https://cdn.tailwindcss.com" defer></script>
-  <link rel="stylesheet" href="/static/css/app.css">
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('shopease-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-
-  <script>
-    window.addEventListener('load', () => {
-      if (window.tailwind) {
-        window.tailwind.config = {
-          theme: { extend: { colors: { clifford: '#da373d' } } }
-        }
-      }
-    });
-  </script>
-  <script src="/static/common.js?v=1.6" defer></script>
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/css/app.css">
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('shopease-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-
-  <style>
-    /* Custom Fonts & Base overrides */
-    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
-    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
-    
-    /* Scrollbar */
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* Marquee */
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
-    
-    /* Smooth Transitions */
-    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Glassmorphism utility */
-    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-  </style>
-
+  <script src="/static/common.js?v=1.6" defer></script>
 </head>
-<body class="bg-white">
+<body class="bg-[#050508] text-white selection:bg-purple-500/30 overflow-x-hidden">
 
+  <!-- Particle Background Container -->
+  <div id="starfield" class="fixed inset-0 pointer-events-none z-0"></div>
 
-  
-  <!-- Shared Navigation Partial -->
-  <div id="nav-placeholder"></div>
+  <!-- Navigation -->
+  <div id="nav-placeholder" class="relative z-50"></div>
   <script>
     fetch('/nav.html').then(r => r.text()).then(html => {
       document.getElementById('nav-placeholder').innerHTML = html;
-      if (typeof updateAuthUI === 'function') updateAuthUI();
-      if (typeof updateCartBadge === 'function') updateCartBadge();
+    });
   </script>
 
-  <div class="px-6 md:px-12 py-4 text-sm text-gray-500">
-    <a href="/index.html" class="hover:text-black">Home</a> › <span id="breadcrumb-category">Shop</span> › <span id="breadcrumb-name" class="text-black font-medium">Product</span>
+  <!-- Breadcrumb -->
+  <div class="relative z-10 px-6 md:px-12 py-6 text-[10px] font-orbitron tracking-[0.3em] uppercase opacity-40">
+    <a href="/index.html" class="hover:text-purple-400">Sector 01</a> › <span id="breadcrumb-category">Nebula</span> › <span id="breadcrumb-name" class="text-purple-400">Object</span>
   </div>
 
-
-<section class="px-6 md:px-12 py-6 grid md:grid-cols-2 gap-10">
-  
-  
-  <div class="flex flex-col-reverse md:flex-row gap-4">
-    <div class="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto scrollbar-hide">
-      <img src="" id="thumb1" class="min-w-[80px] w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover border cursor-pointer hover:border-black transition">
-      <img src="" id="thumb2" class="min-w-[80px] w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover border cursor-pointer hover:border-black transition">
-      <img src="" id="thumb3" class="min-w-[80px] w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover border cursor-pointer hover:border-black transition">
-    </div>
-    <div class="flex-1">
-      <img src="" id="main-img" class="w-full h-[350px] md:h-[500px] rounded-2xl object-cover bg-gray-100 shadow-sm">
-    </div>
-  </div>
-
-  
-  <div class="space-y-6">
-    <h1 id="prod-name" class="text-4xl font-black hero-title leading-tight uppercase">Loading Product...</h1>
-    <div class="flex items-center gap-2">
-      <div class="flex text-yellow-400">★★★★☆</div>
-      <span class="text-sm text-gray-500">4.5/5</span>
-    </div>
+  <main class="relative z-10 px-6 md:px-12 py-10 grid lg:grid-cols-2 gap-20 items-center">
     
-    <div class="flex items-center gap-3">
-      <span id="prod-price" class="text-3xl font-bold">$0</span>
-      <span class="text-2xl text-gray-300 line-through" id="old-price"></span>
-      <span class="bg-red-100 text-red-500 text-xs px-2 py-1 rounded-full font-bold" id="discount-tag">-40%</span>
-    </div>
-
-    <p class="text-gray-500 text-sm leading-relaxed">
-      This premium garment is crafted from soft and breathable fabric, offering superior comfort and style for any occasion.
-    </p>
-
-    <hr class="border-gray-100">
-
-    
-    <div class="space-y-3">
-      <p class="text-sm text-gray-500">Select Colors</p>
-      <div class="flex gap-3">
-        <div class="color-dot-detail w-8 h-8 rounded-full bg-[#4F4631] cursor-pointer ring-2 ring-offset-2 ring-black"></div>
-        <div class="color-dot-detail w-8 h-8 rounded-full bg-[#314F4A] cursor-pointer"></div>
-        <div class="color-dot-detail w-8 h-8 rounded-full bg-[#31344F] cursor-pointer"></div>
-      </div>
-    </div>
-
-    <hr class="border-gray-100">
-
-    
-    <div class="space-y-3">
-      <p class="text-sm text-gray-500">Choose Size</p>
-      <div class="flex flex-wrap gap-3">
-        <button class="size-btn">Small</button>
-        <button class="size-btn">Medium</button>
-        <button class="size-btn active">Large</button>
-        <button class="size-btn">X-Large</button>
-      </div>
-    </div>
-
-    <hr class="border-gray-100">
-
-    
-    <div class="flex items-center gap-4 pt-2">
-      <div class="flex items-center bg-gray-100 rounded-full px-4 py-3 gap-6">
-        <button onclick="updateQtyDetail(-1)" class="text-xl font-bold">−</button>
-        <span id="detail-qty" class="font-bold">1</span>
-        <button onclick="updateQtyDetail(1)" class="text-xl font-bold">+</button>
-      </div>
-      <button onclick="handleAddToCartDetail()" class="checkout-btn flex-1 bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold">
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</section>
-
-<section class="px-6 md:px-12 py-10 border-t mt-10">
-  <div class="flex justify-around border-b text-gray-400 text-sm md:text-base">
-    <button onclick="switchTab('details')" id="tab-details" class="pb-4 px-4 border-b-2 border-transparent hover:text-black transition-all">Product Details</button>
-    <button onclick="switchTab('reviews')" id="tab-reviews" class="pb-4 px-4 border-b-2 border-black text-black font-bold transition-all">Rating & Reviews</button>
-    <button onclick="switchTab('faqs')" id="tab-faqs" class="pb-4 px-4 border-b-2 border-transparent hover:text-black transition-all">FAQs</button>
-  </div>
-
-  <div class="py-8">
-    <!-- Tab: Details -->
-    <div id="content-details" class="hidden animate-on-scroll space-y-6">
-      <div class="grid md:grid-cols-2 gap-10">
-        <div>
-          <h4 class="font-bold text-lg mb-4">Specifications</h4>
-          <ul class="space-y-3 text-sm text-gray-600">
-            <li class="flex justify-between border-b pb-2"><span>Material</span><span class="font-medium text-black">100% Premium Cotton</span></li>
-            <li class="flex justify-between border-b pb-2"><span>Weight</span><span class="font-medium text-black">180 GSM</span></li>
-            <li class="flex justify-between border-b pb-2"><span>Fit</span><span class="font-medium text-black">Regular Fit</span></li>
-            <li class="flex justify-between border-b pb-2"><span>Origin</span><span class="font-medium text-black">Made in Italy</span></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-bold text-lg mb-4">Care Instructions</h4>
-          <ul class="space-y-2 text-sm text-gray-600 list-disc pl-5">
-            <li>Machine wash cold with like colors</li>
-            <li>Tumble dry low</li>
-            <li>Cool iron if needed</li>
-            <li>Do not bleach</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab: Reviews -->
-    <div id="content-reviews" class="animate-on-scroll">
-      <div class="flex justify-between items-center mb-8">
-        <h3 class="text-xl font-bold">All Reviews <span class="text-gray-400 text-sm font-normal">(451)</span></h3>
-        <div class="flex gap-3">
-          <button class="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-          <button class="checkout-btn bg-gradient-to-r from-slate-900 to-black text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg hover:shadow-xl transition-all">Write a Review</button>
-        </div>
-      </div>
+    <!-- Floating Product Panel (Left) -->
+    <div class="relative flex items-center justify-center min-h-[500px] lg:min-h-[700px]">
+      <!-- Orbital Glow -->
+      <div class="absolute w-[80%] h-[80%] bg-purple-600/10 rounded-full blur-[120px] animate-pulse"></div>
       
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="border rounded-2xl p-6 space-y-3 bg-white shadow-sm hover:shadow-md transition-all">
-          <div class="flex text-yellow-400 text-sm">★★★★★</div>
-          <p class="font-bold flex items-center gap-2">Samantha D. <span class="bg-green-500 text-white rounded-full p-0.5"><svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></span></p>
-          <p class="text-sm text-gray-500 italic">"I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. It's become my favorite go-to shirt."</p>
-          <p class="text-xs text-gray-400">Posted on August 14, 2023</p>
+      <!-- Orbiting Rings -->
+      <div class="cosmic-ring animate-orbit opacity-30 border-purple-500/40"></div>
+      <div class="cosmic-ring animate-orbit opacity-10 border-purple-300/20" style="width: 140%; height: 140%; animation-duration: 40s; animation-direction: reverse;"></div>
+      
+      <!-- Main Product Display -->
+      <div class="relative z-10 animate-bob">
+        <img src="" id="main-img" class="w-full max-w-[500px] drop-shadow-[0_0_80px_rgba(139,92,246,0.4)] transition-all duration-700">
+        
+        <!-- UI HUD Overlay -->
+        <div class="absolute -top-10 -left-10 p-4 border-l border-t border-purple-500/30 font-orbitron text-[8px] tracking-widest uppercase text-purple-400/60">
+          Stabilization: Active<br>
+          Grav-Locked
         </div>
-        <div class="border rounded-2xl p-6 space-y-3 bg-white shadow-sm hover:shadow-md transition-all">
-          <div class="flex text-yellow-400 text-sm">★★★★★</div>
-          <p class="font-bold flex items-center gap-2">Alex M. <span class="bg-green-500 text-white rounded-full p-0.5"><svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></span></p>
-          <p class="text-sm text-gray-500 italic">"The quality is top-notch. Being a UI/UX designer myself, I appreciate the aesthetics and this definitely gets a thumbs up from me!"</p>
-          <p class="text-xs text-gray-400">Posted on August 15, 2023</p>
-        </div>
+      </div>
+
+      <!-- Thumb HUD -->
+      <div class="absolute bottom-0 flex gap-4 bg-black/40 backdrop-blur-md p-3 rounded-2xl border border-white/5">
+        <img src="" id="thumb1" class="w-16 h-16 rounded-xl border border-purple-500/20 hover:border-purple-500 transition cursor-pointer p-1" onclick="updateMainImg(this.src)">
+        <img src="" id="thumb2" class="w-16 h-16 rounded-xl border border-purple-500/20 hover:border-purple-500 transition cursor-pointer p-1" onclick="updateMainImg(this.src)">
+        <img src="" id="thumb3" class="w-16 h-16 rounded-xl border border-purple-500/20 hover:border-purple-500 transition cursor-pointer p-1" onclick="updateMainImg(this.src)">
       </div>
     </div>
 
-    <!-- Tab: FAQs -->
-    <div id="content-faqs" class="hidden animate-on-scroll space-y-4">
-      <div class="border rounded-xl p-4 cursor-pointer hover:bg-gray-50 transition">
-        <p class="font-bold text-sm">What is the return policy?</p>
-        <p class="text-xs text-gray-500 mt-2">We offer a 30-day return policy for all unworn and unwashed items with original tags attached.</p>
+    <!-- Product Details (Right) -->
+    <div class="space-y-10 lg:pl-10">
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded text-[9px] font-orbitron tracking-tighter text-purple-300">LIMITED EDITION</span>
+          <div class="flex text-purple-500 text-[10px]">★★★★★</div>
+        </div>
+        <h1 id="prod-name" class="text-6xl md:text-8xl font-black font-orbitron leading-[0.9] tracking-tighter uppercase bg-gradient-to-br from-white via-purple-100 to-purple-900 bg-clip-text text-transparent">
+          CORE<br>UNIT
+        </h1>
       </div>
-      <div class="border rounded-xl p-4 cursor-pointer hover:bg-gray-50 transition">
-        <p class="font-bold text-sm">How long does shipping take?</p>
-        <p class="text-xs text-gray-500 mt-2">Standard shipping usually takes 3-5 business days. Express options are available at checkout.</p>
+
+      <div class="flex items-center gap-8 py-6 border-y border-white/5">
+        <div class="flex flex-col">
+          <span class="text-[10px] font-orbitron text-purple-400/60 uppercase tracking-widest mb-1">Exchange Value</span>
+          <span id="prod-price" class="text-5xl font-black font-orbitron text-white">$00.00</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[10px] font-orbitron text-gray-600 uppercase tracking-widest mb-1">Market Price</span>
+          <span id="old-price" class="text-2xl font-orbitron text-gray-700 line-through">$00.00</span>
+        </div>
+        <div id="discount-tag" class="h-fit px-4 py-1.5 bg-purple-600 rounded font-orbitron text-[10px] font-black">−40%</div>
       </div>
-    </div>
-  </div>
-</section>
 
-<section class="px-6 md:px-16 py-20 bg-white">
-  <div class="animate-on-scroll">
-    <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight mb-14 hero-title uppercase">YOU MIGHT ALSO LIKE</h2>
-  </div>
-  <div id="related-products-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 animate-on-scroll">
-    <!-- Dynamically populated -->
-  </div>
-</section>
-
-  
-  <footer class="bg-gray-900 text-white px-6 md:px-16 pt-20 pb-8 mt-10 rounded-t-[3rem] animate-on-scroll">
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-12 mb-16">
-      <div class="col-span-2 md:col-span-1">
-        <div class="hero-title text-4xl mb-4 tracking-wider">SHOP EASE</div>
-        <p class="text-sm text-gray-400 leading-relaxed mb-6 font-light">Elevate your style with our premium collection of modern fashion.</p>
-        <div class="flex gap-4">
-          <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.56v14.91A4.56 4.56 0 0 1 19.44 24H4.56A4.56 4.56 0 0 1 0 19.44V4.56A4.56 4.56 0 0 1 4.56 0h14.88A4.56 4.56 0 0 1 24 4.56zM9 10H6v3h3v8h4v-8h3l.5-3H13V8.5c0-.8.4-1.5 1.5-1.5H17V4h-2.5C11.4 4 9 6.4 9 9.5V10z"/></svg>
-          </a>
-          <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
+      <!-- Selectors -->
+      <div class="grid grid-cols-2 gap-10">
+        <div class="space-y-4">
+          <label class="text-[10px] font-orbitron text-gray-500 uppercase tracking-[0.2em]">Core Hue</label>
+          <div class="flex gap-4">
+            <div class="color-dot-detail w-8 h-8 rounded-full bg-purple-600 ring-2 ring-offset-4 ring-offset-[#050508] ring-purple-500 cursor-pointer transition-transform hover:scale-110"></div>
+            <div class="color-dot-detail w-8 h-8 rounded-full bg-indigo-900 cursor-pointer transition-transform hover:scale-110"></div>
+            <div class="color-dot-detail w-8 h-8 rounded-full bg-zinc-400 cursor-pointer transition-transform hover:scale-110"></div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <label class="text-[10px] font-orbitron text-gray-500 uppercase tracking-[0.2em]">Module Size</label>
+          <div class="flex gap-3">
+            <button class="size-btn font-orbitron text-xs px-5 py-2 active">S</button>
+            <button class="size-btn font-orbitron text-xs px-5 py-2">M</button>
+            <button class="size-btn font-orbitron text-xs px-5 py-2">L</button>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">COMPANY</div>
-        <ul class="space-y-4 text-sm font-light text-gray-400">
-          <li><a href="/about.html" class="hover:text-white transition">About</a></li>
-          <li><a href="/features.html" class="hover:text-white transition">Features</a></li>
-          <li><a href="/works.html" class="hover:text-white transition">Works</a></li>
-          <li><a href="/career.html" class="hover:text-white transition">Career</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">HELP</div>
-        <ul class="space-y-4 text-sm font-light text-gray-400">
-          <li><a href="/support.html" class="hover:text-white transition">Customer Support</a></li>
-          <li><a href="/delivery-details.html" class="hover:text-white transition">Delivery Details</a></li>
-          <li><a href="/terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
-          <li><a href="/privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">FAQ</div>
-        <ul class="space-y-4 text-sm font-light text-gray-400">
-          <li><a href="/account.html" class="hover:text-white transition">Account</a></li>
-          <li><a href="/delivery-details.html" class="hover:text-white transition">Manage Deliveries</a></li>
-          <li><a href="/orders.html" class="hover:text-white transition">Orders</a></li>
-          <li><a href="/payments.html" class="hover:text-white transition">Payments</a></li>
-        </ul>
+
+      <!-- Action -->
+      <div class="flex items-center gap-6 pt-6">
+        <div class="flex items-center bg-white/5 border border-white/10 rounded-2xl px-6 py-5 gap-10">
+          <button onclick="updateQtyDetail(-1)" class="text-purple-400 text-2xl font-black hover:text-white transition">−</button>
+          <span id="detail-qty" class="font-orbitron font-bold text-xl min-w-[30px] text-center">1</span>
+          <button onclick="updateQtyDetail(1)" class="text-purple-400 text-2xl font-black hover:text-white transition">+</button>
+        </div>
+        <button onclick="handleAddToCartDetail()" class="cosmic-btn flex-1 py-6 rounded-2xl font-orbitron font-black text-xs uppercase tracking-[0.4em] text-white overflow-hidden relative group">
+          <span class="relative z-10">Initialize Acquisition</span>
+          <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+        </button>
       </div>
     </div>
+  </main>
 
-    <hr class="border-gray-800 mb-8"/>
-    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-      <p class="text-xs text-gray-400">SHOP EASE © 2025–2026, All Rights Reserved</p>
-      <div class="flex items-center gap-3">
-        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">VISA</div>
-        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">Paytm</div>
-        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">PayPal</div>
-        <div class="bg-gray-800 rounded-lg px-3 py-1.5 text-[10px] font-black text-white border border-gray-700">G Pay</div>
+  <!-- Content Tabs -->
+  <section class="relative z-10 py-20 px-6 md:px-12 border-t border-white/5">
+    <div class="flex justify-center gap-16 border-b border-white/5 text-[10px] font-orbitron tracking-[0.3em] uppercase mb-20">
+      <button onclick="switchTab('details')" id="tab-details" class="pb-8 px-6 border-b-2 border-transparent hover:text-purple-400 transition-all opacity-40">System Specs</button>
+      <button onclick="switchTab('reviews')" id="tab-reviews" class="pb-8 px-6 border-b-2 border-purple-500 text-purple-400 font-bold transition-all">Transmission Logs</button>
+      <button onclick="switchTab('faqs')" id="tab-faqs" class="pb-8 px-6 border-b-2 border-transparent hover:text-purple-400 transition-all opacity-40">FAQ Terminal</button>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+      <div id="content-reviews" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Review Cards -->
+        <div class="cosmic-card p-10 rounded-[2rem] space-y-6 hover:translate-y-[-10px] transition-all duration-500">
+          <div class="flex text-purple-500 text-[10px]">★★★★★</div>
+          <p class="font-orbitron text-xs font-black uppercase flex items-center gap-3">Operator Samantha D. <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_15px_#22c55e]"></span></p>
+          <p class="text-sm text-gray-400 font-light leading-relaxed italic">"Optimal thermal dispersion. The fabric feels like it's woven from stardust. Essential for orbital leisure."</p>
+          <p class="text-[9px] font-orbitron text-gray-600 uppercase">Stardate: 2023.08.14</p>
+        </div>
+        <div class="cosmic-card p-10 rounded-[2rem] space-y-6 hover:translate-y-[-10px] transition-all duration-500">
+          <div class="flex text-purple-500 text-[10px]">★★★★★</div>
+          <p class="font-orbitron text-xs font-black uppercase flex items-center gap-3">Commander Alex M. <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_15px_#22c55e]"></span></p>
+          <p class="text-sm text-gray-400 font-light leading-relaxed italic">"Aerodynamic aesthetic meets high-fashion utility. The acquisition process was faster than warp speed."</p>
+          <p class="text-[9px] font-orbitron text-gray-600 uppercase">Stardate: 2023.08.15</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Orbital Footer -->
+  <footer class="relative z-10 py-32 px-6 md:px-12 bg-black/90 border-t border-white/5">
+    <div class="grid md:grid-cols-4 gap-20 max-w-7xl mx-auto opacity-80">
+      <div class="space-y-6">
+        <div class="font-orbitron text-3xl font-black tracking-[0.2em] text-white">SHOP EASE</div>
+        <p class="text-[10px] text-gray-500 font-orbitron uppercase tracking-widest leading-loose">Pioneering the future of apparel. Sector 01 Verified.</p>
+      </div>
+      <div>
+        <h4 class="font-orbitron text-[11px] font-black text-purple-400 mb-8 uppercase tracking-[0.3em]">Hangar</h4>
+        <ul class="space-y-4 text-[10px] text-gray-600 font-orbitron uppercase tracking-widest">
+          <li><a href="#" class="hover:text-white transition">New Arrivals</a></li>
+          <li><a href="#" class="hover:text-white transition">Techwear</a></li>
+          <li><a href="#" class="hover:text-white transition">Cosmic Edition</a></li>
+        </ul>
       </div>
     </div>
   </footer>
 
-<script>
-  let currentProduct = null;
-
-  async function loadProductDetail() {
-    const params = new URLSearchParams(window.location.search);
-    let id = params.get('id');
-    
-    // Fallback: Extract from path /products/<id>/<slug>
-    if (!id) {
-      const parts = window.location.pathname.split('/');
-      const idx = parts.indexOf('products');
-      if (idx !== -1 && parts[idx+1]) {
-        id = parts[idx+1];
-      }
-    }
-    
-    if (!id) {
-      document.body.innerHTML = `<div class="p-20 text-center"><h1 class="text-2xl font-bold">Product not found</h1><p class="mb-6">We couldn't identify the product ID.</p><a href="/index.html" class="underline">Go Home</a></div>`;
-      return;
-    }
-
-    try {
-      const response = await apiRequest(`/products/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) throw new Error("Product not found");
-        throw new Error("Failed to load product");
-      }
-      
-      const product = await response.json();
-      currentProduct = product;
-
-      // Update UI
-      document.getElementById('prod-name').innerText = product.name;
-      document.getElementById('breadcrumb-name').innerText = product.name;
-      document.getElementById('breadcrumb-category').innerText = product.category;
-      document.getElementById('prod-price').innerText = "$" + product.price;
-      document.getElementById('main-img').src = product.image;
-      document.getElementById('thumb1').src = product.image;
-      document.getElementById('thumb2').src = product.image;
-      document.getElementById('thumb3').src = product.image;
-      
-      if(parseFloat(product.price) > 150) {
-        document.getElementById('old-price').innerText = "$" + (parseFloat(product.price) + 50);
-      } else {
-        document.getElementById('discount-tag').style.display = 'none';
-      }
-      
-      document.getElementById('detail-qty').innerText = "1";
-
-      // Load related products
-      loadRelatedProducts(product.category);
-
-    } catch (err) {
-      console.error(err);
-      document.getElementById('prod-name').innerText = "Error: " + err.message;
-    }
-  }
-
-  function switchTab(tab) {
-    const tabs = ['details', 'reviews', 'faqs'];
-    tabs.forEach(t => {
-      const btn = document.getElementById(`tab-${t}`);
-      const content = document.getElementById(`content-${t}`);
-      if (t === tab) {
-        btn.classList.add('border-black', 'text-black', 'font-bold');
-        btn.classList.remove('border-transparent');
-        content.classList.remove('hidden');
-      } else {
-        btn.classList.remove('border-black', 'text-black', 'font-bold');
-        btn.classList.add('border-transparent');
-        content.classList.add('hidden');
-      }
-    });
-  }
-
-  // Handle color/size selection
-  document.addEventListener('DOMContentLoaded', () => {
-    // Colors
-    document.querySelectorAll('.color-dot-detail').forEach(dot => {
-      dot.addEventListener('click', () => {
-        document.querySelectorAll('.color-dot-detail').forEach(d => d.classList.remove('ring-2', 'ring-offset-2', 'ring-black'));
-        dot.classList.add('ring-2', 'ring-offset-2', 'ring-black');
-      });
-    });
-
-    // Sizes
-    document.querySelectorAll('.size-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-  });
-
-  async function loadRelatedProducts(category) {
-    const container = document.getElementById('related-products-container');
-    if (!container) return;
-    
-    try {
-      const response = await fetch(`/products?category=${category}&limit=4`);
-      if (!response.ok) return;
-      const products = await response.json();
-      
-      container.innerHTML = products.map(p => `
-        <div class="product-card group cursor-pointer animate-on-scroll" onclick="window.location.href='product-detail.html?id=${p.id}'">
-          <div class="aspect-square rounded-3xl overflow-hidden bg-gray-50 mb-4 relative">
-            <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-          </div>
-          <h3 class="font-bold text-base mb-1 truncate">${p.name}</h3>
-          <div class="flex text-yellow-400 text-xs mb-2">★★★★☆</div>
-          <p class="font-black text-xl">$${p.price}</p>
-        </div>
-      `).join('');
-    } catch (err) {
-      console.error("Related products failed:", err);
-    }
-  }
-
-  window.onload = loadProductDetail;
-
-  function updateQtyDetail(change) {
-    const qtySpan = document.getElementById('detail-qty');
-    let val = parseInt(qtySpan.innerText) + change;
-    if(val < 1) val = 1;
-    qtySpan.innerText = val;
-  }
-
-  function handleAddToCartDetail() {
-    if (!currentProduct) return;
-    const qty = parseInt(document.getElementById('detail-qty').innerText);
-    cartStore.add(currentProduct, qty);
-  }
-</script>
-
-  <!-- Animation Scripts -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
-              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
-          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
-          observer.observe(el);
-        });
+    // Starfield Engine
+    function initStarfield() {
+      const starfield = document.getElementById('starfield');
+      const count = 60;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 2 + 1;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-5%';
+        p.style.animationDelay = Math.random() * 15 + 's';
+        p.style.animationDuration = (Math.random() * 20 + 10) + 's';
+        p.style.background = `rgba(${180 + Math.random() * 75}, ${150 + Math.random() * 105}, 255, ${0.4 + Math.random() * 0.6})`;
+        p.style.boxShadow = `0 0 ${size * 10}px white`;
+        starfield.appendChild(p);
       }
-    });
+    }
+    initStarfield();
 
-    document.addEventListener('click', (e) => {
-      const link = e.target.closest('a');
-      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
-        e.preventDefault();
-        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 300);
-      }
-    });
+    let currentProduct = null;
+
+    async function loadProductDetail() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) return;
+
+      try {
+        const response = await fetch(`/api/products/${id}`);
+        const product = await response.json();
+        currentProduct = product;
+
+        document.getElementById('prod-name').innerHTML = product.name.split(' ').join('<br>');
+        document.getElementById('prod-price').innerText = `$${product.price}`;
+        document.getElementById('main-img').src = product.image;
+        document.getElementById('breadcrumb-name').innerText = product.name;
+        document.getElementById('breadcrumb-category').innerText = product.category;
+        
+        document.querySelectorAll('[id^="thumb"]').forEach(t => t.src = product.image);
+        
+        if (parseFloat(product.price) > 150) {
+          document.getElementById('old-price').innerText = `$${(parseFloat(product.price) + 60).toFixed(2)}`;
+        } else {
+          document.getElementById('old-price').style.display = 'none';
+          document.getElementById('discount-tag').style.display = 'none';
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function updateMainImg(src) {
+      const img = document.getElementById('main-img');
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = src;
+        img.style.opacity = '1';
+      }, 300);
+    }
+
+    function switchTab(tab) {
+      ['details', 'reviews', 'faqs'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const content = document.getElementById(`content-${t}`);
+        if (!btn || !content) return;
+        if (t === tab) {
+          btn.classList.add('border-purple-500', 'text-purple-400', 'font-bold');
+          btn.classList.remove('opacity-40');
+          content.classList.remove('hidden');
+        } else {
+          btn.classList.remove('border-purple-500', 'text-purple-400', 'font-bold');
+          btn.classList.add('opacity-40');
+          content.classList.add('hidden');
+        }
+      });
+    }
+
+    function updateQtyDetail(change) {
+      const el = document.getElementById('detail-qty');
+      let val = parseInt(el.innerText) + change;
+      if (val < 1) val = 1;
+      el.innerText = val;
+    }
+
+    function handleAddToCartDetail() {
+      if (!currentProduct) return;
+      const qty = parseInt(document.getElementById('detail-qty').innerText);
+      cartStore.add(currentProduct, qty);
+    }
+
+    window.onload = loadProductDetail;
   </script>
 </body>
 </html>
-

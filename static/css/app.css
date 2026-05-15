@@ -296,8 +296,69 @@ input[type="range"]:active::-webkit-slider-thumb {
 /* Mobile sidebar */
 #mobileSidebar { transition: transform 0.3s ease-in-out; }
 
-/* Review slider */
-.review-slider { scroll-behavior: smooth; }
+/* Antigravity Animations */
+@keyframes bobbing {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes drift {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 0.4; }
+  80% { opacity: 0.2; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+.animate-bob { animation: bobbing 4s ease-in-out infinite; }
+.animate-orbit { animation: orbit 20s linear infinite; }
+
+.cosmic-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  border: 2px dashed var(--cosmic-border);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: drift linear infinite;
+}
+
+.cosmic-card {
+  background: var(--space-card);
+  border: 1px solid var(--cosmic-border);
+  box-shadow: 0 0 30px var(--cosmic-glow);
+  backdrop-filter: blur(10px);
+}
+
+.cosmic-btn {
+  background: var(--cosmic-purple);
+  box-shadow: 0 0 20px var(--cosmic-glow);
+  transition: all 0.3s ease;
+}
+.cosmic-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 0 40px var(--cosmic-purple);
+}
+
+[data-theme="antigravity"] body {
+  background-color: var(--space-bg);
+  color: white;
+  overflow-x: hidden;
+}
 
 /* Style cards */
 .style-card { position: relative; overflow: hidden; border-radius: 1.25rem; cursor: pointer; }
@@ -308,4 +369,27 @@ input[type="range"]:active::-webkit-slider-thumb {
 button:focus-visible, a:focus-visible, input:focus-visible {
   outline: 2px solid #000;
   outline-offset: 2px;
+}
+[data-theme="antigravity"] .size-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #94a3b8;
+}
+[data-theme="antigravity"] .size-btn.active {
+  background: var(--cosmic-purple);
+  color: white;
+  border-color: var(--cosmic-purple);
+  box-shadow: 0 0 15px var(--cosmic-glow);
+}
+
+[data-theme="antigravity"] .color-dot-detail {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+[data-theme="antigravity"] .color-dot-detail:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--cosmic-glow);
 }
