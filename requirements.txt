@@ -1,0 +1,11 @@
+flask
+flask-cors
+mysql-connector-python
+flask-bcrypt
+PyJWT
+python-dotenv
+gunicorn
+flask-limiter==3.7.0
+marshmallow>=3.19,<5
+python-slugify
+pytest
