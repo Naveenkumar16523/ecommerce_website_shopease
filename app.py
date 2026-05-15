@@ -95,6 +95,14 @@ def init_db():
                     category VARCHAR(100),
                     image TEXT,
                     rating DECIMAL(3, 2) DEFAULT 4.5,
+                    review_count INT DEFAULT 451,
+                    description TEXT,
+                    original_price DECIMAL(10, 2),
+                    discount_tag VARCHAR(50),
+                    images TEXT,
+                    colors TEXT,
+                    sizes TEXT,
+                    related_products TEXT,
                     slug VARCHAR(255) UNIQUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -104,6 +112,23 @@ def init_db():
                     INDEX ix_products_updated (updated_at)
                 )
             """)
+            
+            # Migration: Ensure new columns exist for existing databases
+            cols_to_add = [
+                ("review_count", "INT DEFAULT 451"),
+                ("description", "TEXT"),
+                ("original_price", "DECIMAL(10, 2)"),
+                ("discount_tag", "VARCHAR(50)"),
+                ("images", "TEXT"),
+                ("colors", "TEXT"),
+                ("sizes", "TEXT"),
+                ("related_products", "TEXT")
+            ]
+            for col_name, col_def in cols_to_add:
+                try:
+                    cursor.execute(f"ALTER TABLE products ADD COLUMN {col_name} {col_def}")
+                except:
+                    pass # Already exists
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS wishlist (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -711,11 +736,32 @@ def seed_db_command(force):
         with get_db() as (conn, cursor):
             for p in INITIAL_PRODUCTS:
                 cursor.execute("SELECT id FROM products WHERE name = %s", (p['name'],))
-                if not cursor.fetchone():
+                existing = cursor.fetchone()
+                if not existing:
                     cursor.execute("""
-                        INSERT INTO products (name, price, category, image, rating)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (p['name'], p['price'], p['category'], p['image'], p.get('rating', 4.5)))
+                        INSERT INTO products (name, price, category, image, rating, description, original_price, discount_tag, images, colors, sizes, related_products, review_count)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        p['name'], p['price'], p['category'], p['image'], p.get('rating', 4.5),
+                        p.get('description'), p.get('original_price'), p.get('discount_tag'),
+                        json.dumps(p.get('images', [])), json.dumps(p.get('colors', [])),
+                        json.dumps(p.get('sizes', [])), json.dumps(p.get('related_products', [])),
+                        p.get('review_count', 451)
+                    ))
+                else:
+                    cursor.execute("""
+                        UPDATE products SET 
+                            price=%s, category=%s, image=%s, rating=%s, description=%s, 
+                            original_price=%s, discount_tag=%s, images=%s, colors=%s, 
+                            sizes=%s, related_products=%s, review_count=%s
+                        WHERE name=%s
+                    """, (
+                        p['price'], p['category'], p['image'], p.get('rating', 4.5),
+                        p.get('description'), p.get('original_price'), p.get('discount_tag'),
+                        json.dumps(p.get('images', [])), json.dumps(p.get('colors', [])),
+                        json.dumps(p.get('sizes', [])), json.dumps(p.get('related_products', [])),
+                        p.get('review_count', 451), p['name']
+                    ))
         logger.info("Database seeded successfully! [OK]")
     except Exception as e:
         logger.error(f"Seeding error: {e}")
