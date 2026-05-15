@@ -247,12 +247,17 @@ input[type="range"]:active::-webkit-slider-thumb {
   border-color: var(--text-primary);
 }
 
-[data-theme="dark"] .apply-filter-btn, [data-theme="dark"] .checkout-btn {
+[data-theme="dark"] .apply-filter-btn, 
+[data-theme="dark"] .checkout-btn,
+[data-theme="dark"] .btn-view-all {
   background: #ffffff !important;
   color: #000000 !important;
   border: none !important;
 }
-[data-theme="dark"] .apply-filter-btn:hover, [data-theme="dark"] .checkout-btn:hover {
+
+[data-theme="dark"] .apply-filter-btn:hover, 
+[data-theme="dark"] .checkout-btn:hover,
+[data-theme="dark"] .btn-view-all:hover {
   background: #e2e8f0 !important;
   box-shadow: 0 10px 25px rgba(255,255,255,0.1) !important;
 }
