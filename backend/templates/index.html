@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SHOP EASE - Modern Fashion{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative min-h-[80vh] flex flex-col md:flex-row items-center px-6 md:px-16 overflow-hidden bg-white mt-4 mx-4 md:mx-8 rounded-[2.5rem] shadow-[0_0_40px_rgba(0,0,0,0.03)] border border-gray-100 mb-10">
+  
+  <!-- Background floating circles -->
+  <div class="absolute top-20 left-20 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
+  <div class="absolute bottom-20 right-20 w-72 h-72 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse" style="animation-delay: 2s;"></div>
+
+  <div class="max-w-2xl z-10 py-16 md:py-24 text-left w-full">
+    <h1 class="hero-title text-5xl sm:text-6xl md:text-[5rem] font-extrabold leading-[1.05] mb-6 text-gray-900 tracking-tight">
+      FIND CLOTHES THAT MATCH YOUR 
+      <span class="relative inline-block">
+        STYLE
+      </span>
+    </h1>
+    
+    <p class="text-gray-500 text-base md:text-lg mb-10 max-w-md leading-relaxed font-light">
+      Browse through our diverse range of meticulously crafted garments designed to make you stand out and elevate your everyday wardrobe.
+    </p>
+    
+    <button onclick="document.getElementById('new-arrivals-container').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto bg-black text-white px-10 py-4 rounded-full text-base font-semibold hover:bg-gray-800 hover:shadow-xl transition-all duration-300">
+      Shop Now
+    </button>
+    
+    <!-- Stats Section -->
+    <div class="flex flex-wrap gap-8 md:gap-12 mt-16 pt-8 border-t border-gray-100">
+      <div>
+        <p class="text-3xl md:text-4xl font-black text-black">200+</p>
+        <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Brands</p>
+      </div>
+      <div>
+        <p class="text-3xl md:text-4xl font-black text-black">2,000+</p>
+        <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Products</p>
+      </div>
+      <div>
+        <p class="text-3xl md:text-4xl font-black text-black">30k+</p>
+        <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Customers</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 self-stretch flex justify-center items-center relative w-full mt-10 md:mt-0">
+    <div class="relative w-full max-w-[480px] aspect-[4/5] bg-gray-50 rounded-[3rem] border border-gray-100 overflow-hidden flex items-end justify-center">
+      <img src="/static/assets/Rectangle2.jpg" alt="Fashion Model" class="relative z-10 w-full h-full object-cover object-top transition-transform duration-700"/>
+    </div>
+  </div>
+</section>
+
+<!-- Brand Bar -->
+<div class="bg-black py-5 overflow-hidden">
+  <div class="flex gap-16 animate-marquee whitespace-nowrap items-center brand-bar text-white text-2xl md:text-3xl opacity-80" style="animation: marquee 35s linear infinite;">
+    <span>VERSACE</span><span>ZARA</span><span>GUCCI</span><span>PRADA</span><span>Calvin Klein</span>
+    <span>VERSACE</span><span>ZARA</span><span>GUCCI</span><span>PRADA</span><span>Calvin Klein</span>
+  </div>
+</div>
+
+<!-- New Arrivals -->
+<section class="px-6 md:px-16 py-20 bg-white">
+  <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight mb-14 hero-title uppercase">New Arrivals</h2>
+  <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+    <!-- Dynamically populated -->
+  </div>
+  <div class="text-center mt-14">
+    <a href="/new-arrivals" class="inline-block border-2 border-gray-200 px-12 py-3 rounded-full text-base font-medium hover:bg-black hover:text-white transition-all duration-300">
+      View All
+    </a>
+  </div>
+</section>
+
+<hr class="border-gray-100 mx-6 md:mx-16"/>
+
+<!-- Top Selling -->
+<section class="px-6 md:px-16 py-20 bg-white">
+  <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight mb-14 hero-title uppercase">Top Selling</h2>
+  <div id="top-selling-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+    <!-- Dynamically populated -->
+  </div>
+  <div class="text-center mt-14">
+    <a href="/top-selling" class="inline-block border-2 border-gray-200 px-12 py-3 rounded-full text-base font-medium hover:bg-black hover:text-white transition-all duration-300">
+      View All
+    </a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    async function loadFeatured() {
+        try {
+            const res = await fetch('/api/products?per_page=8');
+            const data = await res.json();
+            const products = data.data || [];
+            
+            renderProductsInto(products.slice(0, 4), document.getElementById('new-arrivals-container'));
+            renderProductsInto(products.slice(4, 8), document.getElementById('top-selling-container'));
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function renderProductsInto(products, container) {
+        if (!container) return;
+        container.innerHTML = products.map(p => `
+            <div class="group cursor-pointer" onclick="viewProduct(this)" data-id="${p.id}">
+                <div class="aspect-square bg-[#F0EEED] rounded-[1.25rem] overflow-hidden mb-4">
+                    <img src="${p.image}" class="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <h3 class="font-bold text-base mb-1 truncate">${p.name}</h3>
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="flex text-yellow-400 text-xs">★★★★☆</div>
+                    <span class="text-xs text-gray-500">4.0/5</span>
+                </div>
+                <p class="font-bold text-xl">$${p.price}</p>
+            </div>
+        `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFeatured);
+</script>
+{% endblock %}

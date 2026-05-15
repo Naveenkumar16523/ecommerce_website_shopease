@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SHOP EASE{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/static/css/app.css">
+    
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .hero-title { font-family: 'Syne', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-white text-black antialiased overflow-x-hidden">
+
+    {% include 'partials/_nav.html' %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/_footer.html' %}
+
+    <!-- Core Scripts -->
+    <script src="/static/common.js?v=1.6" defer></script>
+    <script>
+        // Synchronized viewProduct function
+        function viewProduct(element) {
+            // Product detail page removed
+            console.log("Product detail view disabled");
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

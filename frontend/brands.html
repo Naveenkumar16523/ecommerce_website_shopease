@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Brands – SHOP EASE</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+  
+  
+  
+  
+
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
+
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <script>
+    window.addEventListener('load', () => {
+      if (window.tailwind) {
+        window.tailwind.config = {
+          theme: { extend: { colors: { clifford: '#da373d' } } }
+        }
+      }
+    });
+  </script>
+  <script src="/static/common.js?v=1.6" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
+</head>
+<body class="bg-primary text-primary overflow-x-hidden transition-colors duration-300">
+
+  
+  <!-- Shared Navigation Partial -->
+  <div id="nav-placeholder"></div>
+  <script>
+    fetch('nav.html').then(r => r.text()).then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
+      if (typeof updateAuthUI === 'function') updateAuthUI();
+      if (typeof updateCartBadge === 'function') updateCartBadge();
+    });
+  </script>
+
+
+ 
+  <section class="relative py-24 px-6 md:px-12 text-center overflow-hidden" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);">
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+    <h1 class="hero-title text-5xl md:text-8xl font-black mb-6 tracking-tight relative z-10" style="color: var(--text-primary)">GLOBAL BRANDS</h1>
+    <p class="max-w-2xl mx-auto text-lg relative z-10" style="color: var(--text-secondary)">
+      We partner with the world's most prestigious fashion houses to bring you authentic, high-quality style.
+    </p>
+  </section>
+
+  
+  <section class="py-20 px-6 md:px-12 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- Brand Card 1 -->
+      <div class="brand-card spotlight-card group relative rounded-[2rem] overflow-hidden aspect-[4/5] flex items-center justify-center p-12 transition-all duration-500 border border-transparent hover:border-[var(--accent)]" style="background: var(--bg-secondary);">
+        <div class="spotlight-overlay"></div>
+        <div class="z-10 text-center">
+          <h2 class="hero-title text-4xl md:text-6xl mb-4" style="color: var(--text-primary)">VERSACE</h2>
+          <p class="text-xs tracking-[0.3em] font-bold mb-8 uppercase" style="color: var(--text-secondary)">Italian Luxury</p>
+          <a href="casual-category.html" class="inline-block transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 hover:scale-105" 
+             style="background: var(--text-primary); color: var(--bg-primary);">
+            View Collection
+          </a>
+        </div>
+      </div>
+
+      <!-- Brand Card 2 -->
+      <div class="brand-card spotlight-card group relative rounded-[2rem] overflow-hidden aspect-[4/5] flex items-center justify-center p-12 transition-all duration-500 border border-transparent hover:border-[var(--accent)]" style="background: var(--bg-secondary);">
+        <div class="spotlight-overlay"></div>
+        <div class="z-10 text-center">
+          <h2 class="hero-title text-4xl md:text-6xl mb-4 italic font-light" style="color: var(--text-primary)">ZARA</h2>
+          <p class="text-xs tracking-[0.3em] font-bold mb-8 uppercase" style="color: var(--text-secondary)">Contemporary Style</p>
+          <a href="casual-category.html" class="inline-block transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 hover:scale-105"
+             style="background: var(--text-primary); color: var(--bg-primary);">
+            View Collection
+          </a>
+        </div>
+      </div>
+
+      <!-- Brand Card 3 -->
+      <div class="brand-card spotlight-card group relative rounded-[2rem] overflow-hidden aspect-[4/5] flex items-center justify-center p-12 transition-all duration-500 border border-transparent hover:border-[var(--accent)]" style="background: var(--bg-secondary);">
+        <div class="spotlight-overlay"></div>
+        <div class="z-10 text-center">
+          <h2 class="hero-title text-4xl md:text-6xl mb-4" style="color: var(--text-primary)">GUCCI</h2>
+          <p class="text-xs tracking-[0.3em] font-bold mb-8 uppercase" style="color: var(--text-secondary)">High Fashion</p>
+          <a href="casual-category.html" class="inline-block transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 hover:scale-105"
+             style="background: var(--text-primary); color: var(--bg-primary);">
+            View Collection
+          </a>
+        </div>
+      </div>
+
+      <!-- Brand Card 4 -->
+      <div class="brand-card spotlight-card group relative rounded-[2rem] overflow-hidden aspect-[4/5] flex items-center justify-center p-12 transition-all duration-500 border border-transparent hover:border-[var(--accent)]" style="background: var(--bg-secondary);">
+        <div class="spotlight-overlay"></div>
+        <div class="z-10 text-center">
+          <h2 class="hero-title text-4xl md:text-6xl mb-4 font-black tracking-widest" style="color: var(--text-primary)">PRADA</h2>
+          <p class="text-xs tracking-[0.3em] font-bold mb-8 uppercase" style="color: var(--text-secondary)">Minimalist Luxury</p>
+          <a href="casual-category.html" class="inline-block transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 hover:scale-105"
+             style="background: var(--text-primary); color: var(--bg-primary);">
+            View Collection
+          </a>
+        </div>
+      </div>
+
+      <!-- Brand Card 5 -->
+      <div class="brand-card spotlight-card group relative rounded-[2rem] overflow-hidden aspect-[4/5] flex items-center justify-center p-12 transition-all duration-500 border border-transparent hover:border-[var(--accent)]" style="background: var(--bg-secondary);">
+        <div class="spotlight-overlay"></div>
+        <div class="z-10 text-center">
+          <h2 class="hero-title text-4xl md:text-6xl mb-4 font-light" style="color: var(--text-primary)">Calvin Klein</h2>
+          <p class="text-xs tracking-[0.3em] font-bold mb-8 uppercase" style="color: var(--text-secondary)">Essential Fashion</p>
+          <a href="casual-category.html" class="inline-block transition-all duration-300 px-8 py-3 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 hover:scale-105"
+             style="background: var(--text-primary); color: var(--bg-primary);">
+            View Collection
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <footer class="px-6 md:px-16 pt-12 pb-6" style="background: var(--bg-secondary);">
+    <div class="text-center">
+      <div class="hero-title text-2xl font-black mb-4" style="color: var(--text-primary)">SHOP EASE</div>
+      <p class="text-xs mb-8" style="color: var(--text-secondary)">© 2025–2026, All Rights Reserved</p>
+      <div class="flex justify-center gap-6 text-sm font-bold tracking-widest" style="color: var(--text-secondary)">
+        <a href="about.html" class="hover:opacity-70 transition-opacity">ABOUT</a>
+        <a href="support.html" class="hover:opacity-70 transition-opacity">SUPPORT</a>
+        <a href="privacy.html" class="hover:opacity-70 transition-opacity">PRIVACY</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Spotlight Effect Logic
+      const spotlightCards = document.querySelectorAll('.spotlight-card');
+      const spotlightColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || 'rgba(255, 255, 255, 0.25)';
+      
+      spotlightCards.forEach(card => {
+        const overlay = card.querySelector('.spotlight-overlay');
+        
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          // Use a stronger white glow for light theme and subtle for dark
+          overlay.style.background = `radial-gradient(600px circle at ${x}px ${y}px, var(--accent-transparent), transparent 40%)`;
+        });
+      });
+
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
+</body>
+
+</html>

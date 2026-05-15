@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How it Works – SHOP EASE</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+  
+  
+  
+  
+
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
+
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <script>
+    window.addEventListener('load', () => {
+      if (window.tailwind) {
+        window.tailwind.config = {
+          theme: { extend: { colors: { clifford: '#da373d' } } }
+        }
+      }
+    });
+  </script>
+  <script src="/static/common.js?v=1.6" defer></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+  </style>
+
+</head>
+<body class="bg-white text-black">
+  <nav class="flex items-center justify-between px-6 md:px-12 py-4 border-b border-gray-100 bg-white">
+    <a href="index.html" class="hero-title text-2xl font-black">SHOP EASE</a>
+    <a href="index.html" class="text-sm font-medium hover:underline">Back to Home</a>
+  </nav>
+  <section class="py-20 px-6 md:px-12 max-w-4xl mx-auto">
+    <h1 class="hero-title text-5xl font-black mb-12 text-center">HOW IT WORKS</h1>
+    <div class="space-y-16">
+      <div class="flex flex-col md:flex-row items-center gap-10">
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold mb-4">1. Browse & Select</h2>
+          <p class="text-gray-500">Explore our curated collections of casual, formal, and party wear. Choose the items that match your style.</p>
+        </div>
+        <div class="w-full md:w-1/3 h-40 bg-[#F0EEED] rounded-3xl flex items-center justify-center text-4xl">🛍️</div>
+      </div>
+      <div class="flex flex-col md:flex-row-reverse items-center gap-10">
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold mb-4">2. Easy Checkout</h2>
+          <p class="text-gray-500">Review your cart and proceed to our secure checkout. Enter your details and choose your payment method.</p>
+        </div>
+        <div class="w-full md:w-1/3 h-40 bg-[#F0EEED] rounded-3xl flex items-center justify-center text-4xl">💳</div>
+      </div>
+      <div class="flex flex-col md:flex-row items-center gap-10">
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold mb-4">3. Fast Delivery</h2>
+          <p class="text-gray-500">Sit back and relax. We'll process your order and ship it to your doorstep as quickly as possible.</p>
+        </div>
+        <div class="w-full md:w-1/3 h-40 bg-[#F0EEED] rounded-3xl flex items-center justify-center text-4xl">🚚</div>
+      </div>
+    </div>
+  </section>
+  <footer class="bg-[#F0EEED] py-10 text-center">
+    <p class="text-xs text-gray-500">© 2025–2026 SHOP EASE. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
+</body>
+
+</html>

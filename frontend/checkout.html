@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - SHOP EASE</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+  
+  
+  
+
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://ecommerce-website-shopease.vercel.app">
+
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <script>
+    window.addEventListener('load', () => {
+      if (window.tailwind) {
+        window.tailwind.config = {
+          theme: { extend: { colors: { clifford: '#da373d' } } }
+        }
+      }
+    });
+  </script>
+  <script src="/static/common.js?v=1.6" defer></script>
+  
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; }
+    .hero-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .brand-bar { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.8s ease-out forwards; }
+
+    /* Glassmorphism utility - Theme Aware */
+    .glass { 
+      background: var(--nav-bg); 
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px); 
+      border-bottom: 1px solid var(--border-color);
+    }
+  </style>
+
+</head>
+
+<body class="bg-primary text-primary font-sans h-screen overflow-hidden flex flex-col md:flex-row transition-colors duration-300">
+
+  <!-- Left Panel: Order Summary -->
+  <div class="md:w-2/5 border-r relative overflow-y-auto flex-col p-8 lg:p-12 scrollbar-hide z-10 hidden md:flex shadow-[4px_0_24px_rgba(0,0,0,0.02)]" style="background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary);">
+    <!-- Floating Orbs (Light theme) -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+      <div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-gray-100 rounded-full blur-3xl animate-[spin_20s_linear_infinite]"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] bg-yellow-50 rounded-full blur-3xl animate-[pulse_10s_ease-in-out_infinite]"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="relative z-10 mb-12 animate-fadeUp opacity-0" style="animation-delay: 0.1s;">
+      <a href="/index.html" class="text-3xl font-black tracking-tight hero-title transition-colors" style="color: var(--text-primary)">SHOP EASE</a>
+      <p class="text-xs tracking-widest uppercase mt-2 font-bold" style="color: var(--text-secondary)">Secure Checkout</p>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="relative z-10 flex-1 animate-fadeUp opacity-0" style="animation-delay: 0.2s;">
+      <h2 class="text-2xl font-bold mb-8 text-black tracking-tight">Order Summary</h2>
+      
+      <div class="space-y-4 text-sm mb-8 font-medium">
+        <div class="flex justify-between items-center p-3 rounded-xl transition-colors" style="color: var(--text-secondary)">
+          <span class="flex items-center gap-3"><span class="text-xl">🛍️</span> Subtotal</span>
+          <span id="summary-subtotal" class="font-bold" style="color: var(--text-primary)">$0</span>
+        </div>
+        <div class="flex justify-between text-red-500 items-center p-3 rounded-xl hover:bg-red-50/10 transition-colors">
+          <span class="flex items-center gap-3"><span class="text-xl">🏷️</span> Discount (-20%)</span>
+          <span id="summary-discount" class="font-bold">-$0</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl transition-colors" style="color: var(--text-secondary)">
+          <span class="flex items-center gap-3"><span class="text-xl">🚚</span> Delivery Fee</span>
+          <span id="summary-delivery" class="font-bold" style="color: var(--text-primary)">$15</span>
+        </div>
+      </div>
+
+      <hr class="border-gray-100 mb-8">
+
+      <div class="flex justify-between font-bold text-2xl mb-8 p-6 rounded-2xl border transition-all shadow-lg" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+        <span>Total</span>
+        <span id="summary-total">$0</span>
+      </div>
+      
+      <div class="flex items-center justify-center gap-2 mt-auto text-xs text-gray-400 font-medium pb-8">
+        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        256-Bit SSL Encrypted Checkout
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Top Nav -->
+  <div class="md:hidden border-b p-6 flex items-center justify-between" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+    <a href="/index.html" class="text-2xl font-black tracking-tight hero-title">SHOP EASE</a>
+    <span class="text-xs font-bold tracking-widest uppercase" style="color: var(--text-secondary)">Checkout</span>
+  </div>
+  
+  <div class="md:hidden px-6 py-4 border-b flex justify-between items-center text-sm font-bold shadow-inner" style="background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary);">
+    <span>Total to Pay:</span>
+    <span id="summary-total-mobile" class="text-lg">$0</span>
+  </div>
+
+  <!-- Right Panel: Forms -->
+  <div class="md:w-3/5 flex-1 relative overflow-y-auto scrollbar-hide" style="background: var(--bg-primary);">
+    <div class="p-6 md:p-12 lg:p-20 max-w-3xl mx-auto space-y-8 animate-fadeUp opacity-0" style="animation-delay: 0.3s;">
+      
+      <!-- Shipping Address -->
+      <div class="p-8 rounded-3xl shadow-sm border relative group overflow-hidden" style="background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary);">
+        <div class="absolute top-0 left-0 w-1 h-full bg-black transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-3"><span class="text-2xl">📍</span> Shipping Address</h2>
+        <div class="grid md:grid-cols-2 gap-5">
+          <input id="ship-name" type="text" placeholder="Full Name" class="w-full border rounded-xl px-5 py-3.5 text-sm outline-none transition-colors font-medium" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+          <input id="ship-phone" type="text" placeholder="Phone Number" class="w-full border rounded-xl px-5 py-3.5 text-sm outline-none transition-colors font-medium" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+          <input id="ship-address" type="text" placeholder="Street Address" class="w-full border rounded-xl px-5 py-3.5 text-sm md:col-span-2 outline-none transition-colors font-medium" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+          <input id="ship-city" type="text" placeholder="City" class="w-full border rounded-xl px-5 py-3.5 text-sm outline-none transition-colors font-medium" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+          <input id="ship-pincode" type="text" placeholder="ZIP / Pincode" class="w-full border rounded-xl px-5 py-3.5 text-sm outline-none transition-colors font-medium" style="background: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary);">
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="p-8 rounded-3xl shadow-sm border relative group overflow-hidden" style="background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary);">
+        <div class="absolute top-0 left-0 w-1 h-full bg-yellow-400 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-3"><span class="text-2xl">💳</span> Payment Method</h2>
+        <div class="space-y-4">
+          
+          <label class="flex items-center justify-between p-5 border rounded-2xl cursor-pointer hover:opacity-80 transition-opacity group/label" style="background: var(--bg-primary); border-color: var(--border-color)">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="UPI" class="w-5 h-5 accent-black">
+              <span class="text-base font-bold">UPI / NetBanking</span>
+            </div>
+            <span class="text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 px-2 py-1 rounded shadow-lg animate-pulse">Fast Pay</span>
+          </label>
+
+          <label class="flex items-center justify-between p-5 border rounded-2xl cursor-pointer hover:opacity-80 transition-opacity group/label" style="background: var(--bg-primary); border-color: var(--border-color)">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="Card" class="w-5 h-5 accent-black">
+              <span class="text-base font-bold">Credit/Debit Card</span>
+            </div>
+            <span class="text-xs font-bold text-white bg-gradient-to-r from-blue-500 to-cyan-500 px-2 py-1 rounded shadow-lg animate-pulse">Secure</span>
+          </label>
+
+          <label onclick="showQRModal()" class="flex items-center justify-between p-5 border rounded-2xl cursor-pointer hover:opacity-80 transition-opacity group/label" style="background: var(--bg-primary); border-color: var(--border-color)">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="QR Code" class="w-5 h-5 accent-black">
+              <span class="text-base font-bold">QR Payment</span>
+            </div>
+            <span class="text-xs font-bold text-blue-600 px-2 py-1 rounded border border-blue-100" style="background: rgba(59, 130, 246, 0.1)">Scan & Pay</span>
+          </label>
+
+          <label class="flex items-center justify-between p-5 border rounded-2xl cursor-pointer shadow-sm" style="background: var(--bg-primary); border-color: var(--text-primary)">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="paymentMethod" value="Cash on Delivery" checked class="w-5 h-5 accent-black">
+              <span class="text-base font-bold">Cash on Delivery</span>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Action -->
+      <div class="pt-6 pb-20 md:pb-6">
+        <button id="placeOrderBtn" onclick="submitOrder()" class="checkout-btn w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-[0_0_20px_rgba(0,100,255,0.4)] hover:-translate-y-1 transition-all duration-300 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 border border-black/10 relative overflow-hidden">
+          <span class="relative z-10">Place Order Securely</span> 
+          <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M3 12h18"/></svg>
+        </button>
+      </div>
+      
+    </div>
+  </div>
+
+<script>
+  let qrPaymentConfirmed = false;
+
+  function updateSummary() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) {
+      alert("Your cart is empty. Redirecting to home...");
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    let subtotal = 0;
+    cart.forEach(item => {
+      // Robust price parsing to handle "$120", "120.00", etc.
+      let priceStr = String(item.price).replace(/[^0-9.]/g, '');
+      const price = parseFloat(priceStr) || 0;
+      const qty = parseInt(item.qty) || 1;
+      subtotal += (price * qty);
+    });
+    
+    const discount = Math.round(subtotal * 0.2);
+    const delivery = 15;
+    const total = subtotal - discount + delivery;
+
+    document.getElementById('summary-subtotal').innerText = '$' + subtotal.toFixed(2);
+    document.getElementById('summary-discount').innerText = '-$' + discount.toFixed(2);
+    document.getElementById('summary-delivery').innerText = '$' + delivery.toFixed(2);
+    document.getElementById('summary-total').innerText = '$' + total.toFixed(2);
+    
+    // Also update mobile view if it exists
+    const mobileTotal = document.getElementById('summary-total-mobile');
+    if (mobileTotal) mobileTotal.innerText = '$' + total.toFixed(2);
+  }
+
+  async function submitOrder() {
+    const name = document.getElementById('ship-name').value;
+    const phone = document.getElementById('ship-phone').value;
+    const address = document.getElementById('ship-address').value;
+    const city = document.getElementById('ship-city').value;
+    const pincode = document.getElementById('ship-pincode').value;
+    const paymentMethodEl = document.querySelector('input[name="paymentMethod"]:checked');
+    
+    if (!paymentMethodEl) {
+      alert('Please select a payment method!');
+      return;
+    }
+    const paymentMethod = paymentMethodEl.value;
+
+    if (!name || !address || !phone || !city || !pincode) {
+      alert('Please fill in all shipping details including city and pincode!');
+      return;
+    }
+
+    if (paymentMethod === 'QR Code' && !qrPaymentConfirmed) {
+      alert('Please complete QR payment and click "I\'ve Paid" before placing the order.');
+      return;
+    }
+
+    const btn = document.getElementById('placeOrderBtn') || document.querySelector('button[onclick="submitOrder()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="relative z-10">Processing...</span>';
+    btn.disabled = true;
+
+    try {
+      const extraDetails = { phone, address, city, pincode, paymentMethod };
+      
+      if (paymentMethod === 'Card' || paymentMethod === 'UPI') {
+        const totalAmount = parseFloat(document.getElementById('summary-total').innerText.replace('$', ''));
+        
+        var options = {
+          // 1. The key from your Razorpay Dashboard
+          "key": "rzp_test_SpEf15KaCAj2po", 
+          
+          // 2. Amount is in currency subunits (cents/paise). Multiply by 100
+          "amount": Math.round(totalAmount * 100), 
+          
+          // 3. Currency code
+          "currency": "USD", 
+          
+          // 4. Your business or website name
+          "name": "SHOP EASE", 
+          
+          // 5. Short description of the transaction
+          "description": "Zero-Gravity Checkout Payment", 
+          
+          // 6. Handler function called when payment is successful
+          "handler": async function (response) {
+              console.log("Razorpay Payment ID:", response.razorpay_payment_id);
+              // On success, proceed to the backend order submission
+              const result = await placeOrder(name, "Customer", extraDetails);
+              if (result) {
+                toast.success("Order placed successfully!");
+                setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+              }
+          },
+          
+          // 7. Prefill data for the customer
+          "prefill": {
+              "name": name,
+              "contact": phone,
+              "method": paymentMethod === 'UPI' ? 'upi' : 'card'
+          },
+          "theme": {
+              "color": "#0F172A" // Deep navy/black aesthetic
+          },
+          "modal": {
+              "ondismiss": function(){
+                  btn.innerHTML = originalText;
+                  btn.disabled = false;
+              }
+          }
+        };
+        
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+            alert("Payment failed! " + response.error.description);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+        
+        rzp1.open();
+        
+      } else {
+        const result = await placeOrder(name, "Customer", extraDetails); 
+        if (result) {
+          toast.success("Order placed successfully!");
+          setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+        }
+      }
+    } catch (err) {
+      console.error("Order failed:", err);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  window.onload = async () => {
+    const user = await checkAuth();
+    if (!user) {
+      alert("Please login to place an order.");
+      window.location.href = 'login.html';
+      return;
+    }
+    updateSummary();
+  };
+
+  function showQRModal() {
+    document.querySelector('input[value="QR Code"]').checked = true;
+    document.getElementById('qrModal').classList.remove('hidden');
+    document.getElementById('qrModal').classList.add('flex');
+  }
+
+  function hideQRModal() {
+    qrPaymentConfirmed = true;
+    document.getElementById('qrModal').classList.add('hidden');
+    document.getElementById('qrModal').classList.remove('flex');
+  }
+</script>
+
+<!-- QR Modal -->
+<div id="qrModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden items-center justify-center p-6 transition-all">
+  <div class="rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color);">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold">Scan to Pay</h3>
+      <button onclick="hideQRModal()" class="text-gray-400 hover:text-black transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    
+    <div class="bg-gray-50 p-6 rounded-2xl mb-6 flex justify-center">
+      <!-- Dummy QR Code -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ShopEasePayment" alt="QR Code" class="w-48 h-48 mix-blend-multiply">
+    </div>
+    
+    <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+      Please scan the QR code above with any UPI app to complete your payment. Once done, click the button below.
+    </p>
+    
+    <button onclick="hideQRModal()" class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
+      I've Paid
+    </button>
+  </div>
+</div>
+
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, section, .product-card').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
+</body>
+
+</html>
