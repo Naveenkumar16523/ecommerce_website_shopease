@@ -1,5 +1,37 @@
 var API_BASE = "/api";
 
+// --- Theme System ---
+function initTheme() {
+    const savedTheme = localStorage.getItem('shopease-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    applyTheme(theme);
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('shopease-theme', theme);
+    
+    const icon = document.getElementById('themeIcon');
+    const toggle = document.getElementById('themeToggle');
+    if (icon) icon.innerText = theme === 'dark' ? '🌙' : '☀️';
+    if (toggle) {
+        toggle.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
+    }
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+}
+
+// Run immediately
+initTheme();
+// Re-run on DOMContentLoaded to ensure UI elements are updated once navbar is loaded
+document.addEventListener('DOMContentLoaded', initTheme);
+
+
 // --- Cart Store (ID-Keyed Operations) ---
 const cartStore = {
   get() {

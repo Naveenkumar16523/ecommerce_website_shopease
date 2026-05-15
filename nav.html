@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/static/css/app.css">
 <!-- Top Banner -->
 <div class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-center text-xs py-2 px-4 relative">
   Sign up and get 20% off to your first order.
@@ -143,6 +144,13 @@
           <span id="cartBadge" class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] rounded-full min-w-[16px] h-4 flex items-center justify-center font-bold px-1 animate-[bounce_1s_ease-in-out_infinite]">0</span>
         </div>
       </a>
+      
+      <!-- Theme Toggle -->
+      <button id="themeToggle" class="theme-toggle ml-2" aria-label="Switch to dark mode" onclick="toggleTheme()">
+        <div class="toggle-circle">
+          <span id="themeIcon" class="toggle-icon">☀️</span>
+        </div>
+      </button>
     </div>
   </div>
 
