@@ -1,8 +1,8 @@
 import logging
 import sys
 
-def setup_logger():
-    logger = logging.getLogger('shopease')
+def setup_logger(name='shopease'):
+    logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     
     handler = logging.StreamHandler(sys.stdout)
