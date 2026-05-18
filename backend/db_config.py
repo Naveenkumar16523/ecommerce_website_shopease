@@ -8,7 +8,30 @@ load_dotenv()
 
 # ─── Detect environment ───────────────────────────────────────────────
 USE_SQLITE = not os.getenv("TIDB_HOST")
-DB_FILE    = os.getenv("SQLITE_DB", "ecommerce_demo.db")
+
+# If running on Vercel, copy the database to /tmp to allow write operations
+if os.getenv("VERCEL"):
+    import shutil
+    tmp_db = "/tmp/ecommerce_demo.db"
+    if not os.path.exists(tmp_db):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Look in backend/ first
+        src_db = os.path.join(current_dir, "ecommerce_demo.db")
+        if not os.path.exists(src_db):
+            # Look in parent/ root folder
+            src_db = os.path.join(current_dir, "..", "ecommerce_demo.db")
+        if os.path.exists(src_db):
+            try:
+                shutil.copy2(src_db, tmp_db)
+                os.chmod(tmp_db, 0o666)
+                print(f"[db] Successfully copied database to /tmp/ecommerce_demo.db")
+            except Exception as e:
+                print(f"[db] WARNING: Failed to copy database to /tmp: {e}")
+        else:
+            print(f"[db] WARNING: Source database template not found")
+    DB_FILE = tmp_db
+else:
+    DB_FILE = os.getenv("SQLITE_DB", "ecommerce_demo.db")
 
 # ─────────────────────────────────────────────────────────────────────
 # SQLite shim — translates MySQL DDL/DML to SQLite-compatible syntax

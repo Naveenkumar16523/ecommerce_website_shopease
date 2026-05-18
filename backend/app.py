@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import decimal
 from flask import Flask, request, jsonify, send_from_directory, make_response, render_template, g
 from flask_cors import CORS
