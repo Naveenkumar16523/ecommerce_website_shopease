@@ -1,4 +1,5 @@
-var API_BASE = "/api";
+var isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '';
+var API_BASE = isLocalhost ? 'http://127.0.0.1:5000/api' : '/api';
 
 // --- Theme System ---
 function initTheme() {
