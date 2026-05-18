@@ -1,6 +1,9 @@
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, current_dir)
+sys.path.insert(0, parent_dir)
 
 import decimal
 from flask import Flask, request, jsonify, send_from_directory, make_response, render_template, g
@@ -10,18 +13,18 @@ import jwt
 import datetime
 from functools import wraps
 from marshmallow import ValidationError
-from schemas import (
+from backend.schemas import (
     SignupSchema, LoginSchema, ProfileUpdateSchema, 
     OrderSchema, WishlistToggleSchema
 )
-from db_config import get_db
-from seeds.products import INITIAL_PRODUCTS
-from config import get_config
+from backend.db_config import get_db
+from backend.seeds.products import INITIAL_PRODUCTS
+from backend.config import get_config
 import json
 import os
 import click
 import time
-from logger import setup_logger
+from backend.logger import setup_logger
 from slugify import slugify
 
 logger = setup_logger(__name__)
