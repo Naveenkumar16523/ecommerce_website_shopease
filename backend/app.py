@@ -94,7 +94,7 @@ def init_db():
                     name VARCHAR(255),
                     price DECIMAL(10, 2),
                     category VARCHAR(100),
-                    image TEXT,
+                    image LONGTEXT,
                     rating DECIMAL(3, 2) DEFAULT 4.5,
                     slug VARCHAR(255) UNIQUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -176,6 +176,12 @@ def init_db():
     try:
         with get_db() as (conn, cursor):
             cursor.execute("ALTER TABLE users ADD COLUMN is_admin INT DEFAULT 0")
+    except Exception as e:
+        pass
+
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("ALTER TABLE products ADD COLUMN stock INT DEFAULT 50")
     except Exception as e:
         pass
 
@@ -917,6 +923,7 @@ def admin_create_product(current_user):
     category = data.get("category")
     image = data.get("image")
     rating = data.get("rating", 4.5)
+    stock = data.get("stock", 50)
     
     if not name or price is None or not category or not image:
         return jsonify({"message": "Name, price, category, and image are required"}), 400
@@ -929,9 +936,9 @@ def admin_create_product(current_user):
                 slug = f"{slug}-{int(time.time())}"
             
             cursor.execute("""
-                INSERT INTO products (name, price, category, image, rating, slug)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (name, price, category, image, rating, slug))
+                INSERT INTO products (name, price, category, image, rating, slug, stock)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (name, price, category, image, rating, slug, stock))
             product_id = cursor.lastrowid
         return jsonify({"message": "Product created successfully", "product_id": product_id}), 201
     except Exception as e:
@@ -946,6 +953,7 @@ def admin_update_product(current_user, product_id):
     category = data.get("category")
     image = data.get("image")
     rating = data.get("rating", 4.5)
+    stock = data.get("stock", 50)
     
     if not name or price is None or not category or not image:
         return jsonify({"message": "Name, price, category, and image are required"}), 400
@@ -963,12 +971,103 @@ def admin_update_product(current_user, product_id):
                 
             cursor.execute("""
                 UPDATE products 
-                SET name = %s, price = %s, category = %s, image = %s, rating = %s, slug = %s
+                SET name = %s, price = %s, category = %s, image = %s, rating = %s, slug = %s, stock = %s
                 WHERE id = %s
-            """, (name, price, category, image, rating, slug, product_id))
+            """, (name, price, category, image, rating, slug, stock, product_id))
         return jsonify({"message": "Product updated successfully"})
     except Exception as e:
         return jsonify({"message": f"Error updating product: {str(e)}"}), 500
+
+@app.route("/api/admin/products/bulk", methods=["POST"])
+@admin_required
+def admin_bulk_create_products(current_user):
+    data = request.json or {}
+    products_list = data.get("products", [])
+    if not products_list:
+        return jsonify({"message": "No product listings provided"}), 400
+    
+    inserted_count = 0
+    try:
+        with get_db() as (conn, cursor):
+            for item in products_list:
+                name = item.get("name")
+                price = item.get("price")
+                category = item.get("category")
+                image = item.get("image", "default_product.png")
+                rating = item.get("rating", 4.5)
+                stock = item.get("stock", 50)
+                
+                if not name or price is None or not category:
+                    continue
+                
+                slug = slugify(name)
+                cursor.execute("SELECT id FROM products WHERE slug = %s", (slug,))
+                if cursor.fetchone():
+                    slug = f"{slug}-{int(time.time())}"
+                
+                cursor.execute("""
+                    INSERT INTO products (name, price, category, image, rating, slug, stock)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (name, price, category, image, rating, slug, stock))
+                inserted_count += 1
+        return jsonify({"message": f"Successfully bulk uploaded {inserted_count} products!"}), 201
+    except Exception as e:
+        return jsonify({"message": f"Error in bulk upload: {str(e)}"}), 500
+
+from werkzeug.utils import secure_filename
+@app.route("/api/admin/products/upload-image", methods=["POST"])
+@admin_required
+def admin_upload_image(current_user):
+    if 'image' not in request.files:
+        return jsonify({"message": "No image file provided"}), 400
+    
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"message": "No selected file"}), 400
+    
+    if file:
+        filename = secure_filename(file.filename)
+        filename = f"{int(time.time())}_{filename}"
+        
+        target_dir = os.path.abspath(os.path.join(app.root_path, '../frontend/static/images'))
+        os.makedirs(target_dir, exist_ok=True)
+        
+        filepath = os.path.join(target_dir, filename)
+        file.save(filepath)
+        
+        image_url = f"/static/images/{filename}"
+        return jsonify({
+            "message": "Image uploaded successfully!",
+            "image_url": image_url
+        }), 200
+
+@app.route("/api/admin/products/<int:product_id>/restock", methods=["POST"])
+@admin_required
+def admin_restock_product(current_user, product_id):
+    data = request.json or {}
+    quantity = data.get("quantity", 50)
+    
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT stock FROM products WHERE id = %s", (product_id,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({"message": "Product not found"}), 404
+            
+            current_stock = row[0] if row[0] is not None else 0
+            new_stock = current_stock + quantity
+            
+            cursor.execute("""
+                UPDATE products 
+                SET stock = %s
+                WHERE id = %s
+            """, (new_stock, product_id))
+        return jsonify({
+            "message": "Restocked successfully!",
+            "new_stock": new_stock
+        }), 200
+    except Exception as e:
+        return jsonify({"message": f"Error restocking: {str(e)}"}), 500
 
 @app.route("/api/admin/products/<int:product_id>", methods=["DELETE"])
 @admin_required
@@ -994,18 +1093,43 @@ def admin_get_orders(current_user):
     except:
         return jsonify({"message": "Invalid pagination params"}), 400
 
+    status = request.args.get('status')
+    email = request.args.get('email')
+    order_id = request.args.get('order_id')
+
     try:
+        where_clauses = ["1=1"]
+        params = []
+
+        if status:
+            where_clauses.append("o.status = %s")
+            params.append(status)
+        if email:
+            where_clauses.append("u.email LIKE %s")
+            params.append(f"%{email}%")
+        if order_id:
+            where_clauses.append("o.id = %s")
+            params.append(order_id)
+
+        where_str = " AND ".join(where_clauses)
+
         with get_db() as (conn, cursor):
-            cursor.execute("SELECT COUNT(*) FROM orders")
+            cursor.execute(f"""
+                SELECT COUNT(*) 
+                FROM orders o
+                LEFT JOIN users u ON o.user_id = u.id
+                WHERE {where_str}
+            """, tuple(params))
             total_items = cursor.fetchone()[0]
             
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT o.*, u.name as user_name, u.email as user_email
                 FROM orders o
                 LEFT JOIN users u ON o.user_id = u.id
+                WHERE {where_str}
                 ORDER BY o.created_at DESC
                 LIMIT %s OFFSET %s
-            """, (per_page, offset))
+            """, tuple(params + [per_page, offset]))
             orders = format_rows(cursor, cursor.fetchall())
             
             if orders:
@@ -1360,6 +1484,213 @@ def health_db():
             "status": "unhealthy",
             "error": str(e)
         }), 503
+
+# ─── CUSTOMER MANAGEMENT: REVIEWS & LIVE SUPPORT CHAT APIS ────────────
+import random
+
+_mock_reviews = {}
+_mock_conversations = {}
+
+@app.route("/api/admin/reviews", methods=["GET"])
+@admin_required
+def admin_get_reviews(current_user):
+    global _mock_reviews
+    
+    # Lazy populate mock reviews from active database products
+    if not _mock_reviews:
+        try:
+            with get_db() as (conn, cursor):
+                cursor.execute("SELECT id, name, image FROM products LIMIT 6")
+                products = cursor.fetchall()
+        except Exception:
+            products = []
+            
+        if not products:
+            products = [
+                {"id": 1, "name": "Vapor Max Sneakers", "image": "https://picsum.photos/200"},
+                {"id": 2, "name": "Hyperion Smart Watch", "image": "https://picsum.photos/200"}
+            ]
+            
+        reviewers = [
+            {"name": "Liam Sterling", "email": "liam@cosmos.com"},
+            {"name": "Sarah Jenkins", "email": "sarah.j@outlook.com"},
+            {"name": "Alex Rivera", "email": "arivera@gmail.com"},
+            {"name": "Elena Rostova", "email": "elena.r@yandex.com"},
+            {"name": "David Patel", "email": "david.patel@gmail.com"},
+            {"name": "Chloe Chen", "email": "chloe.c@terminal.com"}
+        ]
+        
+        comments = [
+            "Absolutely premium quality! The glassmorphic design and colors are stunning.",
+            "Fast dispatch to my terminal. Fits perfectly and looks very futuristic.",
+            "The packaging box was slightly scuffed, but the actual product is clean and gorgeous.",
+            "Incredible utility! The design feels extremely state-of-the-art.",
+            "Exceeded my expectations! Will order the secondary color layer soon.",
+            "Decent value, though the cosmic lighting could be slightly brighter."
+        ]
+        
+        for idx, p in enumerate(products):
+            pid = p[0] if isinstance(p, tuple) else p["id"]
+            pname = p[1] if isinstance(p, tuple) else p["name"]
+            pimg = p[2] if isinstance(p, tuple) else p["image"]
+            
+            rev_id = 2001 + idx
+            reviewer = reviewers[idx % len(reviewers)]
+            rating = random.choice([4.0, 4.5, 5.0])
+            status = "Pending" if idx % 3 == 0 else "Approved"
+            
+            _mock_reviews[rev_id] = {
+                "id": rev_id,
+                "product_id": pid,
+                "product_name": pname,
+                "product_image": pimg,
+                "reviewer_name": reviewer["name"],
+                "reviewer_email": reviewer["email"],
+                "rating": rating,
+                "comment": comments[idx % len(comments)],
+                "status": status,
+                "created_at": (datetime.datetime.utcnow() - datetime.timedelta(days=idx)).isoformat()
+            }
+            
+    return jsonify({
+        "data": list(_mock_reviews.values()),
+        "meta": {
+            "page": 1,
+            "per_page": 100,
+            "total_pages": 1,
+            "total_items": len(_mock_reviews),
+            "has_prev": False,
+            "has_next": False
+        }
+    }), 200
+
+@app.route("/api/admin/reviews/<int:review_id>/status", methods=["PUT"])
+@admin_required
+def admin_update_review_status(current_user, review_id):
+    global _mock_reviews
+    data = request.json or {}
+    status = data.get("status", "Approved")
+    
+    if review_id in _mock_reviews:
+        _mock_reviews[review_id]["status"] = status
+        return jsonify({"message": f"Review status marked as {status}"}), 200
+    return jsonify({"message": "Review record not found"}), 404
+
+@app.route("/api/admin/reviews/<int:review_id>", methods=["DELETE"])
+@admin_required
+def admin_delete_review(current_user, review_id):
+    global _mock_reviews
+    if review_id in _mock_reviews:
+        del _mock_reviews[review_id]
+        return jsonify({"message": "Review deleted successfully"}), 200
+    return jsonify({"message": "Review record not found"}), 404
+
+@app.route("/api/admin/messages", methods=["GET"])
+@admin_required
+def admin_get_messages(current_user):
+    global _mock_conversations
+    
+    if not _mock_conversations:
+        # Fetch actual users
+        try:
+            with get_db() as (conn, cursor):
+                cursor.execute("SELECT id, name, email FROM users WHERE is_admin = 0 LIMIT 4")
+                db_users = cursor.fetchall()
+        except Exception:
+            db_users = []
+            
+        buyers = []
+        for u in db_users:
+            buyers.append({"id": u[0], "name": u[1], "email": u[2]})
+            
+        # Fallbacks for premium visual preview
+        if len(buyers) < 3:
+            buyers.extend([
+                {"id": 901, "name": "Sarah Jenkins", "email": "sarah.j@outlook.com"},
+                {"id": 902, "name": "Alex Rivera", "email": "alex.rivera@gmail.com"},
+                {"id": 903, "name": "Elena Rostova", "email": "elena.r@yandex.com"},
+                {"id": 904, "name": "David Patel", "email": "david.patel@gmail.com"}
+            ])
+            
+        histories = [
+            [
+                {"sender": "customer", "text": "Hi, I have a query regarding my shipping schedule.", "time": "10:14 AM"},
+                {"sender": "admin", "text": "Hello! Sure, let me look into that. What is your Order ID?", "time": "10:16 AM"},
+                {"sender": "customer", "text": "It is Order #10085. I checked out yesterday.", "time": "10:18 AM"}
+            ],
+            [
+                {"sender": "customer", "text": "Are the Cyber Sneakers true to standard sizing dimensions?", "time": "Yesterday"},
+                {"sender": "admin", "text": "Yes! They run perfectly true to US size standards.", "time": "Yesterday"},
+                {"sender": "customer", "text": "Stellar! Adding to my wishlist now.", "time": "Yesterday"}
+            ],
+            [
+                {"sender": "customer", "text": "I received my order, but need to exchange the secondary color layer.", "time": "2 days ago"},
+                {"sender": "admin", "text": "Certainly! Please initiate a return request in the refund console.", "time": "2 days ago"},
+                {"sender": "customer", "text": "Done! Thank you for the quick support.", "time": "2 days ago"}
+            ],
+            [
+                {"sender": "customer", "text": "Do you accept international checkout cards from European terminals?", "time": "3 days ago"},
+                {"sender": "admin", "text": "Yes, we fully support Stripe and PayPal worldwide checkouts.", "time": "3 days ago"}
+            ]
+        ]
+        
+        for idx, buyer in enumerate(buyers):
+            bid = buyer["id"]
+            history = histories[idx % len(histories)]
+            _mock_conversations[bid] = {
+                "user_id": bid,
+                "user_name": buyer["name"],
+                "user_email": buyer["email"],
+                "avatar_color": ["#00F0FF", "#A020F0", "#39FF14", "#FF007F"][idx % 4],
+                "messages": list(history)
+            }
+            
+    return jsonify({"conversations": list(_mock_conversations.values())}), 200
+
+@app.route("/api/admin/messages/reply", methods=["POST"])
+@admin_required
+def admin_post_message_reply(current_user):
+    global _mock_conversations
+    data = request.json or {}
+    user_id = data.get("user_id")
+    text = data.get("message")
+    
+    if not user_id or not text:
+        return jsonify({"message": "User ID and reply text are required"}), 400
+        
+    user_key = int(user_id)
+    if user_key in _mock_conversations:
+        # Append Admin reply
+        _mock_conversations[user_key]["messages"].append({
+            "sender": "admin",
+            "text": text,
+            "time": "Just Now"
+        })
+        
+        # Pre-calculate realistic simulated customer responses
+        responses = [
+            "Excellent support! That answers all my queries.",
+            "Stellar speed! Let me proceed with that now.",
+            "Understood, thank you for checking the database index for me.",
+            "That works perfectly. I appreciate the fantastic help!",
+            "Got it! Thanks for looking after this so quickly.",
+            "Perfect. I will monitor my shipping tracking code."
+        ]
+        simulated_reply = random.choice(responses)
+        
+        # Save customer reply to active state so it persists on subsequent loads
+        _mock_conversations[user_key]["messages"].append({
+            "sender": "customer",
+            "text": simulated_reply,
+            "time": "Just Now"
+        })
+        
+        return jsonify({
+            "status": "success",
+            "simulated_reply": simulated_reply
+        }), 200
+        
+    return jsonify({"message": "Conversation channel not found"}), 404
 
 @app.route("/")
 def index_page():

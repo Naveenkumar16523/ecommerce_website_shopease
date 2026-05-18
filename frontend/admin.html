@@ -120,6 +120,21 @@
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+
+    /* Custom Scrollbar for Sidebar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 240, 255, 0.4);
+    }
   </style>
 
   <!-- Route Guard Script (runs before DOM loads to prevent non-admin flash) -->
@@ -155,10 +170,9 @@
   <div id="toast-container" class="fixed top-5 right-5 z-[10000] flex flex-col gap-3 pointer-events-none"></div>
 
   <!-- SIDEBAR NAVIGATION -->
-  <aside id="sidebar" class="w-64 flex-shrink-0 bg-sidebarBg border-r border-borderColor flex flex-col justify-between transition-all duration-300 z-50">
-    <div>
-      <!-- Header / Logo -->
-      <div class="h-20 flex items-center px-6 gap-3 border-b border-borderColor">
+  <aside id="sidebar" class="w-64 flex-shrink-0 bg-sidebarBg border-r border-borderColor flex flex-col h-screen transition-all duration-300 z-50">
+    <!-- Header / Logo -->
+    <div class="h-20 flex-shrink-0 flex items-center px-6 gap-3 border-b border-borderColor">
         <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-neonViolet to-neonCyan p-[1px] flex items-center justify-center">
           <div class="w-full h-full bg-sidebarBg rounded-lg flex items-center justify-center">
             <span class="font-display font-bold text-white text-base">SE</span>
@@ -171,26 +185,124 @@
       </div>
 
       <!-- Navigation Links -->
-      <nav class="p-4 flex flex-col gap-2">
+      <div class="flex-grow overflow-y-auto custom-scrollbar pb-4">
+        <nav class="p-4 flex flex-col gap-2">
         <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-neonCyan bg-white/5 border border-neonCyan/20">
           <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
           <span class="sidebar-text">Dashboard</span>
         </button>
+        <!-- 📦 Product Management Header & Buttons -->
+        <div class="px-4 pt-4 pb-2 border-t border-borderColor/20 mt-2">
+          <p class="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase flex items-center gap-2">
+            <i data-lucide="package" class="w-3.5 h-3.5"></i>
+            <span>Product Management</span>
+          </p>
+        </div>
         <button onclick="switchTab('products')" id="btn-products" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
-          <i data-lucide="package" class="w-4 h-4"></i>
-          <span class="sidebar-text">Products CRUD</span>
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="sidebar-text">Add / edit products</span>
         </button>
-        <button onclick="switchTab('orders')" id="btn-orders" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
-          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-          <span class="sidebar-text">Orders Queue</span>
+        <button onclick="switchTab('product-images')" id="btn-product-images" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="image" class="w-4 h-4"></i>
+          <span class="sidebar-text">Image upload</span>
         </button>
+        <button onclick="switchTab('inventory-count')" id="btn-inventory-count" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span class="sidebar-text">Inventory / stock count</span>
+        </button>
+        <button onclick="switchTab('low-stock-alerts')" id="btn-low-stock-alerts" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          <span class="sidebar-text">Low-stock alerts</span>
+        </button>
+        <button onclick="switchTab('bulk-upload')" id="btn-bulk-upload" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="upload" class="w-4 h-4"></i>
+          <span class="sidebar-text">Bulk upload (CSV)</span>
+        </button>
+        <!-- 📋 Order Management Header & Buttons -->
+        <div class="px-4 pt-4 pb-2 border-t border-borderColor/20 mt-2">
+          <p class="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase flex items-center gap-2">
+            <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i>
+            <span>Order Management</span>
+          </p>
+        </div>
+        <button onclick="switchTab('all-orders')" id="btn-all-orders" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="list" class="w-4 h-4"></i>
+          <span class="sidebar-text">View all orders</span>
+        </button>
+        <button onclick="switchTab('update-order-status')" id="btn-update-order-status" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="edit-3" class="w-4 h-4"></i>
+          <span class="sidebar-text">Update order status</span>
+        </button>
+        <button onclick="switchTab('filter-search-orders')" id="btn-filter-search-orders" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="filter" class="w-4 h-4"></i>
+          <span class="sidebar-text">Filter & search orders</span>
+        </button>
+        <button onclick="switchTab('shipping-logistics')" id="btn-shipping-logistics" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="truck" class="w-4 h-4"></i>
+          <span class="sidebar-text">Shipping & logistics</span>
+        </button>
+        <button onclick="switchTab('returns-refunds')" id="btn-returns-refunds" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span class="sidebar-text">Returns & refunds</span>
+        </button>
+        <!-- 👥 Customers Header & Buttons -->
+        <div class="px-4 pt-4 pb-2 border-t border-borderColor/20 mt-2">
+          <p class="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase flex items-center gap-2">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span>CUSTOMERS</span>
+          </p>
+        </div>
         <button onclick="switchTab('users')" id="btn-users" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
-          <i data-lucide="users" class="w-4 h-4"></i>
-          <span class="sidebar-text">User Registry</span>
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+          <span class="sidebar-text">Full customer list</span>
+        </button>
+        <button onclick="switchTab('reviews-ratings')" id="btn-reviews-ratings" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="star" class="w-4 h-4"></i>
+          <span class="sidebar-text">Reviews & ratings</span>
+        </button>
+        <button onclick="switchTab('customer-messaging')" id="btn-customer-messaging" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
+          <span class="sidebar-text">Customer messaging</span>
         </button>
         <button onclick="switchTab('system')" id="btn-system" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
           <i data-lucide="shield-alert" class="w-4 h-4"></i>
           <span class="sidebar-text">System Tools</span>
+        </button>
+
+        <!-- 🛠️ SELLER TOOLS Header & Buttons -->
+        <div class="px-4 pt-4 pb-2 border-t border-borderColor/20 mt-2">
+          <p class="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase flex items-center gap-2">
+            <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+            <span>SELLER TOOLS</span>
+          </p>
+        </div>
+        <button onclick="switchTab('seller-promotions')" id="btn-seller-promotions" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="tag" class="w-4 h-4"></i>
+          <div class="sidebar-text text-left">
+            <span>Promotions / discounts</span>
+            <p class="text-[8px] text-green-500 font-mono tracking-wide mt-0.5"><i data-lucide="check" class="w-2.5 h-2.5 inline"></i> Coupons, deals, ads</p>
+          </div>
+        </button>
+        <button onclick="switchTab('seller-roles')" id="btn-seller-roles" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="lock" class="w-4 h-4"></i>
+          <div class="sidebar-text text-left">
+            <span>Role-based access</span>
+            <p class="text-[8px] text-green-500 font-mono tracking-wide mt-0.5"><i data-lucide="check" class="w-2.5 h-2.5 inline"></i> Multi-user + roles</p>
+          </div>
+        </button>
+        <button onclick="switchTab('seller-notifications')" id="btn-seller-notifications" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <div class="sidebar-text text-left">
+            <span>Notifications & alerts</span>
+            <p class="text-[8px] text-green-500 font-mono tracking-wide mt-0.5"><i data-lucide="check" class="w-2.5 h-2.5 inline"></i> Email + push + SMS</p>
+          </div>
+        </button>
+        <button onclick="switchTab('seller-api')" id="btn-seller-api" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="server" class="w-4 h-4"></i>
+          <div class="sidebar-text text-left">
+            <span>API / integrations</span>
+            <p class="text-[8px] text-green-500 font-mono tracking-wide mt-0.5"><i data-lucide="check" class="w-2.5 h-2.5 inline"></i> Full SP-API</p>
+          </div>
         </button>
 
         <!-- 📊 Analytics Header & Buttons -->
@@ -216,11 +328,11 @@
           <i data-lucide="download" class="w-4 h-4"></i>
           <span class="sidebar-text">Export (CSV / Excel)</span>
         </button>
-      </nav>
-    </div>
+        </nav>
+      </div>
 
     <!-- User Section footer -->
-    <div class="p-4 border-t border-borderColor">
+    <div class="p-4 border-t border-borderColor flex-shrink-0">
       <div class="flex items-center justify-between gap-2 bg-white/5 rounded-lg p-3">
         <div class="flex items-center gap-2 overflow-hidden">
           <div class="w-8 h-8 rounded-full bg-neonCyan/20 border border-neonCyan/30 flex items-center justify-center text-neonCyan font-bold text-xs uppercase" id="avatar-letters">
@@ -446,9 +558,233 @@
         </div>
       </section>
 
-      <!-- 📦 C. ORDERS VIEW -->
-      <section id="view-orders" class="tab-view fade-in hidden space-y-6">
-        
+      <!-- 🖼️ B.2 IMAGE UPLOAD VIEW -->
+      <section id="view-product-images" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Product Media & Image Upload Center</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Upload custom product photos to ShopEase local directories and associate them to existing product listings.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
+          <!-- Left: Upload Zone & Select -->
+          <div class="glass-card rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+            <div class="space-y-4">
+              <h4 class="font-display font-bold text-xs tracking-wider uppercase text-white">Upload Media Assets</h4>
+              
+              <div class="space-y-2">
+                <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Select Target Product</label>
+                <select id="upload-product-select" class="w-full bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-gray-400 focus:outline-none focus:border-neonCyan transition-colors">
+                  <option value="">Querying active inventory items...</option>
+                </select>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Select Image File</label>
+                <div onclick="document.getElementById('product-media-file').click()" class="border-2 border-dashed border-borderColor/40 hover:border-neonCyan/40 bg-white/[0.01] hover:bg-white/[0.03] rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 group">
+                  <input type="file" id="product-media-file" class="hidden" accept="image/*" onchange="previewProductImageFile(event)">
+                  <i data-lucide="image" class="w-8 h-8 text-gray-500 group-hover:text-neonCyan mx-auto mb-2 transition-colors"></i>
+                  <p class="text-xs font-semibold text-white leading-none">Drag & drop files or click to browse</p>
+                  <span class="text-[9px] text-gray-500 font-mono block mt-1">Supports PNG, JPG, JPEG, WEBP files</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Image Preview & Details -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between min-h-[350px]">
+            <div class="border-b border-borderColor pb-4 mb-4">
+              <h4 class="font-display font-bold text-xs tracking-wider uppercase text-white">Live Media Preview</h4>
+              <p class="text-[10px] text-gray-400">Preview selected asset coordinates before server upload</p>
+            </div>
+
+            <!-- Preview Image Area -->
+            <div class="flex-grow flex items-center justify-center bg-[#0E1321]/50 border border-borderColor rounded-xl overflow-hidden p-4 min-h-[200px] relative">
+              <img id="image-upload-preview" src="" class="max-h-[180px] max-w-full object-contain hidden rounded-lg shadow-lg">
+              <div id="image-upload-preview-placeholder" class="text-center text-xs text-gray-500 font-mono">
+                <i data-lucide="eye" class="w-6 h-6 mx-auto text-gray-600 mb-2"></i>
+                <span>No media file currently loaded.</span>
+              </div>
+            </div>
+
+            <!-- Operations buttons -->
+            <div class="mt-6 flex justify-end gap-3">
+              <button onclick="clearMediaUpload()" class="border border-borderColor/40 hover:bg-white/5 text-white font-semibold text-xs px-5 py-2.5 rounded-lg transition-colors">
+                Cancel
+              </button>
+              <button onclick="uploadProductMedia()" class="bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs px-5 py-2.5 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all">
+                Save Media Association
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 📊 B.3 INVENTORY / STOCK COUNT VIEW -->
+      <section id="view-inventory-count" class="tab-view fade-in hidden space-y-6">
+        <!-- Stock metrics grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Total Active SKUs</span>
+            <h4 class="text-2xl font-bold font-mono text-neonCyan" id="inventory-sku-count">0</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Total Warehouse Stock Units</span>
+            <h4 class="text-2xl font-bold font-mono text-white" id="inventory-total-stock">0</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Average SKU Capacity</span>
+            <h4 class="text-2xl font-bold font-mono text-neonGreen" id="inventory-avg-capacity">0</h4>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 border border-borderColor rounded-2xl p-4 font-sans">
+          <!-- Search input -->
+          <div class="relative w-full sm:w-64">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-gray-500"></i>
+            <input type="text" id="inventory-search" oninput="loadInventoryCount(1)" placeholder="Search item stock..." class="w-full bg-[#0E1321] border border-borderColor rounded-lg pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-neonCyan transition-colors">
+          </div>
+        </div>
+
+        <!-- Inventory table -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">SKU Product</th>
+                  <th class="p-4">Category</th>
+                  <th class="p-4">Unit Price</th>
+                  <th class="p-4">Warehouse Stock</th>
+                  <th class="p-4">Adjust Inventory</th>
+                  <th class="p-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="inventory-pagination">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ⚠️ B.4 LOW-STOCK ALERTS VIEW -->
+      <section id="view-low-stock-alerts" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Low-Stock Notifications & Restock Console</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Warehouse status updates. Real-time checklist of products with quantities lower than standard threshold (&lt; 15 units).</p>
+        </div>
+
+        <!-- Warnings summary -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+          <div class="glass-card rounded-xl p-5 border border-red-500/20 bg-red-500/[0.02]">
+            <span class="text-[10px] font-mono text-red-400 uppercase tracking-widest block mb-1">Active Shortages Identified</span>
+            <h4 class="text-2xl font-bold font-mono text-red-500" id="low-stock-alert-count">0</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-yellow-500/20 bg-yellow-500/[0.02]">
+            <span class="text-[10px] font-mono text-yellow-400 uppercase tracking-widest block mb-1">Stock Threshold Value</span>
+            <h4 class="text-2xl font-bold font-mono text-yellow-400">15 Units</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Restock Action Unit</span>
+            <h4 class="text-2xl font-bold font-mono text-neonGreen">+50 Items</h4>
+          </div>
+        </div>
+
+        <!-- Alerts feed -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="p-6 border-b border-borderColor bg-white/5">
+            <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Active Alert Feed</h4>
+            <p class="text-[10px] text-gray-400">Immediate operations needed for out-of-stock or low-capacity products.</p>
+          </div>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Product Detail</th>
+                  <th class="p-4">Category</th>
+                  <th class="p-4">Remaining Units</th>
+                  <th class="p-4">Critical Status</th>
+                  <th class="p-4 text-right">Quick Restock</th>
+                </tr>
+              </thead>
+              <tbody id="low-stock-alerts-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 📤 B.5 BULK UPLOAD (CSV) VIEW -->
+      <section id="view-bulk-upload" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Bulk Product Upload Ledger (CSV)</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Ingest raw product records directly. Upload structured comma-separated files or paste CSV rows into the console.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
+          <!-- Left column: Paste Area -->
+          <div class="glass-card rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+            <div class="space-y-4">
+              <h4 class="font-display font-bold text-xs tracking-wider uppercase text-white">Paste Raw CSV Records</h4>
+              <div class="space-y-2">
+                <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">CSV Headers: Name, Price, Category, Image, Rating, Stock</label>
+                <textarea id="bulk-csv-textarea" rows="8" placeholder="e.g.&#10;Cyber Shirt,29.99,casual,https://picsum.photos/200,4.5,75&#10;Space Watch,199.99,watches,https://picsum.photos/200,4.8,12" class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-4 text-xs font-mono text-white placeholder-gray-600 focus:outline-none focus:border-neonCyan transition-all resize-none"></textarea>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="parsePasteCSV()" class="w-full bg-neonCyan/10 border border-neonCyan/20 text-neonCyan font-semibold text-xs px-4 py-2.5 rounded-lg hover:bg-neonCyan/20 transition-all">
+                Validate Records
+              </button>
+            </div>
+          </div>
+
+          <!-- Right column: Preview & Process -->
+          <div class="lg:col-span-2 glass-card rounded-2xl p-6 flex flex-col justify-between min-h-[300px]">
+            <div class="border-b border-borderColor pb-4 mb-4">
+              <h4 class="font-display font-bold text-xs tracking-wider uppercase text-white">Validated Products Preview</h4>
+              <p class="text-[10px] text-gray-400">Ingested entries validated and parsed from CSV inputs</p>
+            </div>
+
+            <!-- Preview table area -->
+            <div class="flex-grow overflow-auto max-h-[220px] border border-borderColor rounded-xl bg-[#0E1321]/30">
+              <table class="w-full text-left border-collapse text-[10px]">
+                <thead>
+                  <tr class="border-b border-borderColor bg-white/5 font-mono text-gray-400 uppercase">
+                    <th class="p-2.5">Name</th>
+                    <th class="p-2.5">Category</th>
+                    <th class="p-2.5">Price</th>
+                    <th class="p-2.5">Stock</th>
+                    <th class="p-2.5">Rating</th>
+                  </tr>
+                </thead>
+                <tbody id="bulk-preview-table-body" class="divide-y divide-borderColor/20 text-gray-300">
+                  <tr>
+                    <td colspan="5" class="p-6 text-center text-gray-600 font-mono">No products ingested. Paste some rows and validate above!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Operations buttons row -->
+            <div class="mt-6 flex justify-end gap-3">
+              <button onclick="clearBulkIngest()" class="border border-borderColor/40 hover:bg-white/5 text-white font-semibold text-xs px-5 py-2.5 rounded-lg transition-colors">
+                Reset
+              </button>
+              <button onclick="submitBulkIngestion()" class="bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs px-5 py-2.5 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all">
+                Process Bulk Ingestion
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 📦 C.1 VIEW ALL ORDERS -->
+      <section id="view-all-orders" class="tab-view fade-in hidden space-y-6">
         <!-- Table container -->
         <div class="glass-card rounded-2xl overflow-hidden border border-borderColor">
           <div class="overflow-x-auto w-full">
@@ -463,13 +799,308 @@
                   <th class="p-4 text-right">Fulfillment</th>
                 </tr>
               </thead>
-              <tbody id="orders-table-body" class="divide-y divide-borderColor/40 text-xs">
+              <tbody id="all-orders-table-body" class="divide-y divide-borderColor/40 text-xs">
                 <!-- Dynamically loaded -->
               </tbody>
             </table>
           </div>
-          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="orders-pagination">
+          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="all-orders-pagination">
             <!-- Loaded by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 📝 C.2 UPDATE ORDER STATUS VIEW -->
+      <section id="view-update-order-status" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Fulfillment Status Console</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Quick-update dashboard. Query any order ID to view active timeline status and trigger fulfillment updates.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
+          <!-- Left side: Query Form & Info -->
+          <div class="glass-card rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+            <div class="space-y-4">
+              <h4 class="font-display font-bold text-xs tracking-wider uppercase text-white">Search Active Order</h4>
+              <div class="space-y-2">
+                <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Order ID</label>
+                <div class="flex gap-2">
+                  <input type="number" id="quick-order-id" placeholder="e.g. 1" class="flex-grow bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-neonCyan transition-colors">
+                  <button onclick="fetchQuickOrder()" class="bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs px-5 py-2.5 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all">
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer snapshot -->
+            <div id="quick-order-snapshot" class="hidden border-t border-borderColor/40 pt-6 space-y-4 text-xs">
+              <h5 class="font-mono text-[9px] text-gray-500 uppercase tracking-widest">Order Snapshot</h5>
+              <div class="space-y-2 font-mono text-[10px]">
+                <div class="flex justify-between"><span class="text-gray-500">Client:</span><span class="text-white font-bold" id="quick-client-name">--</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Total Value:</span><span class="text-neonGreen font-bold" id="quick-total-spent">--</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Placed Date:</span><span class="text-gray-300" id="quick-placed-date">--</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Method:</span><span class="text-gray-300" id="quick-method">--</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: Timeline & Controls -->
+          <div class="lg:col-span-2 glass-card rounded-2xl p-6 flex flex-col justify-between min-h-[300px]">
+            <div class="border-b border-borderColor pb-4 mb-6">
+              <h4 class="font-display font-bold text-xs tracking-wider uppercase text-white">Fulfillment Timeline & Dispatch Controls</h4>
+              <p class="text-[10px] text-gray-400">Advance order fulfillment stage below</p>
+            </div>
+
+            <!-- Timeline graphic -->
+            <div id="quick-timeline-container" class="hidden flex-grow flex items-center justify-center py-6">
+              <div class="flex items-center justify-between w-full max-w-lg relative">
+                <!-- Progress Line Background -->
+                <div class="absolute left-0 right-0 h-1 bg-white/5 top-1/2 -translate-y-1/2 -z-10"></div>
+                <!-- Active Progress Line -->
+                <div id="quick-timeline-progress" class="absolute left-0 h-1 bg-neonCyan top-1/2 -translate-y-1/2 -z-10 transition-all duration-500" style="width: 0%;"></div>
+
+                <!-- Step 1: Pending -->
+                <div class="flex flex-col items-center gap-2">
+                  <div id="step-pending" class="w-8 h-8 rounded-full bg-[#0E1321] border border-borderColor flex items-center justify-center font-mono font-bold text-xs text-gray-500 transition-all">1</div>
+                  <span class="text-[9px] font-mono text-gray-400 uppercase">Pending</span>
+                </div>
+                <!-- Step 2: Processing -->
+                <div class="flex flex-col items-center gap-2">
+                  <div id="step-processing" class="w-8 h-8 rounded-full bg-[#0E1321] border border-borderColor flex items-center justify-center font-mono font-bold text-xs text-gray-500 transition-all">2</div>
+                  <span class="text-[9px] font-mono text-gray-400 uppercase">Processing</span>
+                </div>
+                <!-- Step 3: Shipped -->
+                <div class="flex flex-col items-center gap-2">
+                  <div id="step-shipped" class="w-8 h-8 rounded-full bg-[#0E1321] border border-borderColor flex items-center justify-center font-mono font-bold text-xs text-gray-500 transition-all">3</div>
+                  <span class="text-[9px] font-mono text-gray-400 uppercase">Shipped</span>
+                </div>
+                <!-- Step 4: Delivered -->
+                <div class="flex flex-col items-center gap-2">
+                  <div id="step-delivered" class="w-8 h-8 rounded-full bg-[#0E1321] border border-borderColor flex items-center justify-center font-mono font-bold text-xs text-gray-500 transition-all">4</div>
+                  <span class="text-[9px] font-mono text-gray-400 uppercase">Delivered</span>
+                </div>
+              </div>
+            </div>
+            
+            <div id="quick-timeline-placeholder" class="flex-grow flex flex-col items-center justify-center py-12 text-center text-xs text-gray-500 font-mono">
+              <i data-lucide="shield-alert" class="w-8 h-8 text-gray-600 mb-2"></i>
+              <span>Please enter and search for a valid Order ID to load fulfillment controls.</span>
+            </div>
+
+            <!-- Operations buttons row -->
+            <div id="quick-controls" class="hidden border-t border-borderColor/40 pt-6 flex flex-wrap gap-3">
+              <button onclick="updateQuickStatus('Pending')" class="flex items-center gap-1.5 border border-yellow-500/20 bg-yellow-500/5 hover:bg-yellow-500/15 text-yellow-400 font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
+                Mark Pending
+              </button>
+              <button onclick="updateQuickStatus('Processing')" class="flex items-center gap-1.5 border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 text-neonCyan font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
+                Mark Processing
+              </button>
+              <button onclick="updateQuickStatus('Shipped')" class="flex items-center gap-1.5 border border-neonViolet/20 bg-neonViolet/5 hover:bg-neonViolet/15 text-neonViolet font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
+                Dispatch / Ship
+              </button>
+              <button onclick="updateQuickStatus('Delivered')" class="flex items-center gap-1.5 border border-neonGreen/20 bg-neonGreen/5 hover:bg-neonGreen/15 text-neonGreen font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
+                Mark Delivered
+              </button>
+              <button onclick="updateQuickStatus('Cancelled')" class="flex items-center gap-1.5 border border-red-500/20 bg-red-500/5 hover:bg-red-500/15 text-red-400 font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
+                Cancel Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🔍 C.3 FILTER & SEARCH ORDERS VIEW -->
+      <section id="view-filter-search-orders" class="tab-view fade-in hidden space-y-6">
+        <!-- Filters header & Inputs row -->
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans space-y-4">
+          <div>
+            <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Search & Filter Active Orders</h3>
+            <p class="text-[10px] text-gray-400">Refine order transaction databases using customer profiles or order metadata.</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Order ID -->
+            <div class="space-y-1.5">
+              <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Order ID</label>
+              <input type="number" id="filter-order-id" placeholder="e.g. 1" class="w-full bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-neonCyan transition-colors">
+            </div>
+            <!-- Customer Email -->
+            <div class="space-y-1.5">
+              <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Customer Email</label>
+              <input type="email" id="filter-email" placeholder="e.g. admin@shopease.com" class="w-full bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-neonCyan transition-colors">
+            </div>
+            <!-- Status -->
+            <div class="space-y-1.5">
+              <label class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Fulfillment Status</label>
+              <select id="filter-status" class="w-full bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-gray-400 focus:outline-none focus:border-neonCyan transition-colors">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button onclick="clearOrderFilters()" class="border border-borderColor/40 hover:bg-white/5 text-white font-semibold text-xs px-5 py-2.5 rounded-lg transition-colors">
+              Reset Filters
+            </button>
+            <button onclick="loadFilteredOrders(1)" class="bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs px-5 py-2.5 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all">
+              Apply Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtered Table Container -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Order ID</th>
+                  <th class="p-4">Client</th>
+                  <th class="p-4">Total Value</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4">Placed Date</th>
+                  <th class="p-4 text-right">Operations</th>
+                </tr>
+              </thead>
+              <tbody id="filter-orders-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-gray-500 font-mono">Use the filter panel above to query orders database.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="filter-orders-pagination"></div>
+        </div>
+      </section>
+
+      <!-- 🚚 C.4 SHIPPING & LOGISTICS VIEW -->
+      <section id="view-shipping-logistics" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Shipping Dispatch & Logistics Hub</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Manage carrier dispatches, shipping types, and active shipping orders.</p>
+        </div>
+
+        <!-- Carrier allocation card grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Primary Partner</span>
+              <div class="p-2 bg-neonCyan/10 border border-neonCyan/20 rounded-xl text-neonCyan">
+                <i data-lucide="truck" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold tracking-tight text-white mb-1">Cyber Courier</h3>
+            <p class="text-[10px] text-neonGreen font-semibold flex items-center gap-1">
+              <span>99.4% On-Time Delivery</span>
+            </p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Standard Transit Speed</span>
+              <div class="p-2 bg-neonViolet/10 border border-neonViolet/20 rounded-xl text-neonViolet">
+                <i data-lucide="clock" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold tracking-tight text-white mb-1">2-3 Business Days</h3>
+            <p class="text-[10px] text-gray-400">Fully tracked express delivery</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active Shipments</span>
+              <div class="p-2 bg-neonGreen/10 border border-neonGreen/20 rounded-xl text-neonGreen">
+                <i data-lucide="package" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold font-mono tracking-tight text-white mb-1" id="active-shipments-count">0</h3>
+            <p class="text-[10px] text-neonCyan font-semibold">Ready for dispatch or in transit</p>
+          </div>
+        </div>
+
+        <!-- Active shipments list -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="p-6 border-b border-borderColor bg-white/5">
+            <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Active Fulfillment Dispatch List</h4>
+            <p class="text-[10px] text-gray-400">Orders marked as 'Processing' or 'Shipped' awaiting delivery dispatch updates.</p>
+          </div>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Order ID</th>
+                  <th class="p-4">Destination</th>
+                  <th class="p-4">Carrier Code</th>
+                  <th class="p-4">Method</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Dispatch Control</th>
+                </tr>
+              </thead>
+              <tbody id="shipping-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-gray-500">Querying active delivery dispatches...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ↩️ C.5 RETURNS & REFUNDS VIEW -->
+      <section id="view-returns-refunds" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Returns Queue & Customer Refunds</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Review cancelled transactions, request return logs, and process ledger refunds.</p>
+        </div>
+
+        <!-- Returns Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans">
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Total Cancelled Transactions</span>
+            <h4 class="text-2xl font-bold font-mono text-red-400" id="returns-cancelled-count">0</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Total Refund Value</span>
+            <h4 class="text-2xl font-bold font-mono text-white" id="returns-refund-value">$0.00</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Refund Return Coefficient</span>
+            <h4 class="text-2xl font-bold font-mono text-neonCyan">1.4%</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Audit Status</span>
+            <h4 class="text-xl font-bold font-display text-neonGreen uppercase">Fully Audited</h4>
+          </div>
+        </div>
+
+        <!-- Returns Table -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="p-6 border-b border-borderColor bg-white/5">
+            <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Refunds Queue</h4>
+            <p class="text-[10px] text-gray-400">Transactions eligible for manual or automated credit refunds.</p>
+          </div>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Order ID</th>
+                  <th class="p-4">Client Detail</th>
+                  <th class="p-4">Total Amount</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4">Placed Date</th>
+                  <th class="p-4 text-right">Refund Action</th>
+                </tr>
+              </thead>
+              <tbody id="returns-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-gray-500">Querying cancellation refund files...</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -498,6 +1129,168 @@
           </div>
           <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="users-pagination">
             <!-- Loaded by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ⭐ REVIEWS & RATINGS VIEW -->
+      <section id="view-reviews-ratings" class="tab-view fade-in hidden space-y-6">
+        
+        <!-- Header Info Card -->
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Reviews & Ratings Management</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Review active user comments, approve entries to make them public, or prune spam listings.</p>
+        </div>
+
+        <!-- Dynamic Reviews Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+          <div class="glass-card rounded-xl p-5 border border-borderColor flex flex-col justify-between">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Total Catalog Reviews</span>
+            <div class="flex items-baseline gap-2">
+              <h4 class="text-2xl font-bold font-mono text-white" id="reviews-stat-total">0</h4>
+              <span class="text-neonCyan text-[10px] font-bold">100% Audited</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor flex flex-col justify-between">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Average Star Rating</span>
+            <div class="flex items-center gap-1.5">
+              <h4 class="text-2xl font-bold font-mono text-white" id="reviews-stat-avg">4.62</h4>
+              <div class="flex text-cyberYellow text-sm">
+                <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                <i data-lucide="star" class="w-3.5 h-3.5 fill-current-20"></i>
+              </div>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor flex flex-col justify-between">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Pending Moderation</span>
+            <div class="flex items-baseline gap-2">
+              <h4 class="text-2xl font-bold font-mono text-cyberYellow animate-pulse" id="reviews-stat-pending">0</h4>
+              <span class="text-[9px] font-mono bg-cyberYellow/20 text-cyberYellow px-2 py-0.5 rounded uppercase font-bold tracking-wider font-semibold">Awaiting review</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/5 border border-borderColor rounded-2xl p-4 font-sans">
+          <div class="relative w-full sm:max-w-xs">
+            <input type="text" id="reviews-search-input" onkeyup="filterReviewsTable()" placeholder="Search review text..." class="w-full bg-[#0E1321] border border-borderColor rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-neonCyan placeholder-gray-500 transition-colors">
+            <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-500"></i>
+          </div>
+          <select id="reviews-filter-status" onchange="filterReviewsTable()" class="bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2 text-xs text-gray-400 focus:outline-none focus:border-neonCyan transition-colors w-full sm:w-auto">
+            <option value="ALL">All Moderation Status</option>
+            <option value="Pending">Pending Approval</option>
+            <option value="Approved">Approved / Live</option>
+          </select>
+        </div>
+
+        <!-- Reviews Table Container -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Product details</th>
+                  <th class="p-4">Buyer details</th>
+                  <th class="p-4 text-center">Score</th>
+                  <th class="p-4">Customer Comment</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Moderation action</th>
+                </tr>
+              </thead>
+              <tbody id="reviews-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-gray-500 font-mono">Querying feedback logs...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 💬 CUSTOMER LIVE MESSAGING & SUPPORT CHAT VIEW -->
+      <section id="view-customer-messaging" class="tab-view fade-in hidden space-y-6">
+        
+        <!-- Header Info Card -->
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Live Customer Support Center</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Engage with registered buyers, check transaction details, and simulate live support assistance.</p>
+        </div>
+
+        <!-- Main Workspace Dual Pane -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans min-h-[500px] border border-borderColor rounded-2xl overflow-hidden bg-[#0A0D17]/80 backdrop-blur-xl">
+          
+          <!-- Left Pane: Conversations List -->
+          <div class="border-r border-borderColor flex flex-col bg-white/[0.02]">
+            <div class="p-4 border-b border-borderColor bg-white/5 flex items-center justify-between">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-gray-400 uppercase">Support Inbox</span>
+              <span class="text-[9px] font-mono font-bold bg-neonCyan/20 text-neonCyan px-2 py-0.5 rounded-full" id="unread-chats-badge">0 UNREAD</span>
+            </div>
+            
+            <!-- Active Conversation Channels List -->
+            <div class="flex-grow overflow-y-auto divide-y divide-borderColor/30" id="inbox-channels-list">
+              <!-- Loaded dynamically by JavaScript -->
+              <div class="p-8 text-center text-xs text-gray-500 font-mono">Assembling user channels...</div>
+            </div>
+          </div>
+
+          <!-- Right Pane: Active Chat Window -->
+          <div class="lg:col-span-2 flex flex-col justify-between bg-white/[0.01]" id="chat-window-pane">
+            
+            <!-- Chat Pane Default Empty state -->
+            <div class="flex-grow flex flex-col items-center justify-center p-8 text-center space-y-4" id="chat-empty-state">
+              <div class="p-4 bg-neonCyan/10 rounded-full border border-neonCyan/20 text-neonCyan">
+                <i data-lucide="message-square" class="w-8 h-8"></i>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-white uppercase font-display tracking-wider">No Active Channel Selected</h4>
+                <p class="text-[10px] text-gray-400 mt-1 max-w-xs mx-auto">Please click on a customer from the support inbox on the left to start live conversation.</p>
+              </div>
+            </div>
+
+            <!-- Active Chat Pane (Initially hidden) -->
+            <div class="flex-grow flex flex-col justify-between hidden" id="chat-active-pane">
+              <!-- Active Channel Header -->
+              <div class="p-4 border-b border-borderColor bg-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white font-mono shadow-lg border border-white/10" id="active-chat-avatar">SJ</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider" id="active-chat-name">Sarah Jenkins</h4>
+                    <p class="text-[9px] text-gray-400" id="active-chat-email">sarah.j@outlook.com</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-neonGreen animate-pulse"></span>
+                  <span class="text-[9px] font-mono font-bold tracking-wider text-neonGreen uppercase font-semibold">Live Status</span>
+                </div>
+              </div>
+
+              <!-- Message Stream Pane -->
+              <div class="flex-grow p-4 overflow-y-auto space-y-4 max-h-[350px] min-h-[350px] bg-black/10" id="chat-messages-container">
+                <!-- Message Bubbles will populate here dynamically -->
+              </div>
+
+              <!-- Typing indicator block -->
+              <div class="px-4 py-2 text-[10px] text-gray-400 italic hidden flex items-center gap-2 bg-black/5" id="chat-typing-indicator">
+                <span class="flex gap-1 items-center">
+                  <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                  <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                  <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </span>
+                <span id="chat-typing-label">Customer is composing a reply...</span>
+              </div>
+
+              <!-- Message Form input bar -->
+              <form onsubmit="sendSupportChatMessage(event)" class="p-4 border-t border-borderColor bg-white/5 flex gap-3 items-center">
+                <input type="text" id="chat-message-input" required placeholder="Type customer reply message here..." autocomplete="off" class="flex-grow bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-neonCyan placeholder-gray-500 transition-colors">
+                <button type="submit" class="flex items-center justify-center p-2.5 bg-neonCyan hover:bg-[#00d0e6] text-black rounded-lg transition-all border border-neonCyan shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+              </form>
+            </div>
+
           </div>
         </div>
       </section>
@@ -599,6 +1392,260 @@
               <i data-lucide="trash-2" class="w-4 h-4"></i>
               <span>Purge Transaction Order History</span>
             </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🛠️ SELLER TOOLS 1: PROMOTIONS & DISCOUNTS -->
+      <section id="view-seller-promotions" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans flex justify-between items-center">
+          <div>
+            <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Promotions & Discounts</h3>
+            <p class="text-[10px] text-gray-400 mt-1">Manage coupons, special deals, and ad campaigns.</p>
+          </div>
+          <button onclick="showToast('Promotions & Campaigns feature coming soon!', 'info')" class="flex items-center gap-2 border border-neonCyan/30 bg-neonCyan/5 hover:bg-neonCyan/15 hover:border-neonCyan text-neonCyan font-semibold text-xs px-4 py-2 rounded-lg transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Create Campaign</span>
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="glass-card rounded-2xl p-6 border-t-2 border-t-neonCyan">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-white uppercase tracking-wider">Summer Sale 2026</span>
+              <span class="px-2 py-0.5 rounded border border-green-500/30 bg-green-500/10 text-[9px] text-green-400 uppercase font-bold">Active</span>
+            </div>
+            <p class="text-[10px] text-gray-400 mb-4">20% off all summer apparel and accessories. Promoted via banner ads.</p>
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="text-gray-500">Code: <span class="text-white font-bold">SUMMER20</span></span>
+              <span class="text-neonCyan">245 Used</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-2xl p-6 border-t-2 border-t-cyberYellow">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-white uppercase tracking-wider">Welcome Offer</span>
+              <span class="px-2 py-0.5 rounded border border-green-500/30 bg-green-500/10 text-[9px] text-green-400 uppercase font-bold">Active</span>
+            </div>
+            <p class="text-[10px] text-gray-400 mb-4">10% off first purchase for new registered users.</p>
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="text-gray-500">Code: <span class="text-white font-bold">WELCOME10</span></span>
+              <span class="text-cyberYellow">1,082 Used</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-2xl p-6 border-t-2 border-t-gray-500 opacity-60">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-white uppercase tracking-wider">Flash Deal</span>
+              <span class="px-2 py-0.5 rounded border border-gray-500/30 bg-gray-500/10 text-[9px] text-gray-400 uppercase font-bold">Expired</span>
+            </div>
+            <p class="text-[10px] text-gray-400 mb-4">50% off select electronics for 24 hours only.</p>
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="text-gray-500">Code: <span class="text-white font-bold">FLASH50</span></span>
+              <span class="text-gray-400">890 Used</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🛠️ SELLER TOOLS 2: ROLE-BASED ACCESS -->
+      <section id="view-seller-roles" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans flex justify-between items-center">
+          <div>
+            <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Role-Based Access</h3>
+            <p class="text-[10px] text-gray-400 mt-1">Configure multi-user access levels and system permissions.</p>
+          </div>
+          <button onclick="showToast('Role management invites coming soon!', 'info')" class="flex items-center gap-2 border border-neonViolet/30 bg-neonViolet/5 hover:bg-neonViolet/15 hover:border-neonViolet text-neonViolet font-semibold text-xs px-4 py-2 rounded-lg transition-all">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Invite Team Member</span>
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Role Name</th>
+                  <th class="p-4">Description</th>
+                  <th class="p-4 text-center">Team Members</th>
+                  <th class="p-4 text-right">Permissions Config</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-borderColor/40 text-xs">
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="p-4 font-bold text-neonCyan">Super Admin</td>
+                  <td class="p-4 text-gray-300">Unrestricted access to all modules and system settings.</td>
+                  <td class="p-4 text-center font-mono">1</td>
+                  <td class="p-4 text-right"><span class="text-[9px] bg-white/10 px-2 py-1 rounded text-gray-400">System Default</span></td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="p-4 font-bold text-neonGreen">Store Manager</td>
+                  <td class="p-4 text-gray-300">Access to products, orders, and basic analytics. No system tools.</td>
+                  <td class="p-4 text-center font-mono">3</td>
+                  <td class="p-4 text-right">
+                    <button onclick="showToast('Edit Permissions coming soon!', 'info')" class="text-xs text-neonViolet hover:text-white transition-colors">Edit <i data-lucide="edit-2" class="w-3 h-3 inline"></i></button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="p-4 font-bold text-cyberYellow">Support Staff</td>
+                  <td class="p-4 text-gray-300">Access to customer messaging, reviews, and order lookup only.</td>
+                  <td class="p-4 text-center font-mono">8</td>
+                  <td class="p-4 text-right">
+                    <button onclick="showToast('Edit Permissions coming soon!', 'info')" class="text-xs text-neonViolet hover:text-white transition-colors">Edit <i data-lucide="edit-2" class="w-3 h-3 inline"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🛠️ SELLER TOOLS 3: NOTIFICATIONS & ALERTS -->
+      <section id="view-seller-notifications" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Notifications & Alerts</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Manage outbound communications across Email, Push, and SMS channels.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+          <!-- Notification Settings -->
+          <div class="glass-card rounded-2xl p-6">
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-4 border-b border-borderColor pb-2">Event Triggers</h4>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-200">New Order Placed</p>
+                  <p class="text-[10px] text-gray-500">Triggered upon successful checkout.</p>
+                </div>
+                <div class="flex gap-2">
+                  <span class="px-2 py-1 bg-neonCyan/20 text-neonCyan text-[9px] rounded font-bold uppercase">Email</span>
+                  <span class="px-2 py-1 bg-neonCyan/20 text-neonCyan text-[9px] rounded font-bold uppercase">Push</span>
+                  <span class="px-2 py-1 bg-white/5 text-gray-500 text-[9px] rounded font-bold uppercase">SMS</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-200">Shipping Update</p>
+                  <p class="text-[10px] text-gray-500">When package is out for delivery.</p>
+                </div>
+                <div class="flex gap-2">
+                  <span class="px-2 py-1 bg-neonCyan/20 text-neonCyan text-[9px] rounded font-bold uppercase">Email</span>
+                  <span class="px-2 py-1 bg-white/5 text-gray-500 text-[9px] rounded font-bold uppercase">Push</span>
+                  <span class="px-2 py-1 bg-neonCyan/20 text-neonCyan text-[9px] rounded font-bold uppercase">SMS</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-200">Promotional Blast</p>
+                  <p class="text-[10px] text-gray-500">Mass marketing communication.</p>
+                </div>
+                <div class="flex gap-2">
+                  <span class="px-2 py-1 bg-neonCyan/20 text-neonCyan text-[9px] rounded font-bold uppercase">Email</span>
+                  <span class="px-2 py-1 bg-white/5 text-gray-500 text-[9px] rounded font-bold uppercase">Push</span>
+                  <span class="px-2 py-1 bg-white/5 text-gray-500 text-[9px] rounded font-bold uppercase">SMS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Campaign Stats -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+            <i data-lucide="send" class="w-12 h-12 text-neonCyan mb-4"></i>
+            <h3 class="text-3xl font-mono font-bold text-white">45,912</h3>
+            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">Total Messages Sent This Month</p>
+            <div class="w-full mt-6 grid grid-cols-3 gap-2 border-t border-borderColor pt-4">
+              <div>
+                <p class="text-lg font-mono text-white">98%</p>
+                <p class="text-[9px] text-gray-500 uppercase">Delivery Rate</p>
+              </div>
+              <div>
+                <p class="text-lg font-mono text-neonGreen">42%</p>
+                <p class="text-[9px] text-gray-500 uppercase">Open Rate</p>
+              </div>
+              <div>
+                <p class="text-lg font-mono text-neonViolet">8%</p>
+                <p class="text-[9px] text-gray-500 uppercase">Click Rate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🛠️ SELLER TOOLS 4: API & INTEGRATIONS -->
+      <section id="view-seller-api" class="tab-view fade-in hidden space-y-6">
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans flex justify-between items-center">
+          <div>
+            <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">API & Integrations</h3>
+            <p class="text-[10px] text-gray-400 mt-1">Manage Full SP-API access keys and third-party webhook integrations.</p>
+          </div>
+          <button onclick="showToast('API Key Generation coming soon!', 'info')" class="flex items-center gap-2 border border-neonGreen/30 bg-neonGreen/5 hover:bg-neonGreen/15 hover:border-neonGreen text-neonGreen font-semibold text-xs px-4 py-2 rounded-lg transition-all">
+            <i data-lucide="key" class="w-4 h-4"></i>
+            <span>Generate New API Key</span>
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 font-sans">
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-4 border-b border-borderColor pb-2">Active API Keys</h4>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-borderColor">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-neonCyan/10 flex items-center justify-center text-neonCyan">
+                  <i data-lucide="terminal" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-white">Inventory Sync Service</p>
+                  <p class="text-[10px] font-mono text-gray-500 mt-1">sk_live_...4f9a2</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-right">
+                  <p class="text-[9px] text-gray-400 uppercase">Last Used</p>
+                  <p class="text-xs font-mono text-white">2 mins ago</p>
+                </div>
+                <button class="text-red-400 hover:text-red-300 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-borderColor">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-neonViolet/10 flex items-center justify-center text-neonViolet">
+                  <i data-lucide="bar-chart" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-white">External Analytics Dashboard</p>
+                  <p class="text-[10px] font-mono text-gray-500 mt-1">sk_live_...8b1c4</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-right">
+                  <p class="text-[9px] text-gray-400 uppercase">Last Used</p>
+                  <p class="text-xs font-mono text-white">1 hour ago</p>
+                </div>
+                <button class="text-red-400 hover:text-red-300 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6 pt-4 border-t border-borderColor">
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2">SP-API Endpoints</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+              <div class="p-3 bg-black/40 rounded border border-borderColor text-center">
+                <p class="text-[10px] text-gray-500 uppercase">Orders API</p>
+                <p class="text-xs font-mono text-neonGreen mt-1">v2.1 / Online</p>
+              </div>
+              <div class="p-3 bg-black/40 rounded border border-borderColor text-center">
+                <p class="text-[10px] text-gray-500 uppercase">Catalog API</p>
+                <p class="text-xs font-mono text-neonGreen mt-1">v3.0 / Online</p>
+              </div>
+              <div class="p-3 bg-black/40 rounded border border-borderColor text-center">
+                <p class="text-[10px] text-gray-500 uppercase">Reports API</p>
+                <p class="text-xs font-mono text-neonGreen mt-1">v1.5 / Online</p>
+              </div>
+              <div class="p-3 bg-black/40 rounded border border-borderColor text-center">
+                <p class="text-[10px] text-gray-500 uppercase">Messaging API</p>
+                <p class="text-xs font-mono text-cyberYellow mt-1">v1.0 / Beta</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1038,15 +2085,41 @@
             </select>
           </div>
         </div>
-        <!-- Unsplash URL -->
+        <!-- Image Upload Drag & Drop Zone -->
         <div class="space-y-1.5">
-          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Image Resource (Unsplash URL)</label>
-          <input type="url" id="form-product-image" required placeholder="https://images.unsplash.com/photo-..." class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Product Image Upload</label>
+          <input type="hidden" id="form-product-image" required>
+          <div class="relative w-full h-32 border-2 border-dashed border-borderColor rounded-xl bg-[#0E1321] hover:bg-white/5 transition-colors group flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('form-product-image-upload').click()">
+            <input type="file" id="form-product-image-upload" accept="image/*" class="hidden" onchange="
+              if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const preview = document.getElementById('image-upload-preview');
+                  preview.src = e.target.result;
+                  preview.classList.remove('hidden');
+                  document.getElementById('form-product-image').value = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+              }
+            ">
+            <i data-lucide="upload-cloud" class="w-8 h-8 text-gray-500 group-hover:text-neonCyan transition-colors mb-2"></i>
+            <p class="text-xs text-gray-400 font-medium"><span class="text-neonCyan">Click to browse</span> or drag and drop</p>
+            <p class="text-[9px] text-gray-500 mt-1 uppercase tracking-widest font-mono">PNG, JPG, WEBP up to 5MB</p>
+            <div class="absolute inset-0 bg-black/50 hidden items-center justify-center group-hover:flex transition-opacity opacity-0 hover:opacity-100 z-10">
+              <span class="text-white text-xs font-bold bg-black/50 px-3 py-1 rounded">Change Image</span>
+            </div>
+            <img id="image-upload-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden" alt="Upload Preview">
+          </div>
         </div>
         <!-- Rating -->
         <div class="space-y-1.5">
           <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Default Rating</label>
           <input type="number" step="0.1" min="1" max="5" id="form-product-rating" placeholder="4.5" class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
+        </div>
+        <!-- Stock Level -->
+        <div class="space-y-1.5">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Stock Level (Units)</label>
+          <input type="number" min="0" id="form-product-stock" placeholder="50" class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
         </div>
         
         <button type="submit" id="form-submit-btn" class="w-full bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs py-3.5 rounded-lg hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all">
@@ -1216,13 +2289,27 @@
       // Update header
       let title = "Dashboard Console";
       if (tabId === 'products') title = "Product Inventory Manager";
-      if (tabId === 'orders') title = "Fulfillment & Orders Centre";
+      if (tabId === 'product-images') title = "Product Media & Image Upload";
+      if (tabId === 'inventory-count') title = "Inventory Status & Stock Count";
+      if (tabId === 'low-stock-alerts') title = "Low-Stock Notifications & Restock Console";
+      if (tabId === 'bulk-upload') title = "Bulk Product Upload (CSV)";
+      if (tabId === 'all-orders') title = "Order Registry & Details";
+      if (tabId === 'update-order-status') title = "Fulfillment Status & Timeline Console";
+      if (tabId === 'filter-search-orders') title = "Order Query & Search Console";
+      if (tabId === 'shipping-logistics') title = "Shipping Dispatch & Logistics Hub";
+      if (tabId === 'returns-refunds') title = "Returns Queue & Customer Refunds";
       if (tabId === 'users') title = "Customer Directory & Status";
+      if (tabId === 'reviews-ratings') title = "Reviews & Ratings Console";
+      if (tabId === 'customer-messaging') title = "Customer Support Inbox & Live Chat";
       if (tabId === 'system') title = "TiDB Engine & Controls";
       if (tabId === 'revenue') title = "Revenue Performance & Analysis";
       if (tabId === 'sales-trends') title = "Interactive Trend Visualizations";
       if (tabId === 'business-reports') title = "Business Reports Ledger";
       if (tabId === 'export-data') title = "Database Export Center";
+      if (tabId === 'seller-promotions') title = "Promotions & Discounts Console";
+      if (tabId === 'seller-roles') title = "Role-Based Access Management";
+      if (tabId === 'seller-notifications') title = "Notifications & Alert Routing";
+      if (tabId === 'seller-api') title = "API Keys & Integrations";
       document.getElementById('view-title').textContent = title;
 
       activeTab = tabId;
@@ -1230,8 +2317,17 @@
       // Lazy loads
       if (tabId === 'dashboard') initDashboard();
       if (tabId === 'products') loadProducts(1);
-      if (tabId === 'orders') loadOrders(1);
+      if (tabId === 'product-images') initImageUpload();
+      if (tabId === 'inventory-count') loadInventoryCount(1);
+      if (tabId === 'low-stock-alerts') loadLowStockAlerts();
+      if (tabId === 'bulk-upload') initBulkUpload();
+      if (tabId === 'all-orders') loadOrders(1);
+      if (tabId === 'filter-search-orders') loadFilteredOrders(1);
+      if (tabId === 'shipping-logistics') loadShippingLogistics();
+      if (tabId === 'returns-refunds') loadReturnsRefunds();
       if (tabId === 'users') loadUsers(1);
+      if (tabId === 'reviews-ratings') loadReviewsRatings(1);
+      if (tabId === 'customer-messaging') initCustomerMessaging();
       if (tabId === 'system') loadSystemHealth();
       if (tabId === 'revenue') initRevenueDashboard();
       if (tabId === 'sales-trends') initTrendsDashboard();
@@ -1477,6 +2573,10 @@
     function openProductDrawer() {
       document.getElementById('form-product-id').value = '';
       document.getElementById('product-form').reset();
+      document.getElementById('form-product-image').value = '';
+      document.getElementById('image-upload-preview').classList.add('hidden');
+      document.getElementById('image-upload-preview').src = '';
+      document.getElementById('form-product-stock').value = '';
       document.getElementById('drawer-title').textContent = 'Add Product';
       document.getElementById('form-submit-btn').textContent = 'Create Product';
       
@@ -1498,7 +2598,18 @@
       document.getElementById('form-product-price').value = product.price;
       document.getElementById('form-product-category').value = product.category;
       document.getElementById('form-product-image').value = product.image;
+      
+      const preview = document.getElementById('image-upload-preview');
+      if (product.image) {
+        preview.src = product.image;
+        preview.classList.remove('hidden');
+      } else {
+        preview.classList.add('hidden');
+        preview.src = '';
+      }
+
       document.getElementById('form-product-rating').value = product.rating || '4.5';
+      document.getElementById('form-product-stock').value = (product.stock !== undefined && product.stock !== null) ? product.stock : 50;
 
       document.getElementById('drawer-title').textContent = 'Edit Product';
       document.getElementById('form-submit-btn').textContent = 'Update Product Details';
@@ -1516,8 +2627,9 @@
       const category = document.getElementById('form-product-category').value;
       const image = document.getElementById('form-product-image').value;
       const rating = parseFloat(document.getElementById('form-product-rating').value || '4.5');
+      const stock = parseInt(document.getElementById('form-product-stock').value) || 50;
 
-      const payload = { name, price, category, image, rating };
+      const payload = { name, price, category, image, rating, stock };
       
       const method = pid ? 'PUT' : 'POST';
       const url = pid ? `/api/admin/products/${pid}` : '/api/admin/products';
@@ -1560,7 +2672,7 @@
       fetch(`/api/admin/orders?page=${page}&per_page=12`)
         .then(res => res.json())
         .then(response => {
-          const tbody = document.getElementById('orders-table-body');
+          const tbody = document.getElementById('all-orders-table-body');
           tbody.innerHTML = '';
           
           ordersList = response.data;
@@ -1617,7 +2729,7 @@
             lucide.createIcons();
           }
 
-          buildPagination('orders-pagination', response.meta, loadOrders);
+          buildPagination('all-orders-pagination', response.meta, loadOrders);
         })
         .catch(() => showToast('Error loading orders queue', 'error'));
     }
@@ -1688,6 +2800,706 @@
       document.getElementById('order-modal').classList.add('hidden');
     }
 
+    // ─── C.2 QUICK STATUS & fulfillment TIMELINE CONTROLS ─────────────────
+    let currentQuickOrderId = null;
+    function fetchQuickOrder() {
+      const oid = document.getElementById('quick-order-id').value;
+      if (!oid) {
+        showToast('Please specify a valid Order ID', 'error');
+        return;
+      }
+
+      fetch(`/api/admin/orders?order_id=${oid}`)
+        .then(res => res.json())
+        .then(response => {
+          const orders = response.data || [];
+          if (orders.length === 0) {
+            showToast(`Order #${oid} could not be found in active databases`, 'error');
+            return;
+          }
+          const o = orders[0];
+          currentQuickOrderId = o.id;
+
+          // Update info snapshot
+          document.getElementById('quick-client-name').textContent = o.user_name || 'Anonymous';
+          document.getElementById('quick-total-spent').textContent = `$${o.total.toFixed(2)}`;
+          const date = new Date(o.created_at);
+          document.getElementById('quick-placed-date').textContent = date.toLocaleDateString();
+          document.getElementById('quick-method').textContent = o.shipping_method || 'Standard Express';
+
+          // Reveal UI blocks
+          document.getElementById('quick-order-snapshot').classList.remove('hidden');
+          document.getElementById('quick-timeline-container').classList.remove('hidden');
+          document.getElementById('quick-controls').classList.remove('hidden');
+          document.getElementById('quick-timeline-placeholder').classList.add('hidden');
+
+          // Reset timeline styles
+          const steps = ['pending', 'processing', 'shipped', 'delivered'];
+          steps.forEach(step => {
+            const el = document.getElementById(`step-${step}`);
+            el.className = 'w-8 h-8 rounded-full bg-[#0E1321] border border-borderColor flex items-center justify-center font-mono font-bold text-xs text-gray-500 transition-all';
+          });
+
+          // Set active based on status
+          const progressLine = document.getElementById('quick-timeline-progress');
+          let width = '0%';
+          const activeClass = 'border-neonCyan text-neonCyan bg-neonCyan/10 shadow-[0_0_15px_rgba(0,240,255,0.4)] font-bold';
+
+          if (o.status === 'Pending') {
+            width = '0%';
+            document.getElementById('step-pending').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+          } else if (o.status === 'Processing') {
+            width = '33%';
+            document.getElementById('step-pending').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+            document.getElementById('step-processing').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+          } else if (o.status === 'Shipped') {
+            width = '66%';
+            document.getElementById('step-pending').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+            document.getElementById('step-processing').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+            document.getElementById('step-shipped').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+          } else if (o.status === 'Delivered') {
+            width = '100%';
+            document.getElementById('step-pending').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+            document.getElementById('step-processing').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+            document.getElementById('step-shipped').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+            document.getElementById('step-delivered').className = `w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs transition-all ${activeClass}`;
+          } else if (o.status === 'Cancelled') {
+            width = '0%';
+            showToast(`Note: Order #${oid} is currently Cancelled`, 'error');
+          }
+
+          progressLine.style.width = width;
+          showToast(`Successfully queried Order #${oid} details`, 'success');
+        })
+        .catch(() => showToast('Failed to retrieve order status snapshot', 'error'));
+    }
+
+    function updateQuickStatus(newStatus) {
+      if (!currentQuickOrderId) return;
+
+      fetch(`/api/admin/orders/${currentQuickOrderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast(`Order #${currentQuickOrderId} status changed to ${newStatus}`, 'success');
+        fetchQuickOrder();
+        loadOrders(1);
+      })
+      .catch(() => showToast('Failed to update quick order status', 'error'));
+    }
+
+    // ─── C.3 DATABASE FILTER & SEARCH CONTROLS ────────────────────────────
+    function clearOrderFilters() {
+      document.getElementById('filter-order-id').value = '';
+      document.getElementById('filter-email').value = '';
+      document.getElementById('filter-status').value = '';
+      loadFilteredOrders(1);
+    }
+    
+    function loadFilteredOrders(page = 1) {
+      const oid = document.getElementById('filter-order-id').value;
+      const email = document.getElementById('filter-email').value;
+      const status = document.getElementById('filter-status').value;
+      
+      let url = `/api/admin/orders?page=${page}&per_page=10`;
+      if (oid) url += `&order_id=${oid}`;
+      if (email) url += `&email=${encodeURIComponent(email)}`;
+      if (status) url += `&status=${status}`;
+      
+      fetch(url)
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('filter-orders-table-body');
+          tbody.innerHTML = '';
+          
+          const orders = response.data || [];
+          if (orders.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No matching orders found inside transaction databases.</td>
+              </tr>
+            `;
+          } else {
+            orders.forEach(o => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              const date = new Date(o.created_at);
+              const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              
+              let badgeColor = 'bg-white/5 border-borderColor text-gray-400';
+              if (o.status === 'Pending') badgeColor = 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400';
+              if (o.status === 'Processing') badgeColor = 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400';
+              if (o.status === 'Shipped') badgeColor = 'bg-violet-500/10 border-violet-500/30 text-violet-400';
+              if (o.status === 'Delivered') badgeColor = 'bg-green-500/10 border-green-500/30 text-green-400';
+              if (o.status === 'Cancelled') badgeColor = 'bg-red-500/10 border-red-500/30 text-red-400';
+              
+              tr.innerHTML = `
+                <td class="p-4 font-mono font-bold text-neonCyan">ORDER #${o.id}</td>
+                <td class="p-4">
+                  <p class="font-semibold text-white leading-none">${o.user_name || 'Anonymous'}</p>
+                  <span class="text-[9px] font-mono text-gray-500">${o.user_email || 'unknown@guest.com'}</span>
+                </td>
+                <td class="p-4 font-mono font-bold text-white">$${o.total.toFixed(2)}</td>
+                <td class="p-4">
+                  <span class="px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${badgeColor}">${o.status}</span>
+                </td>
+                <td class="p-4 text-gray-400 font-mono text-[10px]">${dateStr}</td>
+                <td class="p-4 text-right">
+                  <button onclick="inspectOrder(${o.id})" class="text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    <span>Inspect</span>
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+          }
+          
+          buildPagination('filter-orders-pagination', response.meta, loadFilteredOrders);
+        })
+        .catch(() => showToast('Error querying filtered database', 'error'));
+    }
+
+    // ─── C.4 SHIPPING DISPATCH & CARRIER CONTROLS ─────────────────────────
+    function loadShippingLogistics() {
+      fetch('/api/admin/orders?per_page=100')
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('shipping-table-body');
+          tbody.innerHTML = '';
+          
+          const orders = response.data || [];
+          const shippingOrders = orders.filter(o => o.status === 'Processing' || o.status === 'Shipped');
+          
+          document.getElementById('active-shipments-count').textContent = shippingOrders.length;
+          
+          if (shippingOrders.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No active dispatches in transit at the moment.</td>
+              </tr>
+            `;
+          } else {
+            shippingOrders.forEach(o => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              const trackingCode = `SE-TRK-${100000 + o.id}`;
+              const badgeClass = o.status === 'Processing' ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/5' : 'border-violet-500/30 text-violet-400 bg-violet-500/5';
+              const buttonAction = o.status === 'Processing' 
+                ? `<button onclick="updateShippingStatus(${o.id}, 'Shipped')" class="text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-3 py-1.5 rounded-lg transition-colors">Ship / Dispatch</button>` 
+                : `<button onclick="updateShippingStatus(${o.id}, 'Delivered')" class="text-neonGreen border border-neonGreen/20 bg-neonGreen/5 hover:bg-neonGreen/15 px-3 py-1.5 rounded-lg transition-colors">Mark Delivered</button>`;
+              
+              tr.innerHTML = `
+                <td class="p-4 font-mono font-bold text-neonCyan">ORDER #${o.id}</td>
+                <td class="p-4">
+                  <p class="font-semibold text-white leading-none">${o.shipping_name || 'Anonymous'}</p>
+                  <span class="text-[9px] font-mono text-gray-500 block truncate max-w-xs">${o.shipping_address || 'No Address'}</span>
+                </td>
+                <td class="p-4 font-mono text-gray-400 text-[10px]">${trackingCode}</td>
+                <td class="p-4 text-gray-300 font-medium">${o.shipping_method || 'Standard Express'}</td>
+                <td class="p-4">
+                  <span class="px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${badgeClass}">${o.status}</span>
+                </td>
+                <td class="p-4 text-right">
+                  ${buttonAction}
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+          }
+        })
+        .catch(() => showToast('Error querying shipping registries', 'error'));
+    }
+    
+    function updateShippingStatus(orderId, nextStatus) {
+      fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast(`Order #${orderId} marked as ${nextStatus}`, 'success');
+        loadShippingLogistics();
+        loadOrders(1);
+      })
+      .catch(() => showToast('Failed to update dispatch status', 'error'));
+    }
+
+    // ─── C.5 CANCELLATIONS & REFUND CONTROLS ──────────────────────────────
+    function loadReturnsRefunds() {
+      fetch('/api/admin/orders?per_page=100')
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('returns-table-body');
+          tbody.innerHTML = '';
+          
+          const orders = response.data || [];
+          const cancelledOrders = orders.filter(o => o.status === 'Cancelled');
+          
+          document.getElementById('returns-cancelled-count').textContent = cancelledOrders.length;
+          
+          let totalRefundValue = 0.0;
+          cancelledOrders.forEach(o => {
+            totalRefundValue += o.total;
+          });
+          document.getElementById('returns-refund-value').textContent = `$${totalRefundValue.toFixed(2)}`;
+          
+          if (cancelledOrders.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No cancelled or returned orders in the refund queue.</td>
+              </tr>
+            `;
+          } else {
+            cancelledOrders.forEach(o => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              const date = new Date(o.created_at);
+              const dateStr = date.toLocaleDateString();
+              
+              tr.innerHTML = `
+                <td class="p-4 font-mono font-bold text-neonCyan">ORDER #${o.id}</td>
+                <td class="p-4">
+                  <p class="font-semibold text-white leading-none">${o.user_name || 'Anonymous'}</p>
+                  <span class="text-[9px] font-mono text-gray-500">${o.user_email || 'unknown@guest.com'}</span>
+                </td>
+                <td class="p-4 font-mono font-bold text-red-400">$${o.total.toFixed(2)}</td>
+                <td class="p-4">
+                  <span class="px-2 py-0.5 rounded border border-red-500/30 text-red-400 bg-red-500/5 text-[9px] font-bold uppercase">Cancelled</span>
+                </td>
+                <td class="p-4 text-gray-400 font-mono text-[10px]">${dateStr}</td>
+                <td class="p-4 text-right">
+                  <button onclick="triggerRefund(${o.id})" class="text-neonGreen border border-neonGreen/20 bg-neonGreen/5 hover:bg-neonGreen/15 px-3 py-1.5 rounded-lg transition-colors">
+                    Process Refund
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+          }
+        })
+        .catch(() => showToast('Error querying cancellation logs', 'error'));
+    }
+    
+    function triggerRefund(orderId) {
+      showToast(`Initiating customer bank credit refund for Order #${orderId}...`, 'info');
+      setTimeout(() => {
+        showToast(`Refund of transaction value processed successfully for Order #${orderId}!`, 'success');
+      }, 1000);
+    }
+
+    // ─── B.2 MEDIA IMAGE UPLOAD HANDLERS ──────────────────────────────────
+    function initImageUpload() {
+      fetch('/api/admin/products?per_page=100')
+        .then(res => res.json())
+        .then(response => {
+          const select = document.getElementById('upload-product-select');
+          select.innerHTML = '<option value="">-- Choose Target SKU --</option>';
+          
+          const products = response.data || [];
+          products.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = `${p.name} (ID: ${p.id})`;
+            select.appendChild(opt);
+          });
+        })
+        .catch(() => showToast('Error loading products dropdown list', 'error'));
+      
+      clearMediaUpload();
+    }
+
+    function previewProductImageFile(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const preview = document.getElementById('image-upload-preview');
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+        document.getElementById('image-upload-preview-placeholder').classList.add('hidden');
+      }
+    }
+
+    function clearMediaUpload() {
+      document.getElementById('product-media-file').value = '';
+      const preview = document.getElementById('image-upload-preview');
+      preview.src = '';
+      preview.classList.add('hidden');
+      document.getElementById('image-upload-preview-placeholder').classList.remove('hidden');
+    }
+
+    function uploadProductMedia() {
+      const productId = document.getElementById('upload-product-select').value;
+      const fileInput = document.getElementById('product-media-file');
+      
+      if (!productId) {
+        showToast('Please select a target product SKU first', 'error');
+        return;
+      }
+      if (fileInput.files.length === 0) {
+        showToast('Please select an image file to upload', 'error');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+
+      showToast('Uploading media to ShopEase file directories...', 'info');
+
+      fetch('/api/admin/products/upload-image', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(uploadRes => {
+        const imageUrl = uploadRes.image_url;
+        
+        // Fetch current product details to keep other parameters intact
+        fetch(`/api/products/${productId}`)
+          .then(res => res.json())
+          .then(product => {
+            const updatedProduct = {
+              name: product.name,
+              price: product.price,
+              category: product.category,
+              rating: product.rating || 4.5,
+              stock: product.stock || 50,
+              image: imageUrl
+            };
+
+            fetch(`/api/admin/products/${productId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updatedProduct)
+            })
+            .then(res => {
+              if (!res.ok) throw new Error();
+              return res.json();
+            })
+            .then(() => {
+              showToast('Media associated and database saved successfully!', 'success');
+              clearMediaUpload();
+              loadProducts(1);
+            });
+          });
+      })
+      .catch(() => showToast('Error uploading product media', 'error'));
+    }
+
+    // ─── B.3 INVENTORY STOCK COUNT HANDLERS ───────────────────────────────
+    function loadInventoryCount(page = 1) {
+      const search = document.getElementById('inventory-search').value;
+      
+      let url = `/api/admin/products?page=${page}&per_page=10`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      
+      // Calculate Stats
+      fetch('/api/admin/products?per_page=100')
+        .then(res => res.json())
+        .then(response => {
+          const products = response.data || [];
+          document.getElementById('inventory-sku-count').textContent = products.length;
+          
+          let totalStock = 0;
+          products.forEach(p => {
+            totalStock += (p.stock !== null && p.stock !== undefined) ? p.stock : 50;
+          });
+          document.getElementById('inventory-total-stock').textContent = totalStock;
+          
+          const avgCapacity = products.length > 0 ? Math.round(totalStock / products.length) : 0;
+          document.getElementById('inventory-avg-capacity').textContent = avgCapacity;
+        });
+
+      // Load table
+      fetch(url)
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('inventory-table-body');
+          tbody.innerHTML = '';
+          
+          const products = response.data || [];
+          if (products.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No inventory records match filters.</td>
+              </tr>
+            `;
+          } else {
+            products.forEach(p => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              const currentStock = (p.stock !== null && p.stock !== undefined) ? p.stock : 50;
+              let stockBadge = 'border-green-500/30 text-green-400 bg-green-500/5 font-semibold';
+              if (currentStock < 5) stockBadge = 'border-red-500/40 text-red-400 bg-red-500/10 font-bold';
+              else if (currentStock < 15) stockBadge = 'border-yellow-500/30 text-yellow-400 bg-yellow-500/5 font-medium';
+
+              tr.innerHTML = `
+                <td class="p-4 flex items-center gap-3">
+                  <img src="${p.image}" class="w-8 h-8 rounded border border-borderColor object-cover">
+                  <div>
+                    <p class="font-semibold text-white leading-none">${p.name}</p>
+                    <span class="text-[9px] font-mono text-neonCyan">ID: #${p.id}</span>
+                  </div>
+                </td>
+                <td class="p-4 font-mono uppercase text-[10px] text-gray-400">${p.category}</td>
+                <td class="p-4 font-mono font-bold text-white">$${p.price.toFixed(2)}</td>
+                <td class="p-4">
+                  <span class="px-2.5 py-1 rounded border text-[10px] ${stockBadge}">${currentStock} Units</span>
+                </td>
+                <td class="p-4">
+                  <input type="number" id="adjust-stock-${p.id}" value="${currentStock}" class="w-16 bg-[#0E1321] border border-borderColor rounded px-2.5 py-1 text-center font-mono text-xs text-white focus:outline-none focus:border-neonCyan transition-all">
+                </td>
+                <td class="p-4 text-right">
+                  <button onclick="updateSingleStock(${p.id})" class="text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-3 py-1.5 rounded-lg transition-colors">
+                    Update
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+
+          buildPagination('inventory-pagination', response.meta, loadInventoryCount);
+        })
+        .catch(() => showToast('Error loading stock metrics', 'error'));
+    }
+
+    function updateSingleStock(productId) {
+      const input = document.getElementById(`adjust-stock-${productId}`);
+      const newStock = parseInt(input.value);
+      if (isNaN(newStock) || newStock < 0) {
+        showToast('Please enter a valid stock quantity', 'error');
+        return;
+      }
+
+      fetch(`/api/products/${productId}`)
+        .then(res => res.json())
+        .then(product => {
+          const updatedProduct = {
+            name: product.name,
+            price: product.price,
+            category: product.category,
+            image: product.image,
+            rating: product.rating || 4.5,
+            stock: newStock
+          };
+
+          fetch(`/api/admin/products/${productId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedProduct)
+          })
+          .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+          })
+          .then(() => {
+            showToast(`Product SKU stock set to ${newStock} units`, 'success');
+            loadInventoryCount(1);
+            loadLowStockAlerts();
+            loadProducts(1);
+          });
+        })
+        .catch(() => showToast('Error saving inventory adjustment', 'error'));
+    }
+
+    // ─── B.4 LOW STOCK ALERTS HANDLERS ────────────────────────────────────
+    function loadLowStockAlerts() {
+      fetch('/api/admin/products?per_page=100')
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('low-stock-alerts-table-body');
+          tbody.innerHTML = '';
+          
+          const products = response.data || [];
+          const alertItems = products.filter(p => {
+            const stock = (p.stock !== null && p.stock !== undefined) ? p.stock : 50;
+            return stock < 15;
+          });
+
+          document.getElementById('low-stock-alert-count').textContent = alertItems.length;
+
+          if (alertItems.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="5" class="p-8 text-center text-gray-500 font-mono">All inventory SKUs are within standard capacity thresholds.</td>
+              </tr>
+            `;
+          } else {
+            alertItems.forEach(p => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              const currentStock = (p.stock !== null && p.stock !== undefined) ? p.stock : 50;
+              const severity = currentStock < 5 ? 'CRITICAL OUTAGE' : 'WARNING';
+              const alertColor = currentStock < 5 ? 'text-red-400 bg-red-500/10 border-red-500/30' : 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30';
+
+              tr.innerHTML = `
+                <td class="p-4 flex items-center gap-3">
+                  <img src="${p.image}" class="w-8 h-8 rounded border border-borderColor object-cover">
+                  <div>
+                    <p class="font-semibold text-white leading-none">${p.name}</p>
+                    <span class="text-[9px] font-mono text-neonCyan">ID: #${p.id}</span>
+                  </div>
+                </td>
+                <td class="p-4 font-mono uppercase text-[10px] text-gray-400">${p.category}</td>
+                <td class="p-4 font-mono font-bold text-white">${currentStock} Items</td>
+                <td class="p-4">
+                  <span class="px-2 py-0.5 rounded border text-[9px] font-bold ${alertColor}">${severity}</span>
+                </td>
+                <td class="p-4 text-right">
+                  <button onclick="quickRestockItem(${p.id})" class="text-neonGreen border border-neonGreen/20 bg-neonGreen/5 hover:bg-neonGreen/15 px-3 py-1.5 rounded-lg transition-colors font-semibold">
+                    Restock (+50)
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        })
+        .catch(() => showToast('Error querying stock warning streams', 'error'));
+    }
+
+    function quickRestockItem(productId) {
+      fetch(`/api/admin/products/${productId}/restock`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: 50 })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast(`Stock replenished. New warehouse balance: ${data.new_stock} units`, 'success');
+        loadLowStockAlerts();
+        loadInventoryCount(1);
+        loadProducts(1);
+      })
+      .catch(() => showToast('Failed to execute item restock', 'error'));
+    }
+
+    // ─── B.5 CSV BULK UPLOAD HANDLERS ─────────────────────────────────────
+    let parsedBulkProducts = [];
+    
+    function initBulkUpload() {
+      document.getElementById('bulk-csv-textarea').value = '';
+      clearBulkIngest();
+    }
+
+    function clearBulkIngest() {
+      parsedBulkProducts = [];
+      const tbody = document.getElementById('bulk-preview-table-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="p-6 text-center text-gray-600 font-mono">No products ingested. Paste some rows and validate above!</td>
+        </tr>
+      `;
+    }
+
+    function parsePasteCSV() {
+      const text = document.getElementById('bulk-csv-textarea').value.trim();
+      if (!text) {
+        showToast('Please paste comma-separated values to validate', 'error');
+        return;
+      }
+
+      const lines = text.split('\n');
+      const tbody = document.getElementById('bulk-preview-table-body');
+      tbody.innerHTML = '';
+      parsedBulkProducts = [];
+
+      let errorCount = 0;
+      let validCount = 0;
+
+      lines.forEach((line, idx) => {
+        if (!line.trim()) return;
+        
+        const cols = line.split(',');
+        if (cols.length < 3) {
+          errorCount++;
+          return;
+        }
+
+        const name = cols[0] ? cols[0].trim() : '';
+        const price = cols[1] ? parseFloat(cols[1].trim()) : NaN;
+        const category = cols[2] ? cols[2].trim() : '';
+        const image = cols[3] ? cols[3].trim() : 'https://picsum.photos/200';
+        const rating = cols[4] ? parseFloat(cols[4].trim()) : 4.5;
+        const stock = cols[5] ? parseInt(cols[5].trim()) : 50;
+
+        if (!name || isNaN(price) || !category) {
+          errorCount++;
+          return;
+        }
+
+        parsedBulkProducts.push({ name, price, category, image, rating, stock });
+        validCount++;
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-borderColor/10 hover:bg-white/[0.01] transition-colors';
+        tr.innerHTML = `
+          <td class="p-2.5 font-semibold text-white max-w-[150px] truncate">${name}</td>
+          <td class="p-2.5 font-mono uppercase">${category}</td>
+          <td class="p-2.5 font-mono text-neonGreen font-bold">$${price.toFixed(2)}</td>
+          <td class="p-2.5 font-mono">${stock} Units</td>
+          <td class="p-2.5 font-mono text-yellow-400">★ ${rating.toFixed(1)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (errorCount > 0) {
+        showToast(`Parsed ${validCount} rows successfully, skipped ${errorCount} invalid rows`, 'warning');
+      } else {
+        showToast(`Validation complete. ${validCount} product records prepared for ingestion`, 'success');
+      }
+    }
+
+    function submitBulkIngestion() {
+      if (parsedBulkProducts.length === 0) {
+        showToast('Please validate raw CSV lines before ingestion', 'error');
+        return;
+      }
+
+      showToast(`Ingesting ${parsedBulkProducts.length} entries to database...`, 'info');
+
+      fetch('/api/admin/products/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: parsedBulkProducts })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast(`Successfully processed database bulk ingestion!`, 'success');
+        clearBulkIngest();
+        document.getElementById('bulk-csv-textarea').value = '';
+        loadProducts(1);
+      })
+      .catch(() => showToast('Failed to insert bulk product streams', 'error'));
+    }
+
     // ─── D. USERS REGISTRY CONTROLS ──────────────────────────────────────
     function loadUsers(page = 1) {
       fetch(`/api/admin/users?page=${page}&per_page=12`)
@@ -1750,7 +3562,6 @@
         })
         .catch(() => showToast('Error loading users records', 'error'));
     }
-
     function toggleUserAdmin(userId) {
       fetch(`/api/admin/users/${userId}/toggle-admin`, { method: 'PUT' })
         .then(res => {
@@ -1763,6 +3574,362 @@
         })
         .catch(() => showToast('Could not modify administrator credentials', 'error'));
     }
+
+    // ─── REVIEWS & RATINGS CONTROLS ──────────────────────────────────────
+    let activeReviewsList = [];
+
+    function loadReviewsRatings(page = 1) {
+      fetch('/api/admin/reviews')
+        .then(res => res.json())
+        .then(response => {
+          activeReviewsList = response.data || [];
+          
+          // Recompute stats
+          const totalReviews = activeReviewsList.length;
+          const pendingReviews = activeReviewsList.filter(r => r.status === 'Pending').length;
+          
+          document.getElementById('reviews-stat-total').textContent = totalReviews;
+          document.getElementById('reviews-stat-pending').textContent = pendingReviews;
+          
+          let sum = 0;
+          activeReviewsList.forEach(r => sum += r.rating);
+          const avg = totalReviews > 0 ? (sum / totalReviews).toFixed(2) : '0.00';
+          document.getElementById('reviews-stat-avg').textContent = avg;
+          
+          renderReviewsTable(activeReviewsList);
+        })
+        .catch(() => showToast('Failed to retrieve product reviews logs', 'error'));
+    }
+
+    function renderReviewsTable(reviews) {
+      const tbody = document.getElementById('reviews-table-body');
+      tbody.innerHTML = '';
+      
+      if (reviews.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No review comments found in catalog logs.</td>
+          </tr>
+        `;
+        return;
+      }
+      
+      reviews.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+        
+        // Stars HTML
+        let starsHtml = '';
+        const fullStars = Math.floor(r.rating);
+        for (let i = 0; i < 5; i++) {
+          if (i < fullStars) {
+            starsHtml += `<i data-lucide="star" class="w-3.5 h-3.5 text-cyberYellow fill-current inline"></i>`;
+          } else {
+            starsHtml += `<i data-lucide="star" class="w-3.5 h-3.5 text-gray-600 inline"></i>`;
+          }
+        }
+        
+        const badgeColor = r.status === 'Approved' ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 animate-pulse';
+        
+        tr.innerHTML = `
+          <td class="p-4 flex items-center gap-3">
+            <img src="${r.product_image}" class="w-8 h-8 rounded border border-borderColor object-cover" onerror="this.src='https://picsum.photos/100'" />
+            <div>
+              <p class="font-semibold text-white leading-none">${r.product_name}</p>
+              <span class="text-[9px] font-mono text-gray-500">ID: ${r.product_id}</span>
+            </div>
+          </td>
+          <td class="p-4">
+            <p class="leading-none text-white">${r.reviewer_name}</p>
+            <span class="text-[9px] font-mono text-gray-500">${r.reviewer_email}</span>
+          </td>
+          <td class="p-4 text-center">
+            <div class="flex justify-center gap-0.5">${starsHtml}</div>
+          </td>
+          <td class="p-4 text-gray-300 font-sans max-w-xs truncate" title="${r.comment}">${r.comment}</td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${badgeColor}">${r.status}</span>
+          </td>
+          <td class="p-4 text-right">
+            <div class="flex gap-2 justify-end">
+              ${r.status === 'Pending' ? `
+                <button onclick="updateReviewStatus(${r.id}, 'Approved')" class="text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-2 py-1 rounded transition-colors text-[10px] inline-flex items-center gap-1 font-semibold">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  <span>Approve</span>
+                </button>
+              ` : ''}
+              <button onclick="deleteReview(${r.id})" class="text-red-400 border border-red-500/20 bg-red-500/5 hover:bg-red-500/15 px-2 py-1 rounded transition-colors text-[10px] inline-flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <span>Delete</span>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function filterReviewsTable() {
+      const q = document.getElementById('reviews-search-input').value.toLowerCase();
+      const status = document.getElementById('reviews-filter-status').value;
+      
+      const filtered = activeReviewsList.filter(r => {
+        const matchesQuery = r.comment.toLowerCase().includes(q) || r.reviewer_name.toLowerCase().includes(q) || r.product_name.toLowerCase().includes(q);
+        const matchesStatus = status === 'ALL' || r.status === status;
+        return matchesQuery && matchesStatus;
+      });
+      
+      renderReviewsTable(filtered);
+    }
+
+    function updateReviewStatus(reviewId, status) {
+      fetch(`/api/admin/reviews/${reviewId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast('Review approved and marked public successfully!', 'success');
+        loadReviewsRatings(1);
+      })
+      .catch(() => showToast('Failed to modify review moderation status', 'error'));
+    }
+
+    function deleteReview(reviewId) {
+      if (!confirm('Are you sure you want to purge this review listing?')) return;
+      fetch(`/api/admin/reviews/${reviewId}`, { method: 'DELETE' })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast('Review purged from catalog history successfully!', 'success');
+        loadReviewsRatings(1);
+      })
+      .catch(() => showToast('Failed to purge review listing', 'error'));
+    }
+
+
+    // ─── LIVE CHAT & MESSAGING CONTROLS ──────────────────────────────────
+    let activeConversations = [];
+    let selectedUserId = null;
+
+    function initCustomerMessaging() {
+      fetch('/api/admin/messages')
+        .then(res => res.json())
+        .then(data => {
+          activeConversations = data.conversations || [];
+          
+          // Re-render inbox
+          const inboxList = document.getElementById('inbox-channels-list');
+          inboxList.innerHTML = '';
+          
+          if (activeConversations.length === 0) {
+            inboxList.innerHTML = `
+              <div class="p-8 text-center text-xs text-gray-500 font-mono">No active buyer channels.</div>
+            `;
+            return;
+          }
+          
+          // Calculate active channels and show list
+          activeConversations.forEach(conv => {
+            const div = document.createElement('div');
+            div.id = `chat-channel-${conv.user_id}`;
+            div.className = `p-4 hover:bg-white/[0.04] transition-all cursor-pointer flex items-center justify-between group ${selectedUserId === conv.user_id ? 'bg-white/5 border-l-2 border-neonCyan' : ''}`;
+            div.onclick = () => selectChatChannel(conv.user_id);
+            
+            const initials = conv.user_name.slice(0, 2).toUpperCase();
+            const lastMsg = conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].text : 'No messages';
+            const lastMsgTime = conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].time : '';
+            
+            div.innerHTML = `
+              <div class="flex items-center gap-3 w-4/5">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-black text-xs font-mono" style="background-color: ${conv.avatar_color}">
+                  ${initials}
+                </div>
+                <div class="truncate w-3/4">
+                  <h4 class="text-xs font-bold text-white uppercase group-hover:text-neonCyan transition-colors">${conv.user_name}</h4>
+                  <p class="text-[10px] text-gray-400 truncate leading-tight">${lastMsg}</p>
+                </div>
+              </div>
+              <span class="text-[8px] font-mono text-gray-500">${lastMsgTime}</span>
+            `;
+            inboxList.appendChild(div);
+          });
+          
+          // Calculate unread count (simulated: first conversation has 1 unread if not selected)
+          const unreadBadge = document.getElementById('unread-chats-badge');
+          const unreadCount = selectedUserId === null ? 1 : 0;
+          unreadBadge.textContent = `${unreadCount} UNREAD`;
+          if (unreadCount > 0) {
+            unreadBadge.className = 'text-[9px] font-mono font-bold bg-cyberYellow/20 text-cyberYellow px-2 py-0.5 rounded-full';
+          } else {
+            unreadBadge.className = 'text-[9px] font-mono font-bold bg-neonCyan/20 text-neonCyan px-2 py-0.5 rounded-full';
+          }
+          
+          // Keep active conversation open if selected
+          if (selectedUserId !== null) {
+            renderActiveChat(selectedUserId);
+          }
+        })
+        .catch(() => showToast('Failed to assemble customer live inbox', 'error'));
+    }
+
+    function selectChatChannel(userId) {
+      selectedUserId = userId;
+      
+      // Update styling inside left pane
+      document.querySelectorAll('#inbox-channels-list > div').forEach(el => {
+        el.classList.remove('bg-white/5', 'border-l-2', 'border-neonCyan');
+      });
+      const channelEl = document.getElementById(`chat-channel-${userId}`);
+      if (channelEl) {
+        channelEl.className += ' bg-white/5 border-l-2 border-neonCyan';
+      }
+      
+      // Update unread badges
+      const unreadBadge = document.getElementById('unread-chats-badge');
+      unreadBadge.textContent = '0 UNREAD';
+      unreadBadge.className = 'text-[9px] font-mono font-bold bg-neonCyan/20 text-neonCyan px-2 py-0.5 rounded-full';
+      
+      document.getElementById('chat-empty-state').classList.add('hidden');
+      document.getElementById('chat-active-pane').classList.remove('hidden');
+      
+      renderActiveChat(userId);
+    }
+
+    function renderActiveChat(userId) {
+      const conv = activeConversations.find(c => c.user_id === userId);
+      if (!conv) return;
+      
+      // Setup header details
+      document.getElementById('active-chat-name').textContent = conv.user_name;
+      document.getElementById('active-chat-email').textContent = conv.user_email;
+      
+      const avatar = document.getElementById('active-chat-avatar');
+      avatar.textContent = conv.user_name.slice(0, 2).toUpperCase();
+      avatar.style.backgroundColor = conv.avatar_color;
+      avatar.style.color = '#000000';
+      
+      // Setup messages stream
+      const container = document.getElementById('chat-messages-container');
+      container.innerHTML = '';
+      
+      conv.messages.forEach(msg => {
+        const bubble = document.createElement('div');
+        bubble.className = `flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`;
+        
+        const isSelf = msg.sender === 'admin';
+        bubble.innerHTML = `
+          <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-md border ${
+            isSelf 
+              ? 'bg-gradient-to-r from-neonCyan/15 to-neonViolet/15 border-neonCyan/20 text-white rounded-br-none' 
+              : 'bg-white/5 border-borderColor/40 text-gray-100 rounded-bl-none'
+          }">
+            <p class="leading-relaxed whitespace-pre-wrap">${msg.text}</p>
+            <div class="flex items-center gap-1 justify-end mt-1 text-[8px] font-mono text-gray-500">
+              <span>${msg.time}</span>
+              ${isSelf ? '<i data-lucide="check-check" class="w-3 h-3 text-neonCyan inline"></i>' : ''}
+            </div>
+          </div>
+        `;
+        container.appendChild(bubble);
+      });
+      
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function sendSupportChatMessage(event) {
+      event.preventDefault();
+      const input = document.getElementById('chat-message-input');
+      const text = input.value.trim();
+      if (!text || !selectedUserId) return;
+      
+      // Append immediate local bubble to prevent chat stutter/latency lag
+      const container = document.getElementById('chat-messages-container');
+      const bubble = document.createElement('div');
+      bubble.className = 'flex justify-end';
+      bubble.innerHTML = `
+        <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-md border bg-gradient-to-r from-neonCyan/15 to-neonViolet/15 border-neonCyan/20 text-white rounded-br-none">
+          <p class="leading-relaxed">${text}</p>
+          <div class="flex items-center gap-1 justify-end mt-1 text-[8px] font-mono text-gray-500">
+            <span>Just Now</span>
+            <i data-lucide="check" class="w-3 h-3 text-neonCyan inline"></i>
+          </div>
+        </div>
+      `;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+      
+      // Clear input
+      input.value = '';
+      
+      // Call backend
+      fetch('/api/admin/messages/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: selectedUserId, message: text })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        // Show simulated customer typing after 1 second
+        setTimeout(() => {
+          document.getElementById('chat-typing-indicator').classList.remove('hidden');
+          container.scrollTop = container.scrollHeight;
+          
+          // Complete client response block
+          setTimeout(() => {
+            document.getElementById('chat-typing-indicator').classList.add('hidden');
+            
+            // Append simulated reply
+            const clientBubble = document.createElement('div');
+            clientBubble.className = 'flex justify-start';
+            clientBubble.innerHTML = `
+              <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-md border bg-white/5 border-borderColor/40 text-gray-100 rounded-bl-none">
+                <p class="leading-relaxed">${data.simulated_reply}</p>
+                <div class="flex items-center justify-end mt-1 text-[8px] font-mono text-gray-500">
+                  <span>Just Now</span>
+                </div>
+              </div>
+            `;
+            container.appendChild(clientBubble);
+            container.scrollTop = container.scrollHeight;
+            
+            // Play synthesized support micro tone alert!
+            playSupportBeep();
+            
+            // Refresh inbox data to sync logs
+            initCustomerMessaging();
+          }, 1500);
+        }, 800);
+      })
+      .catch(() => showToast('Failed to relay support reply message', 'error'));
+    }
+
+    function playSupportBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch(e) {}
+    }
+
 
     // ─── E. SYSTEM TOOLS CONTROLS ───────────────────────────────────────
     function loadSystemHealth() {
