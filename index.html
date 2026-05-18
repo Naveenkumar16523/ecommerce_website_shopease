@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SHOP EASE - Modern Fashion</title>
+  <meta name="description" content="Shop EASE – Find clothes that match your style. Browse casual, formal, gym and party wear from top brands.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/app.css">
+  
+  <!-- Theme Initialization Script (Prevents Flash) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('shopease-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Custom Fonts & Base overrides */
+    body { font-family: 'Outfit', sans-serif; background-color: #fafafa; }
+    .hero-title { font-family: 'Syne', sans-serif; }
+    .brand-bar { font-family: 'Syne', sans-serif; letter-spacing: 0.2em; }
+    
+    /* Scrollbar */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Marquee */
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: inline-flex; animation: marquee 35s linear infinite; }
+    
+    /* Smooth Transitions */
+    .page-transition { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism utility */
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+
+    /* FlowingMenu CSS */
+    .menu-wrap { width: 100%; height: 100%; overflow: hidden; }
+    .menu { display: flex; flex-direction: column; height: 100%; margin: 0; padding: 0; }
+    .menu__item { flex: 1; position: relative; overflow: hidden; text-align: center; border-top: 1px solid; }
+    .menu__item:first-child { border-top: none; }
+    .menu__item-link { display: flex; align-items: center; justify-content: center; height: 100%; position: relative; cursor: pointer; text-transform: uppercase; text-decoration: none; white-space: nowrap; font-weight: 600; font-size: 4vh; }
+    .menu__item-link:hover { color: inherit; }
+    .menu__item-link:focus:not(:focus-visible) { color: inherit; }
+    .marquee { position: absolute; top: 0; left: 0; overflow: hidden; width: 100%; height: 100%; pointer-events: none; transform: translate3d(0, 101%, 0); }
+    .marquee__inner-wrap { height: 100%; width: 100%; overflow: hidden; }
+    .marquee__inner { display: flex; align-items: center; position: relative; height: 100%; width: fit-content; will-change: transform; }
+    .marquee__part { display: flex; align-items: center; flex-shrink: 0; }
+    .marquee span { white-space: nowrap; text-transform: uppercase; font-weight: 400; font-size: 4vh; line-height: 1; padding: 0 1vw; }
+    .marquee__img { width: 200px; height: 7vh; margin: 2em 2vw; padding: 1em 0; border-radius: 50px; background-size: cover; background-position: 50% 50%; }
+  </style>
+
+  <script src="/static/common.js?v=1.6" defer></script>
+</head>
+<body class="text-gray-900 overflow-x-hidden antialiased">
+
+  <!-- Fullscreen Loader -->
+  <div id="page-loader" class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+    <div class="relative flex items-center justify-center">
+      <div class="w-20 h-20 border-4 border-gray-800 border-t-white rounded-full animate-spin"></div>
+      <div class="absolute w-12 h-12 bg-white rounded-full opacity-10 animate-ping"></div>
+    </div>
+    <h1 class="hero-title text-white text-5xl mt-8 tracking-[0.2em] animate-pulse">SHOP EASE</h1>
+  </div>
+
+  <div id="nav-placeholder" class="sticky top-0 z-50 glass shadow-sm"></div>
+  <script>
+    fetch('nav.html').then(r => r.text()).then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
+      if (typeof updateAuthUI === 'function') updateAuthUI();
+      if (typeof updateCartBadge === 'function') updateCartBadge();
+    });
+  </script>
+
+  <!-- Main Content Wrapper for Page Transition -->
+  <main class="page-transition">
+    
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] flex flex-col md:flex-row items-center px-6 md:px-16 overflow-hidden bg-white mt-4 mx-4 md:mx-8 rounded-[2.5rem] shadow-[0_0_40px_rgba(0,0,0,0.03)] border border-gray-100 mb-10">
+      
+      <!-- Background floating circles -->
+      <div class="absolute top-20 left-20 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
+      <div class="absolute bottom-20 right-20 w-72 h-72 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse" style="animation-delay: 2s;"></div>
+
+      <div class="max-w-2xl z-10 py-16 md:py-24 text-left w-full animate-on-scroll">
+        
+        <!-- Live status tag -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-200 mb-6">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+          </span>
+          <span class="text-xs font-bold text-green-700 tracking-wide uppercase">New Collection 2025</span>
+        </div>
+
+        <h1 class="hero-title text-5xl sm:text-6xl md:text-[5rem] font-extrabold leading-[1.05] mb-6 text-gray-900 tracking-tight">
+          FIND CLOTHES THAT MATCH YOUR 
+          <span class="relative inline-block">
+            STYLE
+            <svg class="absolute -bottom-1 left-0 w-full h-3 text-yellow-400" viewBox="0 0 100 20" preserveAspectRatio="none">
+              <path stroke-dasharray="1000" stroke-dashoffset="0" class="animate-[dash_2s_ease-out_forwards]" d="M0 15 Q 50 0 100 15" stroke="currentColor" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </h1>
+        
+        <style>
+          @keyframes dash {
+            0% { stroke-dashoffset: 1000; }
+            100% { stroke-dashoffset: 0; }
+          }
+        </style>
+        
+        <p class="text-gray-500 text-base md:text-lg mb-10 max-w-md leading-relaxed font-light">
+          Browse through our diverse range of meticulously crafted garments designed to make you stand out and elevate your everyday wardrobe.
+        </p>
+        
+        <button onclick="document.getElementById('new-arrivals-container').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto bg-black text-white px-10 py-4 rounded-full text-base font-semibold hover:bg-gray-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group">
+          Shop Now
+          <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+        
+        <!-- Stats Section -->
+        <div class="flex flex-wrap gap-8 md:gap-12 mt-16 pt-8 border-t border-gray-100">
+          <div class="hover:-translate-y-1 transition-transform duration-300">
+            <p class="text-3xl md:text-4xl font-black text-black">200+</p>
+            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Brands</p>
+          </div>
+          <div class="hover:-translate-y-1 transition-transform duration-300">
+            <p class="text-3xl md:text-4xl font-black text-black">2,000+</p>
+            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Products</p>
+          </div>
+          <div class="hover:-translate-y-1 transition-transform duration-300">
+            <p class="text-3xl md:text-4xl font-black text-black">30k+</p>
+            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Customers</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 self-stretch flex justify-center items-center relative w-full mt-10 md:mt-0 animate-on-scroll" style="transition-delay: 200ms;">
+        <!-- Soft geometric background card -->
+        <div class="relative w-full max-w-[480px] aspect-[4/5] bg-gray-50 rounded-[3rem] border border-gray-100 overflow-hidden flex items-end justify-center shadow-inner">
+          <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+          <img src="assets/Rectangle2.jpg" alt="Fashion Model" class="relative z-10 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700"/>
+          
+          <!-- Floating Info Badges -->
+          <div class="absolute top-12 -left-4 md:-left-8 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-white/60 flex items-center gap-3 animate-[bounce_4s_ease-in-out_infinite] z-20">
+            <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-sm">✨</div>
+            <div>
+              <p class="text-xs font-extrabold text-gray-900 uppercase tracking-wide">New Arrival</p>
+              <p class="text-[10px] text-gray-500">Just dropped</p>
+            </div>
+          </div>
+
+          <div class="absolute bottom-24 -right-4 md:-right-8 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-white/60 flex items-center gap-3 animate-[bounce_5s_ease-in-out_infinite_reverse] z-20">
+            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs">%</div>
+            <div>
+              <p class="text-xs font-extrabold text-gray-900 uppercase tracking-wide">Big Sale</p>
+              <p class="text-[10px] text-gray-500">Up to 50% Off</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Brand Bar -->
+    <div class="bg-black py-5 overflow-hidden shadow-inner">
+      <div class="animate-marquee whitespace-nowrap items-center brand-bar text-white text-2xl md:text-3xl opacity-80 hover:opacity-100 transition-opacity duration-300">
+        <span class="mx-8">VERSACE</span><span class="mx-8 italic font-light">ZARA</span><span class="mx-8">GUCCI</span><span class="mx-8 font-black tracking-widest">PRADA</span><span class="mx-8 font-light">Calvin Klein</span>
+        <span class="mx-8">VERSACE</span><span class="mx-8 italic font-light">ZARA</span><span class="mx-8">GUCCI</span><span class="mx-8 font-black tracking-widest">PRADA</span><span class="mx-8 font-light">Calvin Klein</span>
+        <span class="mx-8">VERSACE</span><span class="mx-8 italic font-light">ZARA</span><span class="mx-8">GUCCI</span><span class="mx-8 font-black tracking-widest">PRADA</span><span class="mx-8 font-light">Calvin Klein</span>
+      </div>
+    </div>
+  
+    <!-- New Arrivals -->
+    <section class="px-6 md:px-16 py-20 bg-white">
+      <div class="animate-on-scroll">
+        <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight mb-14 hero-title">NEW ARRIVALS</h2>
+      </div>
+      <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 animate-on-scroll" style="transition-delay: 100ms;">
+        <!-- Dynamically populated by JS -->
+      </div>
+      <div class="text-center mt-14 animate-on-scroll">
+        <a href="new-arrivals.html" class="inline-block border-2 border-gray-200 px-12 py-3 rounded-full text-base font-medium hover:bg-black hover:text-white hover:scale-105 hover:shadow-xl transition-all duration-300">
+          View All Products
+        </a>
+      </div>
+    </section>
+  
+    <hr class="border-gray-100 mx-6 md:mx-16"/>
+
+    <!-- Top Selling -->
+    <section class="px-6 md:px-16 py-20 bg-white">
+      <div class="animate-on-scroll">
+        <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight mb-14 hero-title">TOP SELLING</h2>
+      </div>
+      <div id="top-selling-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 animate-on-scroll" style="transition-delay: 100ms;">
+        <!-- Dynamically populated by JS -->
+      </div>
+      <div class="text-center mt-14 animate-on-scroll">
+        <a href="top-selling.html" class="inline-block border-2 border-gray-200 px-12 py-3 rounded-full text-base font-medium hover:bg-black hover:text-white hover:scale-105 hover:shadow-xl transition-all duration-300">
+          View All Products
+        </a>
+      </div>
+    </section>
+
+    <!-- Browse By Style -->
+    <section class="px-6 md:px-16 py-10 bg-white">
+      <div class="bg-[#120F17] rounded-[2.5rem] py-10 shadow-sm animate-on-scroll overflow-hidden" id="flowing-menu-container">
+        <h2 class="text-center text-4xl md:text-5xl font-black mb-6 hero-title text-white tracking-widest">BROWSE BY DRESS STYLE</h2>
+        <div class="menu-wrap px-4">
+          <nav class="menu" id="flowing-menu">
+            <!-- Items generated by JS -->
+          </nav>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white px-6 md:px-16 pt-20 pb-8 mt-10 rounded-t-[3rem] animate-on-scroll">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-12 mb-16">
+        <div class="col-span-2 md:col-span-1">
+          <div class="hero-title text-4xl mb-4 tracking-wider">SHOP EASE</div>
+          <p class="text-sm text-gray-400 leading-relaxed mb-6 font-light">Elevate your style with our premium collection of modern fashion.</p>
+          <div class="flex gap-4">
+            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.56v14.91A4.56 4.56 0 0 1 19.44 24H4.56A4.56 4.56 0 0 1 0 19.44V4.56A4.56 4.56 0 0 1 4.56 0h14.88A4.56 4.56 0 0 1 24 4.56zM9 10H6v3h3v8h4v-8h3l.5-3H13V8.5c0-.8.4-1.5 1.5-1.5H17V4h-2.5C11.4 4 9 6.4 9 9.5V10z"/></svg>
+            </a>
+            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:scale-110 transition-all duration-300">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">COMPANY</div>
+          <ul class="space-y-4 text-sm font-light text-gray-400">
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">About</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Features</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Works</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Career</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">HELP</div>
+          <ul class="space-y-4 text-sm font-light text-gray-400">
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Customer Support</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Delivery Details</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Terms & Conditions</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="font-bold text-sm mb-6 tracking-widest text-gray-300">FAQ</div>
+          <ul class="space-y-4 text-sm font-light text-gray-400">
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Account</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Manage Deliveries</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Orders</a></li>
+            <li><a href="#" class="hover:text-white hover:translate-x-1 inline-block transition-transform duration-300">Payments</a></li>
+          </ul>
+        </div>
+      </div>
+  
+      <hr class="border-gray-800 mb-8"/>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <p class="text-sm font-light text-gray-500">SHOP EASE © 2025–2026, All Rights Reserved</p>
+        <div class="flex items-center gap-3">
+          <div class="bg-gray-800 rounded px-3 py-1.5 text-xs font-bold text-white hover:bg-gray-700 transition-colors">VISA</div>
+          <div class="bg-gray-800 rounded px-3 py-1.5 text-xs font-bold text-white hover:bg-gray-700 transition-colors">PayPal</div>
+          <div class="bg-gray-800 rounded px-3 py-1.5 text-xs font-bold text-white hover:bg-gray-700 transition-colors">G Pay</div>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Animation Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Loader Logic
+      const loader = document.getElementById('page-loader');
+      if (loader) {
+        setTimeout(() => {
+          loader.classList.add('opacity-0', '-translate-y-full');
+          setTimeout(() => loader.remove(), 700);
+        }, 800); // 800ms sleek loading delay
+      }
+
+      // 2. Intersection Observer for Scroll Animations
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+              entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        // Add initial states to elements
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+          el.classList.add('opacity-0', 'translate-y-10', 'scale-95', 'transition-all', 'duration-700', 'ease-out');
+          observer.observe(el);
+        });
+      }
+    });
+
+    // 3. Page Transition handling (intercepting links)
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && link.href && link.target !== '_blank' && link.origin === window.location.origin && !link.hasAttribute('data-no-transition')) {
+        e.preventDefault();
+        document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 300);
+      }
+    });
+  </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const demoItems = [
+        { link: 'casual-category.html', text: 'Casual', image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=80' },
+        { link: 'formal-category.html', text: 'Formal', image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1000&q=80' },
+        { link: 'party-category.html', text: 'Party', image: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1000&q=80' },
+        { link: 'gym-category.html', text: 'Gym', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80' }
+      ];
+
+      const menu = document.getElementById('flowing-menu');
+      if(!menu) return;
+
+      const speed = 15;
+      const animationDefaults = { duration: 0.6, ease: 'expo' };
+
+      const findClosestEdge = (mouseX, mouseY, width, height) => {
+        const topEdgeDist = distMetric(mouseX, mouseY, width / 2, 0);
+        const bottomEdgeDist = distMetric(mouseX, mouseY, width / 2, height);
+        return topEdgeDist < bottomEdgeDist ? 'top' : 'bottom';
+      };
+
+      const distMetric = (x, y, x2, y2) => {
+        const xDiff = x - x2;
+        const yDiff = y - y2;
+        return xDiff * xDiff + yDiff * yDiff;
+      };
+
+      demoItems.forEach(item => {
+        const menuItem = document.createElement('div');
+        menuItem.className = 'menu__item mt-5';
+        menuItem.style.borderColor = '#ffffff33';
+
+        const link = document.createElement('a');
+        link.className = 'menu__item-link';
+        link.href = item.link;
+        link.textContent = item.text;
+        link.style.color = '#fff';
+        link.setAttribute('data-no-transition', 'true');
+
+        const marquee = document.createElement('div');
+        marquee.className = 'marquee';
+        marquee.style.backgroundColor = '#fff';
+
+        const marqueeInnerWrap = document.createElement('div');
+        marqueeInnerWrap.className = 'marquee__inner-wrap';
+
+        const marqueeInner = document.createElement('div');
+        marqueeInner.className = 'marquee__inner';
+        marqueeInner.setAttribute('aria-hidden', 'true');
+
+        // Build parts
+        const buildParts = (repetitions) => {
+          marqueeInner.innerHTML = '';
+          for(let i=0; i<repetitions; i++){
+            const part = document.createElement('div');
+            part.className = 'marquee__part';
+            part.style.color = '#120F17';
+            part.innerHTML = `<span>${item.text}</span><div class="marquee__img" style="background-image: url(${item.image})"></div>`;
+            marqueeInner.appendChild(part);
+          }
+        };
+
+        marqueeInnerWrap.appendChild(marqueeInner);
+        marquee.appendChild(marqueeInnerWrap);
+        menuItem.appendChild(link);
+        menuItem.appendChild(marquee);
+        menu.appendChild(menuItem);
+
+        let animation;
+        const calculateRepetitions = () => {
+          const marqueeContent = marqueeInner.querySelector('.marquee__part');
+          if (!marqueeContent) return;
+          const contentWidth = marqueeContent.offsetWidth || 300; // fallback
+          const viewportWidth = window.innerWidth;
+          const needed = Math.ceil(viewportWidth / contentWidth) + 2;
+          buildParts(Math.max(4, needed));
+
+          if (animation) animation.kill();
+          setTimeout(() => {
+            const newContent = marqueeInner.querySelector('.marquee__part');
+            if(!newContent) return;
+            animation = gsap.to(marqueeInner, {
+              x: -newContent.offsetWidth,
+              duration: speed,
+              ease: 'none',
+              repeat: -1
+            });
+          }, 50);
+        };
+
+        // Initial build
+        buildParts(4);
+        setTimeout(calculateRepetitions, 100);
+        window.addEventListener('resize', calculateRepetitions);
+
+        // Hover logic
+        link.addEventListener('mouseenter', (ev) => {
+          const rect = menuItem.getBoundingClientRect();
+          const x = ev.clientX - rect.left;
+          const y = ev.clientY - rect.top;
+          const edge = findClosestEdge(x, y, rect.width, rect.height);
+
+          gsap.timeline({ defaults: animationDefaults })
+            .set(marquee, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+            .set(marqueeInner, { y: edge === 'top' ? '101%' : '-101%' }, 0)
+            .to([marquee, marqueeInner], { y: '0%' }, 0);
+        });
+
+        link.addEventListener('mouseleave', (ev) => {
+          const rect = menuItem.getBoundingClientRect();
+          const x = ev.clientX - rect.left;
+          const y = ev.clientY - rect.top;
+          const edge = findClosestEdge(x, y, rect.width, rect.height);
+
+          gsap.timeline({ defaults: animationDefaults })
+            .to(marquee, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+            .to(marqueeInner, { y: edge === 'top' ? '101%' : '-101%' }, 0);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
