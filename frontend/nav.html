@@ -153,19 +153,106 @@
     </div>
   </div>
 
-  <div class="glass border-b border-gray-100 overflow-hidden group">
+  <div class="glass border-b border-gray-100 overflow-hidden md:overflow-visible group">
     <div class="max-w-[1440px] mx-auto px-6 md:px-12 relative">
-      <div id="categoryScroll" class="flex items-center gap-10 py-2 overflow-x-auto scrollbar-hide whitespace-nowrap text-[13px] font-medium" style="color: var(--text-secondary)">
+      <div id="categoryScroll" class="flex items-center gap-10 py-2 overflow-x-auto md:overflow-visible scrollbar-hide whitespace-nowrap text-[13px] font-medium" style="color: var(--text-secondary)">
         <a href="/on-sale.html" class="flex items-center hover:scale-105 transition-transform"><span data-t="cat_sale" class="bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest shadow-sm shadow-red-500/30">Sale</span></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_indian">Indian Wear</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_western">Western Wear</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_footwear">Footwear</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_lingerie">Lingerie</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_bags">Bags</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_jewellery">Jewellery</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_active">Active & Sports</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_watches">Watches</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_tech">Tech Acc</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        
+        <!-- Indian Wear -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_indian">Indian Wear</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Kurtas & Suits</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Sarees</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Lehengas</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Anarkalis</a>
+          </div>
+        </div>
+
+        <!-- Western Wear -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_western">Western Wear</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Tops & Tees</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Jeans & Denim</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Dresses</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Shirts & Blazers</a>
+          </div>
+        </div>
+
+        <!-- Footwear -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_footwear">Footwear</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Sneakers</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Flats & Heels</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Casual Shoes</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Formal Shoes</a>
+          </div>
+        </div>
+
+        <!-- Lingerie -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_lingerie">Lingerie</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Bras & Panties</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Sleepwear</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Shapewear</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Loungewear</a>
+          </div>
+        </div>
+
+        <!-- Bags -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_bags">Bags</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Handbags</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Backpacks</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Wallets & Clutches</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Travel Bags</a>
+          </div>
+        </div>
+
+        <!-- Jewellery -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_jewellery">Jewellery</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Necklaces</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Earrings</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Rings & Bracelets</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Fine Jewellery</a>
+          </div>
+        </div>
+
+        <!-- Active & Sports -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_active">Active & Sports</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Sports Tees & Bras</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Tights & Joggers</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Tracksuits & Jackets</a>
+          </div>
+        </div>
+
+        <!-- Watches -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_watches">Watches</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Analog Watches</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Smartwatches</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Chronographs</a>
+          </div>
+        </div>
+
+        <!-- Tech Acc -->
+        <div class="group relative py-2 flex items-center">
+          <a href="#" class="flex items-center gap-1 hover:opacity-70 transition"><span data-t="cat_tech">Tech Acc</span> <svg class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-[110] space-y-1 whitespace-normal text-left">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Phone Cases</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Wireless Earbuds</a>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">Smart Gadgets</a>
+          </div>
+        </div>
       </div>
       <div class="absolute left-0 top-0 bottom-0 flex items-center pl-4 category-scroll-gradient-left pointer-events-none">
         <button onclick="document.getElementById('categoryScroll').scrollBy({left: -200, behavior: 'smooth'})" 
