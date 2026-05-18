@@ -692,10 +692,136 @@ async function migrateLegacyCart() {
   }
 }
 
+// --- Dynamic Category-Specific Sidebar Filters ---
+function updateSidebarFilters() {
+  const filterContainer = document.querySelector('aside .filter-section ul');
+  if (!filterContainer) return;
+
+  const path = window.location.pathname.toLowerCase();
+  let filters = [];
+
+  if (path.includes('indian-')) {
+    filters = [
+      { name: 'Kurtas & Suits', url: 'indian-kurtas.html' },
+      { name: 'Sarees', url: 'indian-sarees.html' },
+      { name: 'Lehengas', url: 'indian-lehengas.html' },
+      { name: 'Anarkalis', url: 'indian-anarkalis.html' }
+    ];
+  } else if (path.includes('western-')) {
+    filters = [
+      { name: 'Tops & Tees', url: 'western-tops.html' },
+      { name: 'Dresses & Jumpsuits', url: 'western-dresses.html' },
+      { name: 'Jeans & Trousers', url: 'western-jeans.html' },
+      { name: 'Shirts', url: 'western-shirts.html' }
+    ];
+  } else if (path.includes('footwear-')) {
+    filters = [
+      { name: 'Flats & Heels', url: 'footwear-heels.html' },
+      { name: 'Sneakers & Casuals', url: 'footwear-sneakers.html' },
+      { name: 'Boots & Formals', url: 'footwear-formal.html' },
+      { name: 'Casuals', url: 'footwear-casual.html' }
+    ];
+  } else if (path.includes('lingerie-')) {
+    filters = [
+      { name: 'Loungewear', url: 'lingerie-loungewear.html' },
+      { name: 'Shapewear', url: 'lingerie-shapewear.html' },
+      { name: 'Sleepwear', url: 'lingerie-sleepwear.html' }
+    ];
+  } else if (path.includes('bags-')) {
+    filters = [
+      { name: 'Handbags & Totes', url: 'bags-handbags.html' },
+      { name: 'Backpacks', url: 'bags-backpacks.html' },
+      { name: 'Clutches & Slings', url: 'bags-travel.html' },
+      { name: 'Wallets', url: 'bags-wallets.html' }
+    ];
+  } else if (path.includes('jewellery-')) {
+    filters = [
+      { name: 'Earrings', url: 'jewellery-earrings.html' },
+      { name: 'Necklaces', url: 'jewellery-necklaces.html' },
+      { name: 'Rings', url: 'jewellery-rings.html' },
+      { name: 'Fine Jewellery', url: 'jewellery-fine.html' }
+    ];
+  } else if (path.includes('active-')) {
+    filters = [
+      { name: 'Sports Tees & Bras', url: 'active-tees.html' },
+      { name: 'Tights & Joggers', url: 'active-tights.html' },
+      { name: 'Tracksuits & Jackets', url: 'active-tracksuits.html' }
+    ];
+  } else if (path.includes('watches-')) {
+    filters = [
+      { name: 'Analog Watches', url: 'watches-analog.html' },
+      { name: 'Smartwatches', url: 'watches-smart.html' },
+      { name: 'Chronographs', url: 'watches-chronographs.html' }
+    ];
+  } else if (path.includes('tech-')) {
+    filters = [
+      { name: 'Phone Cases', url: 'tech-cases.html' },
+      { name: 'Wireless Earbuds', url: 'tech-earbuds.html' },
+      { name: 'Smart Gadgets', url: 'tech-gadgets.html' }
+    ];
+  } else if (path.includes('mens-') || path.includes('mens.html')) {
+    filters = [
+      { name: 'T-shirts', url: 'mens-tshirts.html' },
+      { name: 'Shorts', url: 'mens-shorts.html' },
+      { name: 'Shirts', url: 'mens-shirts.html' },
+      { name: 'Hoodie & Jackets', url: 'mens-jackets.html' },
+      { name: 'Jeans', url: 'mens-jeans.html' }
+    ];
+  } else if (path.includes('womens-') || path.includes('womens.html')) {
+    filters = [
+      { name: 'T-shirts', url: 'womens-tshirts.html' },
+      { name: 'Shorts', url: 'womens-shorts.html' },
+      { name: 'Dresses', url: 'womens-dresses.html' },
+      { name: 'Hoodies', url: 'womens-hoodies.html' },
+      { name: 'Jeans', url: 'womens-jeans.html' }
+    ];
+  } else if (path.includes('kids-') || path.includes('kids.html')) {
+    filters = [
+      { name: 'Baby Boys', url: 'kids-babyboys.html' },
+      { name: 'Baby Girls', url: 'kids-babygirls.html' },
+      { name: 'Toddlers', url: 'kids-toddlers.html' }
+    ];
+  }
+
+  if (filters.length > 0) {
+    filterContainer.innerHTML = filters.map(f => {
+      const isActive = path.includes(f.url.toLowerCase());
+      const activeClass = isActive ? 'text-black font-bold font-semibold' : 'text-gray-500 hover:text-black';
+      return `
+        <li class="flex items-center justify-between cursor-pointer ${activeClass}" onclick="window.location.href='${f.url}'">
+          <span>${f.name}</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </li>
+      `;
+    }).join('');
+  }
+
+  const sectionsContainer = document.querySelector('aside .filter-section:last-of-type ul');
+  if (sectionsContainer && sectionsContainer.previousElementSibling && sectionsContainer.previousElementSibling.textContent.trim() === 'Sections') {
+    sectionsContainer.innerHTML = `
+      <li class="flex items-center justify-between hover:text-black cursor-pointer" onclick="window.location.href='mens.html'">
+        <span>Men</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </li>
+      <li class="flex items-center justify-between hover:text-black cursor-pointer" onclick="window.location.href='womens.html'">
+        <span>Women</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </li>
+      <li class="flex items-center justify-between hover:text-black cursor-pointer" onclick="window.location.href='kids.html'">
+        <span>Kids</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </li>
+    `;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   await migrateLegacyCart();
   await loadLanguage(currentLang);
   translatePage();
   updateCartBadge();
   updateAuthUI();
+  updateSidebarFilters();
 });
