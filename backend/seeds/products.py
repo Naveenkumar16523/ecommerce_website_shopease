@@ -1,13 +1,13 @@
 INITIAL_PRODUCTS = [
     # --- Indian Wear ---
     {"name": "Elegant Embroidered Kurta Set", "price": 120, "category": "kurtas", "rating": 4.5,
-     "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80"},
-    {"name": "Designer Silk Kurta", "price": 180, "category": "kurtas", "rating": 4.8,
-     "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&q=80"},
+     "image": "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?w=600&q=80"},
+    {"name": "Designer Silk Kurta Pajama", "price": 180, "category": "kurtas", "rating": 4.8,
+     "image": "https://images.unsplash.com/photo-1608748010899-18f300247112?w=600&q=80"},
     {"name": "Vibrant Banarasi Silk Saree", "price": 250, "category": "sarees", "rating": 4.9,
-     "image": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&q=80"},
-    {"name": "Elegant Designer Kanchipuram Saree", "price": 290, "category": "sarees", "rating": 4.7,
      "image": "https://images.unsplash.com/photo-1610030469668-93535c17b6b3?w=600&q=80"},
+    {"name": "Elegant Designer Kanchipuram Saree", "price": 290, "category": "sarees", "rating": 4.7,
+     "image": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&q=80"},
     {"name": "Royal Velvet Bridal Lehenga", "price": 450, "category": "lehengas", "rating": 5.0,
      "image": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80"},
     {"name": "Georgette Floral Lehenga Choli", "price": 350, "category": "lehengas", "rating": 4.6,
@@ -15,7 +15,7 @@ INITIAL_PRODUCTS = [
     {"name": "Floral Anarkali Suit", "price": 160, "category": "anarkalis", "rating": 4.4,
      "image": "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=600&q=80"},
     {"name": "Mughal Style Anarkali Gown", "price": 220, "category": "anarkalis", "rating": 4.7,
-     "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&q=80"},
+     "image": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&q=80"},
 
     # --- Western Wear ---
     {"name": "Chiffon Puff Sleeve Top", "price": 65, "category": "tops", "rating": 4.2,
