@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopEase Control Centre — Admin Console</title>
+  <meta name="description" content="Ultra-premium operational admin console for ShopEase Control Centre.">
+  
+  <!-- Font preconnect & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Lucide Icons CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            consoleBg: '#080C14',
+            sidebarBg: '#0D1321',
+            cardBg: 'rgba(17, 24, 39, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            neonCyan: '#00F0FF',
+            neonViolet: '#A020F0',
+            neonGreen: '#39FF14',
+            cyberYellow: '#FFEA00'
+          },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Syne', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #080C14;
+      font-family: 'Outfit', sans-serif;
+    }
+    
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080C14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1F2937;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+
+    /* Glassmorphism Class */
+    .glass-console {
+      background: rgba(13, 19, 33, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .glass-card {
+      background: rgba(17, 24, 39, 0.45);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Glowing Text Effects */
+    .glow-cyan {
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+    }
+    .glow-violet {
+      text-shadow: 0 0 10px rgba(160, 32, 240, 0.6);
+    }
+    .glow-green {
+      text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+    }
+
+    /* Neon Border Glow Animation */
+    @keyframes pulse-cyan {
+      0%, 100% { border-color: rgba(0, 240, 255, 0.2); }
+      50% { border-color: rgba(0, 240, 255, 0.6); }
+    }
+    .glow-border-cyan {
+      animation: pulse-cyan 3s infinite;
+    }
+
+    /* Page Switch Transition */
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Toast Notification CSS */
+    .toast {
+      animation: slideInRight 0.3s ease-out forwards;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+
+  <!-- Route Guard Script (runs before DOM loads to prevent non-admin flash) -->
+  <script>
+    (function() {
+      fetch('/api/me')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.authenticated || !data.is_admin) {
+            window.location.replace('/admin-login.html');
+          } else {
+            document.documentElement.classList.remove('invisible');
+          }
+        })
+        .catch(() => {
+          window.location.replace('/admin-login.html');
+        });
+    })();
+  </script>
+</head>
+<body class="text-gray-100 overflow-x-hidden min-h-screen bg-consoleBg flex">
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" class="fixed inset-0 z-[9999] bg-[#080C14] flex flex-col items-center justify-center">
+    <div class="relative flex items-center justify-center mb-6">
+      <div class="w-16 h-16 border-4 border-gray-800 border-t-neonCyan rounded-full animate-spin"></div>
+      <div class="absolute w-10 h-10 bg-neonCyan rounded-full opacity-10 animate-ping"></div>
+    </div>
+    <p class="font-display tracking-[0.2em] text-xs text-neonCyan glow-cyan uppercase animate-pulse">Establishing Secure Console...</p>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[10000] flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-64 flex-shrink-0 bg-sidebarBg border-r border-borderColor flex flex-col justify-between transition-all duration-300 z-50">
+    <div>
+      <!-- Header / Logo -->
+      <div class="h-20 flex items-center px-6 gap-3 border-b border-borderColor">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-neonViolet to-neonCyan p-[1px] flex items-center justify-center">
+          <div class="w-full h-full bg-sidebarBg rounded-lg flex items-center justify-center">
+            <span class="font-display font-bold text-white text-base">SE</span>
+          </div>
+        </div>
+        <div class="sidebar-text">
+          <h1 class="font-display font-bold text-sm tracking-widest text-white leading-none">SHOPEASE</h1>
+          <span class="text-[9px] font-mono text-neonCyan uppercase tracking-widest">Control Centre</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-4 flex flex-col gap-2">
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-neonCyan bg-white/5 border border-neonCyan/20">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span class="sidebar-text">Dashboard</span>
+        </button>
+        <button onclick="switchTab('products')" id="btn-products" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="package" class="w-4 h-4"></i>
+          <span class="sidebar-text">Products CRUD</span>
+        </button>
+        <button onclick="switchTab('orders')" id="btn-orders" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+          <span class="sidebar-text">Orders Queue</span>
+        </button>
+        <button onclick="switchTab('users')" id="btn-users" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span class="sidebar-text">User Registry</span>
+        </button>
+        <button onclick="switchTab('system')" id="btn-system" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="shield-alert" class="w-4 h-4"></i>
+          <span class="sidebar-text">System Tools</span>
+        </button>
+
+        <!-- 📊 Analytics Header & Buttons -->
+        <div class="px-4 pt-4 pb-2 border-t border-borderColor/20 mt-2">
+          <p class="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
+            <span>Analytics</span>
+          </p>
+        </div>
+        <button onclick="switchTab('revenue')" id="btn-revenue" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="trending-up" class="w-4 h-4"></i>
+          <span class="sidebar-text">Revenue dashboard</span>
+        </button>
+        <button onclick="switchTab('sales-trends')" id="btn-sales-trends" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="line-chart" class="w-4 h-4"></i>
+          <span class="sidebar-text">Sales trends & charts</span>
+        </button>
+        <button onclick="switchTab('business-reports')" id="btn-business-reports" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+          <span class="sidebar-text">Business reports</span>
+        </button>
+        <button onclick="switchTab('export-data')" id="btn-export-data" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span class="sidebar-text">Export (CSV / Excel)</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- User Section footer -->
+    <div class="p-4 border-t border-borderColor">
+      <div class="flex items-center justify-between gap-2 bg-white/5 rounded-lg p-3">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <div class="w-8 h-8 rounded-full bg-neonCyan/20 border border-neonCyan/30 flex items-center justify-center text-neonCyan font-bold text-xs uppercase" id="avatar-letters">
+            AD
+          </div>
+          <div class="sidebar-text overflow-hidden">
+            <p class="text-xs font-semibold text-white truncate" id="admin-name">Administrator</p>
+            <p class="text-[9px] text-gray-400 truncate" id="admin-email">admin@shopease.com</p>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="text-gray-400 hover:text-red-400 transition-colors p-1" title="Secure Exit">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow flex flex-col min-w-0">
+    
+    <!-- TOP BAR -->
+    <header class="h-20 border-b border-borderColor px-8 flex items-center justify-between bg-sidebarBg/50 backdrop-blur-md sticky top-0 z-40">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-1 hover:bg-white/5 rounded-lg mr-2 lg:hidden">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <h2 id="view-title" class="font-display font-bold text-lg text-white uppercase tracking-wider">Dashboard Console</h2>
+      </div>
+
+      <!-- Action Stats -->
+      <div class="flex items-center gap-4">
+        <!-- DB Engine status -->
+        <div class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-borderColor">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neonGreen opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-neonGreen"></span>
+          </span>
+          <span class="text-[10px] font-mono tracking-wider text-gray-400">TiDB Node:</span>
+          <span class="text-[10px] font-mono font-bold text-neonCyan uppercase" id="db-status-label">SQLite</span>
+        </div>
+        <!-- Time -->
+        <div class="hidden sm:flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-borderColor text-[10px] font-mono text-gray-400">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-gray-500"></i>
+          <span id="current-time">00:00:00 UTC</span>
+        </div>
+        <!-- Shop link -->
+        <a href="/index.html" class="flex items-center gap-1.5 text-xs text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-3 py-1.5 rounded-lg transition-colors">
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          <span>View Site</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- CONTENT MODULES -->
+    <div class="p-8 flex-grow overflow-y-auto">
+      
+      <!-- 📊 A. DASHBOARD VIEW -->
+      <section id="view-dashboard" class="tab-view fade-in space-y-8">
+        
+        <!-- Metrics Counters Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Metric 1: Revenue -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-neonCyan/5 rounded-full filter blur-2xl group-hover:bg-neonCyan/10 transition-all"></div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Revenue</span>
+              <div class="p-2 bg-neonCyan/10 border border-neonCyan/20 rounded-xl text-neonCyan">
+                <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="metric-revenue">$0.00</h3>
+            <p class="text-[10px] text-neonGreen font-semibold flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i>
+              <span>+18.4% vs last week</span>
+            </p>
+          </div>
+
+          <!-- Metric 2: Orders -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-neonViolet/5 rounded-full filter blur-2xl group-hover:bg-neonViolet/10 transition-all"></div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Orders</span>
+              <div class="p-2 bg-neonViolet/10 border border-neonViolet/20 rounded-xl text-neonViolet">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="metric-orders">0</h3>
+            <p class="text-[10px] text-neonGreen font-semibold flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i>
+              <span>+12.1% sales surge</span>
+            </p>
+          </div>
+
+          <!-- Metric 3: Average Order Value -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-neonGreen/5 rounded-full filter blur-2xl group-hover:bg-neonGreen/10 transition-all"></div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Avg Order Value</span>
+              <div class="p-2 bg-neonGreen/10 border border-neonGreen/20 rounded-xl text-neonGreen">
+                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="metric-aov">$0.00</h3>
+            <p class="text-[10px] text-neonCyan font-semibold flex items-center gap-1">
+              <i data-lucide="percent" class="w-3 h-3"></i>
+              <span>Highly stable</span>
+            </p>
+          </div>
+
+          <!-- Metric 4: Conversion Rate -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-cyberYellow/5 rounded-full filter blur-2xl group-hover:bg-cyberYellow/10 transition-all"></div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Conversion Rate</span>
+              <div class="p-2 bg-cyberYellow/10 border border-cyberYellow/20 rounded-xl text-cyberYellow">
+                <i data-lucide="activity" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="metric-conversion">0.0%</h3>
+            <p class="text-[10px] text-neonGreen font-semibold flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i>
+              <span>+0.8% dynamic uplift</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Sales Chart & Recent Activities Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Sales Graph -->
+          <div class="lg:col-span-2 glass-card rounded-2xl p-6 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Sales & Uptime Monitor</h4>
+                <p class="text-[10px] text-gray-400">Aggregated daily revenue transaction metrics</p>
+              </div>
+              <div class="flex gap-2">
+                <span class="px-2.5 py-1 text-[9px] bg-white/5 rounded-lg border border-borderColor font-mono text-neonCyan">30 DAYS</span>
+              </div>
+            </div>
+            <div class="h-64 relative w-full flex items-center justify-center">
+              <canvas id="salesChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
+
+          <!-- Live Activity Log -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col">
+            <div class="flex items-center justify-between mb-6 border-b border-borderColor pb-4">
+              <div>
+                <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Control Centre Log</h4>
+                <p class="text-[10px] text-gray-400">Live operational & activity stream</p>
+              </div>
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neonCyan opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-neonCyan"></span>
+              </span>
+            </div>
+            
+            <!-- Feed scroll list -->
+            <div id="activity-feed" class="flex-grow space-y-4 max-h-[250px] overflow-y-auto pr-2">
+              <div class="text-center py-8 text-xs text-gray-500 font-mono">Listening to real-time events...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🛍️ B. PRODUCT CRUD VIEW -->
+      <section id="view-products" class="tab-view fade-in hidden space-y-6">
+        
+        <!-- Controls row -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 border border-borderColor rounded-2xl p-4">
+          <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <!-- Search input -->
+            <div class="relative w-full sm:w-64">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-gray-500"></i>
+              <input type="text" id="product-search" oninput="loadProducts(1)" placeholder="Search products..." class="w-full bg-[#0E1321] border border-borderColor rounded-lg pl-10 pr-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-neonCyan transition-colors">
+            </div>
+            <!-- Category Filter -->
+            <select id="product-category" onchange="loadProducts(1)" class="bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-gray-400 focus:outline-none focus:border-neonCyan transition-colors">
+              <option value="">All Categories</option>
+              <option value="casual">Casual</option>
+              <option value="formal">Formal</option>
+              <option value="party">Party</option>
+              <option value="gym">Gym</option>
+              <option value="footwear">Footwear</option>
+              <option value="watches">Watches</option>
+              <option value="bags">Bags</option>
+              <option value="kids">Kids</option>
+              <option value="jewellery">Jewellery</option>
+              <option value="tech">Tech Accessories</option>
+            </select>
+          </div>
+          <!-- Add Button -->
+          <button onclick="openProductDrawer()" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs px-5 py-3 rounded-lg hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add New Product</span>
+          </button>
+        </div>
+
+        <!-- Products Table Container -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Item Detail</th>
+                  <th class="p-4">Category</th>
+                  <th class="p-4">Price</th>
+                  <th class="p-4">Rating</th>
+                  <th class="p-4 text-right">Operations</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="products-pagination">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 📦 C. ORDERS VIEW -->
+      <section id="view-orders" class="tab-view fade-in hidden space-y-6">
+        
+        <!-- Table container -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Order ID</th>
+                  <th class="p-4">Client</th>
+                  <th class="p-4">Total Value</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4">Placed Date</th>
+                  <th class="p-4 text-right">Fulfillment</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="orders-pagination">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 👥 D. USERS VIEW -->
+      <section id="view-users" class="tab-view fade-in hidden space-y-6">
+        
+        <!-- Table container -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">User Details</th>
+                  <th class="p-4">Role</th>
+                  <th class="p-4">Contact</th>
+                  <th class="p-4">Order Count</th>
+                  <th class="p-4">Total Spent</th>
+                  <th class="p-4 text-right">Access Controls</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body" class="divide-y divide-borderColor/40 text-xs">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-borderColor bg-white/5 flex items-center justify-between" id="users-pagination">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 🛡️ E. SYSTEM TOOLS VIEW -->
+      <section id="view-system" class="tab-view fade-in hidden space-y-8">
+        
+        <!-- System Status Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <!-- TiDB Database latency panel -->
+          <div class="glass-card rounded-2xl p-6 glow-border-cyan flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white flex items-center gap-2">
+                  <i data-lucide="database" class="w-4 h-4 text-neonCyan"></i>
+                  <span>TiDB Cloud Telemetry</span>
+                </h4>
+                <span class="text-[9px] font-mono bg-neonGreen/20 text-neonGreen px-2 py-0.5 rounded uppercase font-bold tracking-wider">Healthy</span>
+              </div>
+              <p class="text-xs text-gray-400 leading-relaxed mb-6">
+                Active operational connection to Google Cloud TiDB Cluster database. Monitored query transaction speed and database response logs.
+              </p>
+              
+              <!-- Metrics gauge representation -->
+              <div class="space-y-4 font-mono">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-400">Rountrip Query Latency:</span>
+                  <span class="text-neonCyan font-bold" id="telemetry-latency">-- ms</span>
+                </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-borderColor">
+                  <div id="telemetry-latency-bar" class="bg-gradient-to-r from-neonCyan to-neonViolet h-full w-0 transition-all duration-500"></div>
+                </div>
+                <div class="flex justify-between items-center text-[10px] text-gray-500">
+                  <span>0ms</span>
+                  <span>Optimal (<= 250ms)</span>
+                  <span>1000ms</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="border-t border-borderColor mt-6 pt-4 flex justify-between items-center text-xs font-mono">
+              <span class="text-gray-500">Connection Engine:</span>
+              <span class="text-white" id="telemetry-engine">---</span>
+            </div>
+          </div>
+
+          <!-- DB Row metrics count -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white flex items-center gap-2 mb-4">
+                <i data-lucide="bar-chart" class="w-4 h-4 text-neonViolet"></i>
+                <span>Database Allocation</span>
+              </h4>
+              <p class="text-xs text-gray-400 leading-relaxed mb-6">
+                Table record allocation and volume counters for products, users, wishlists, and purchase records.
+              </p>
+              
+              <div class="grid grid-cols-2 gap-4 font-mono text-xs">
+                <div class="bg-white/5 p-3 rounded-lg border border-borderColor flex justify-between items-center">
+                  <span class="text-gray-400">Products:</span>
+                  <span class="text-white font-bold" id="rowcount-products">--</span>
+                </div>
+                <div class="bg-white/5 p-3 rounded-lg border border-borderColor flex justify-between items-center">
+                  <span class="text-gray-400">Users:</span>
+                  <span class="text-white font-bold" id="rowcount-users">--</span>
+                </div>
+                <div class="bg-white/5 p-3 rounded-lg border border-borderColor flex justify-between items-center">
+                  <span class="text-gray-400">Orders:</span>
+                  <span class="text-white font-bold" id="rowcount-orders">--</span>
+                </div>
+                <div class="bg-white/5 p-3 rounded-lg border border-borderColor flex justify-between items-center">
+                  <span class="text-gray-400">Items Sold:</span>
+                  <span class="text-white font-bold" id="rowcount-items">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seed & Safety wipes -->
+        <div class="glass-card rounded-2xl p-6 border border-red-500/20 bg-red-950/5">
+          <h4 class="font-display font-bold text-sm tracking-wider uppercase text-red-400 flex items-center gap-2 mb-4">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+            <span>System Wipes & Core Database Operations</span>
+          </h4>
+          <p class="text-xs text-gray-400 leading-relaxed mb-6 max-w-2xl">
+            Execute master database seeds or drop transactional tables. These operations directly mutate raw SQL datasets inside SQLite/TiDB configurations and cannot be easily undone.
+          </p>
+
+          <div class="flex flex-wrap gap-4">
+            <!-- Wipe & Seed Products -->
+            <button onclick="triggerSeeding()" class="flex items-center gap-2 border border-neonCyan/30 bg-neonCyan/5 hover:bg-neonCyan/15 hover:border-neonCyan text-neonCyan font-semibold text-xs px-5 py-3 rounded-lg transition-all">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>Wipe & Seed Product Inventory</span>
+            </button>
+            <!-- Wipe Order History -->
+            <button onclick="triggerWipeOrders()" class="flex items-center gap-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 hover:border-red-500 text-red-400 font-semibold text-xs px-5 py-3 rounded-lg transition-all">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <span>Purge Transaction Order History</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 📈 REVENUE DASHBOARD VIEW -->
+      <section id="view-revenue" class="tab-view fade-in hidden space-y-8">
+        
+        <!-- Header details -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/5 border border-borderColor rounded-2xl p-6">
+          <div>
+            <h3 class="text-lg font-display font-bold text-white uppercase tracking-wider">Revenue Breakdown & Performance</h3>
+            <p class="text-xs text-gray-400 mt-1">Detailed operational analysis of cash flows, margins, and category performance.</p>
+          </div>
+          <!-- Dynamic progress info -->
+          <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-borderColor/40">
+            <div class="text-xs font-mono">
+              <span class="text-gray-400 uppercase tracking-wider block text-[9px] mb-1">Monthly Milestone Target ($10,000)</span>
+              <div class="flex items-center gap-2">
+                <span class="text-white font-bold" id="revenue-milestone-label">$0.00</span>
+                <span class="text-neonCyan font-bold text-[10px]" id="revenue-milestone-pct">(0%)</span>
+              </div>
+            </div>
+            <div class="w-32 bg-white/10 h-2.5 rounded-full overflow-hidden border border-borderColor">
+              <div id="revenue-milestone-bar" class="bg-gradient-to-r from-neonCyan to-neonViolet h-full w-0 transition-all duration-500"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue KPI Summary Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estimated Gross Revenue</span>
+              <div class="p-2 bg-neonCyan/10 border border-neonCyan/20 rounded-xl text-neonCyan">
+                <i data-lucide="banknote" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="revenue-gross">$0.00</h3>
+            <p class="text-[10px] text-gray-400 font-semibold">Total captured sales volume</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estimated Net Profit (70% Margin)</span>
+              <div class="p-2 bg-neonGreen/10 border border-neonGreen/20 rounded-xl text-neonGreen">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="revenue-profit">$0.00</h3>
+            <p class="text-[10px] text-neonGreen font-semibold flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i>
+              <span>High profit coefficient</span>
+            </p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group font-sans">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Average Order Revenue</span>
+              <div class="p-2 bg-neonViolet/10 border border-neonViolet/20 rounded-xl text-neonViolet">
+                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold font-mono tracking-tight text-white mb-1" id="revenue-aov">$0.00</h3>
+            <p class="text-[10px] text-gray-400 font-semibold">Average receipt value per checkout</p>
+          </div>
+        </div>
+
+        <!-- Revenue Charts Section: Category Revenue & Payment Split -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Category Sales Breakdown -->
+          <div class="lg:col-span-2 glass-card rounded-2xl p-6 flex flex-col justify-between">
+            <div class="mb-4">
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Revenue by Category</h4>
+              <p class="text-[10px] text-gray-400">Total volume breakdown from products categorized under TiDB/SQLite</p>
+            </div>
+            <div class="space-y-4" id="revenue-category-list">
+              <!-- Dynamically populated category bars -->
+              <div class="text-center py-8 text-xs text-gray-500 font-mono">Scanning categories...</div>
+            </div>
+          </div>
+
+          <!-- Payment Methods & Channels -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col">
+            <div class="border-b border-borderColor pb-4 mb-4">
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Payment Split</h4>
+              <p class="text-[10px] text-gray-400">Estimated distribution of transaction methods</p>
+            </div>
+            <!-- Progress breakdown -->
+            <div class="space-y-4 font-mono text-xs flex-grow justify-center flex flex-col">
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300 font-semibold flex items-center gap-1.5"><i data-lucide="credit-card" class="w-3.5 h-3.5 text-neonCyan"></i> Credit Card</span>
+                  <span class="text-white font-bold">45%</span>
+                </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-borderColor"><div class="bg-neonCyan h-full w-[45%]"></div></div>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300 font-semibold flex items-center gap-1.5"><i data-lucide="smartphone" class="w-3.5 h-3.5 text-neonGreen"></i> UPI / Bank Transfer</span>
+                  <span class="text-white font-bold">30%</span>
+                </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-borderColor"><div class="bg-neonGreen h-full w-[30%]"></div></div>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300 font-semibold flex items-center gap-1.5"><i data-lucide="truck" class="w-3.5 h-3.5 text-cyberYellow"></i> Cash On Delivery</span>
+                  <span class="text-white font-bold">15%</span>
+                </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-borderColor"><div class="bg-cyberYellow h-full w-[15%]"></div></div>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300 font-semibold flex items-center gap-1.5"><i data-lucide="globe" class="w-3.5 h-3.5 text-neonViolet"></i> PayPal & Stripe</span>
+                  <span class="text-white font-bold">10%</span>
+                </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-borderColor"><div class="bg-neonViolet h-full w-[10%]"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 📉 SALES TRENDS & CHARTS VIEW -->
+      <section id="view-sales-trends" class="tab-view fade-in hidden space-y-8">
+        
+        <!-- Controls & Configuration Header -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 border border-borderColor rounded-2xl p-4 font-sans">
+          <div>
+            <h3 class="text-sm font-display font-bold text-white uppercase tracking-wider">Dynamic Trend Visualizations</h3>
+            <p class="text-[10px] text-gray-400">Configure visual analysis layers for executive presentation panels.</p>
+          </div>
+          <!-- Chart configurations -->
+          <div class="flex gap-3">
+            <select id="trend-timeframe" onchange="updateTrendsChart()" class="bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-gray-400 focus:outline-none focus:border-neonCyan transition-colors">
+              <option value="30">Last 30 Days</option>
+              <option value="7">Last 7 Days</option>
+              <option value="365">Last 12 Months</option>
+            </select>
+            <select id="trend-chart-type" onchange="updateTrendsChart()" class="bg-[#0E1321] border border-borderColor rounded-lg px-4 py-2.5 text-xs text-gray-400 focus:outline-none focus:border-neonCyan transition-colors">
+              <option value="line">Line Graph</option>
+              <option value="bar">Bar Chart</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Main Big Sales Graph -->
+        <div class="glass-card rounded-2xl p-6 font-sans">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white" id="trends-chart-title">Revenue & Orders over time</h4>
+              <p class="text-[10px] text-gray-400">Aggregated sales performance tracking</p>
+            </div>
+            <div class="flex gap-4 text-[10px] font-mono text-gray-400">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-neonCyan"></span> Revenue</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-neonViolet"></span> Orders</span>
+            </div>
+          </div>
+          <div class="h-80 relative w-full flex items-center justify-center">
+            <canvas id="trendsChart" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Category Pie & Top Products Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-sans">
+          <!-- Bestselling Categories (Doughnut) -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+            <div class="mb-4">
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Product Category Breakdown</h4>
+              <p class="text-[10px] text-gray-400">Sales volume percentages by category division</p>
+            </div>
+            <div class="h-64 relative w-full flex items-center justify-center">
+              <canvas id="categoryChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
+
+          <!-- Top-Selling Products (Bar Chart) -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+            <div class="mb-4">
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Best-Selling Product Inventory</h4>
+              <p class="text-[10px] text-gray-400">Catalog rank sorted by total sales count</p>
+            </div>
+            <div class="h-64 relative w-full flex items-center justify-center">
+              <canvas id="topProductsChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 📋 BUSINESS REPORTS VIEW -->
+      <section id="view-business-reports" class="tab-view fade-in hidden space-y-8">
+        
+        <!-- Summary widgets cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans">
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Taxes Collected (18% GST)</span>
+            <h4 class="text-2xl font-bold font-mono text-white" id="report-stat-tax">$0.00</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Estimated Shipping Fees</span>
+            <h4 class="text-2xl font-bold font-mono text-white" id="report-stat-shipping">$0.00</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Core Catalog Categories</span>
+            <h4 class="text-2xl font-bold font-mono text-white" id="report-stat-categories">--</h4>
+          </div>
+          <div class="glass-card rounded-xl p-5 border border-borderColor">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mb-1">Top Performing Category</span>
+            <h4 class="text-xl font-bold font-display text-neonCyan uppercase" id="report-stat-top-cat">---</h4>
+          </div>
+        </div>
+
+        <!-- Sales breakdown table -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-borderColor font-sans">
+          <div class="p-6 border-b border-borderColor bg-white/5 flex justify-between items-center">
+            <div>
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Daily Transactions & Revenue Breakdown</h4>
+              <p class="text-[10px] text-gray-400">Detailed financial analysis of customer receipts and estimated costs</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-borderColor bg-white/5 text-[10px] uppercase font-mono tracking-widest text-gray-400">
+                  <th class="p-4">Report Date</th>
+                  <th class="p-4">Total Orders</th>
+                  <th class="p-4">Gross Revenue</th>
+                  <th class="p-4">Avg Order Value</th>
+                  <th class="p-4">Estimated Tax (18%)</th>
+                  <th class="p-4">Net Income</th>
+                </tr>
+              </thead>
+              <tbody id="report-sales-body" class="divide-y divide-borderColor/40 text-xs font-mono">
+                <!-- Dynamically loaded daily sales summary rows -->
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-gray-500">Compiling financial indexes...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Two column grid for: low stock alerts & highest spender report -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
+          
+          <!-- Top Spenders -->
+          <div class="glass-card rounded-2xl overflow-hidden border border-borderColor flex flex-col">
+            <div class="p-6 border-b border-borderColor bg-white/5">
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Top Spending Customer Registry</h4>
+              <p class="text-[10px] text-gray-400">Highest volume user accounts linked to order checkouts</p>
+            </div>
+            <div class="overflow-x-auto w-full flex-grow">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-borderColor bg-white/5 text-[9px] uppercase font-mono tracking-wider text-gray-400">
+                    <th class="p-3">Client</th>
+                    <th class="p-3 text-center">Orders</th>
+                    <th class="p-3 text-right">Total Spent</th>
+                  </tr>
+                </thead>
+                <tbody id="report-users-body" class="divide-y divide-borderColor/30 text-xs">
+                  <!-- Dynamically populated spenders -->
+                  <tr>
+                    <td colspan="3" class="p-6 text-center text-gray-500">Querying user registry...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Inventory Alerts -->
+          <div class="glass-card rounded-2xl overflow-hidden border border-borderColor flex flex-col">
+            <div class="p-6 border-b border-borderColor bg-white/5">
+              <h4 class="font-display font-bold text-sm tracking-wider uppercase text-white">Low Inventory & stock warnings</h4>
+              <p class="text-[10px] text-gray-400">Products currently with high rankings but needing operational attention</p>
+            </div>
+            <div class="overflow-x-auto w-full flex-grow">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-borderColor bg-white/5 text-[9px] uppercase font-mono tracking-wider text-gray-400">
+                    <th class="p-3">Product Name</th>
+                    <th class="p-3">Category</th>
+                    <th class="p-3 text-center">Current Rating</th>
+                    <th class="p-3 text-right">Action Needed</th>
+                  </tr>
+                </thead>
+                <tbody id="report-inventory-body" class="divide-y divide-borderColor/30 text-xs">
+                  <!-- Dynamically populated warning products -->
+                  <tr>
+                    <td colspan="4" class="p-6 text-center text-gray-500">Assessing stock metrics...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- 📥 EXPORT (CSV / EXCEL) VIEW -->
+      <section id="view-export-data" class="tab-view fade-in hidden space-y-6">
+        
+        <div class="bg-white/5 border border-borderColor rounded-2xl p-6 font-sans">
+          <h3 class="text-lg font-display font-bold text-white uppercase tracking-wider">Dataset Generation Center</h3>
+          <p class="text-xs text-gray-400 mt-1">Download flat file archives of key transactional and relational relational databases inside ShopEase.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+          
+          <!-- Export 1: Revenue -->
+          <div class="glass-card rounded-2xl p-6 border border-borderColor flex flex-col justify-between">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <span class="text-[10px] font-mono text-neonCyan uppercase tracking-widest block mb-1">Financial Report</span>
+                <h4 class="text-base font-bold text-white font-display uppercase">Revenue & Sales Summary CSV</h4>
+                <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                  Generates a full history of daily transaction revenues, order counts, and tax calculations. Optimized for immediate import inside Excel or Google Sheets.
+                </p>
+              </div>
+              <div class="p-3 bg-neonCyan/10 rounded-xl text-neonCyan border border-neonCyan/20">
+                <i data-lucide="trending-up" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <button onclick="downloadCSV('revenue')" class="w-full flex items-center justify-center gap-2 border border-neonCyan/30 bg-neonCyan/5 hover:bg-neonCyan/15 text-neonCyan font-semibold text-xs px-4 py-3 rounded-lg transition-all">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Generate Sales Report CSV</span>
+            </button>
+          </div>
+
+          <!-- Export 2: Products -->
+          <div class="glass-card rounded-2xl p-6 border border-borderColor flex flex-col justify-between">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <span class="text-[10px] font-mono text-neonViolet uppercase tracking-widest block mb-1">Catalog Report</span>
+                <h4 class="text-base font-bold text-white font-display uppercase">Product Inventory Sheet</h4>
+                <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                  Downloads a CSV copy of all product listings, prices, slugs, ratings, and classifications directly from active database storage.
+                </p>
+              </div>
+              <div class="p-3 bg-neonViolet/10 rounded-xl text-neonViolet border border-neonViolet/20">
+                <i data-lucide="package" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <button onclick="downloadCSV('products')" class="w-full flex items-center justify-center gap-2 border border-neonViolet/30 bg-neonViolet/5 hover:bg-neonViolet/15 text-neonViolet font-semibold text-xs px-4 py-3 rounded-lg transition-all">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Download Catalog CSV</span>
+            </button>
+          </div>
+
+          <!-- Export 3: Orders -->
+          <div class="glass-card rounded-2xl p-6 border border-borderColor flex flex-col justify-between">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <span class="text-[10px] font-mono text-cyberYellow uppercase tracking-widest block mb-1">Fulfillment Report</span>
+                <h4 class="text-base font-bold text-white font-display uppercase">Order Fulfillment Ledger</h4>
+                <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                  Generates an exhaustive list of all client orders, including contact details, shipping addresses, fulfillment status, and total checkout amounts.
+                </p>
+              </div>
+              <div class="p-3 bg-cyberYellow/10 rounded-xl text-cyberYellow border border-cyberYellow/20">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <button onclick="downloadCSV('orders')" class="w-full flex items-center justify-center gap-2 border border-cyberYellow/30 bg-cyberYellow/5 hover:bg-cyberYellow/15 text-cyberYellow font-semibold text-xs px-4 py-3 rounded-lg transition-all">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Download Orders Ledger CSV</span>
+            </button>
+          </div>
+
+          <!-- Export 4: Users -->
+          <div class="glass-card rounded-2xl p-6 border border-borderColor flex flex-col justify-between">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <span class="text-[10px] font-mono text-neonGreen uppercase tracking-widest block mb-1">User Directory</span>
+                <h4 class="text-base font-bold text-white font-display uppercase">Customer Registry Ledger</h4>
+                <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                  Compiles a spreadsheet report of all registered users, authorization roles, contact details, total spent balances, and join timestamps.
+                </p>
+              </div>
+              <div class="p-3 bg-neonGreen/10 rounded-xl text-neonGreen border border-neonGreen/20">
+                <i data-lucide="users" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <button onclick="downloadCSV('users')" class="w-full flex items-center justify-center gap-2 border border-neonGreen/30 bg-neonGreen/5 hover:bg-neonGreen/15 text-neonGreen font-semibold text-xs px-4 py-3 rounded-lg transition-all">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Download Registry CSV</span>
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- PRODUCT SLIDE-OUT PANEL DRAWER -->
+  <div id="product-drawer" class="fixed inset-y-0 right-0 w-[450px] bg-sidebarBg border-l border-borderColor z-[999] shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out">
+    <div>
+      <!-- Drawer Header -->
+      <div class="p-6 border-b border-borderColor flex items-center justify-between">
+        <h4 id="drawer-title" class="font-display font-bold text-sm text-white uppercase tracking-widest">Add Product</h4>
+        <button onclick="closeProductDrawer()" class="text-gray-400 hover:text-white p-1 hover:bg-white/5 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <!-- Drawer Form -->
+      <form id="product-form" onsubmit="handleProductSubmit(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="form-product-id">
+        <!-- Title -->
+        <div class="space-y-1.5">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Product Name</label>
+          <input type="text" id="form-product-name" required placeholder="e.g. Vintage Leather Jacket" class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
+        </div>
+        <!-- Price & Category row -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Price (USD)</label>
+            <input type="number" step="0.01" id="form-product-price" required placeholder="99.99" class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Category</label>
+            <select id="form-product-category" required class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-gray-400 focus:outline-none focus:border-neonCyan transition-colors">
+              <option value="casual">Casual</option>
+              <option value="formal">Formal</option>
+              <option value="party">Party</option>
+              <option value="gym">Gym</option>
+              <option value="footwear">Footwear</option>
+              <option value="watches">Watches</option>
+              <option value="bags">Bags</option>
+              <option value="kids">Kids</option>
+              <option value="jewellery">Jewellery</option>
+              <option value="tech">Tech Accessories</option>
+            </select>
+          </div>
+        </div>
+        <!-- Unsplash URL -->
+        <div class="space-y-1.5">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Image Resource (Unsplash URL)</label>
+          <input type="url" id="form-product-image" required placeholder="https://images.unsplash.com/photo-..." class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
+        </div>
+        <!-- Rating -->
+        <div class="space-y-1.5">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Default Rating</label>
+          <input type="number" step="0.1" min="1" max="5" id="form-product-rating" placeholder="4.5" class="w-full bg-[#0E1321] border border-borderColor rounded-lg p-3 text-white focus:outline-none focus:border-neonCyan transition-colors">
+        </div>
+        
+        <button type="submit" id="form-submit-btn" class="w-full bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs py-3.5 rounded-lg hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all">
+          Save Product
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ORDER INSPECTOR GLASS MODAL -->
+  <div id="order-modal" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-4 bg-consoleBg/80 backdrop-blur-md">
+    <div class="w-full max-w-xl glass-console rounded-2xl overflow-hidden border border-borderColor flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="p-6 border-b border-borderColor flex items-center justify-between">
+        <div>
+          <h4 class="font-display font-bold text-sm text-white uppercase tracking-widest" id="modal-order-title">Inspect Order #--</h4>
+          <p class="text-[10px] text-gray-400" id="modal-order-date">Placed on: ----</p>
+        </div>
+        <button onclick="closeOrderModal()" class="text-gray-400 hover:text-white p-1 hover:bg-white/5 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <!-- Scroll contents -->
+      <div class="p-6 overflow-y-auto space-y-6 text-xs text-gray-300">
+        <!-- Client detail -->
+        <div class="grid grid-cols-2 gap-4 border-b border-borderColor/40 pb-4 font-mono text-[10px]">
+          <div>
+            <p class="text-gray-500 uppercase tracking-wider mb-1">Customer</p>
+            <p class="text-white font-bold" id="modal-customer-name">----</p>
+            <p class="text-gray-400" id="modal-customer-email">----</p>
+          </div>
+          <div>
+            <p class="text-gray-500 uppercase tracking-wider mb-1">Shipping Details</p>
+            <p class="text-white" id="modal-shipping-name">----</p>
+            <p class="text-gray-400 leading-tight" id="modal-shipping-address">----</p>
+            <p class="text-gray-400 mt-1" id="modal-shipping-phone">----</p>
+          </div>
+        </div>
+
+        <!-- Items table -->
+        <div>
+          <h5 class="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-3">Line Items</h5>
+          <div class="space-y-3" id="modal-items-list">
+            <!-- Loaded -->
+          </div>
+        </div>
+
+        <!-- Bottom details -->
+        <div class="flex justify-between items-center border-t border-borderColor/40 pt-4">
+          <div class="font-mono text-[10px]">
+            <p class="text-gray-500 uppercase tracking-wider">Method</p>
+            <p class="text-white font-bold" id="modal-shipping-method">Standard</p>
+          </div>
+          <div class="text-right">
+            <span class="text-gray-500 font-mono text-[10px] uppercase tracking-wider block mb-1">Grand Total</span>
+            <span class="text-2xl font-bold font-mono text-white glow-cyan" id="modal-order-total">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROL SYSTEM SCRIPTS -->
+  <script>
+    // System vars
+    let activeTab = 'dashboard';
+    let currentAdmin = null;
+    let salesChart = null;
+    let productsList = [];
+    let activityLog = [];
+
+    // On Load
+    document.addEventListener("DOMContentLoaded", () => {
+      // Establish auth
+      fetch('/api/me')
+        .then(res => res.json())
+        .then(data => {
+          currentAdmin = data;
+          document.getElementById('admin-name').textContent = data.name || 'Admin';
+          document.getElementById('admin-email').textContent = data.email || 'admin@shopease.com';
+          
+          const letters = (data.name || 'AD').split(' ').map(n => n[0]).join('').slice(0,2);
+          document.getElementById('avatar-letters').textContent = letters;
+
+          // Start interval clock
+          setInterval(updateClock, 1000);
+          updateClock();
+
+          // Load first dashboard content
+          initDashboard();
+          
+          // Remove loading overlay
+          setTimeout(() => {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.remove();
+            showToast('Secure Console Session Established', 'success');
+          }, 600);
+        })
+        .catch(() => {
+          window.location.replace('/index.html');
+        });
+    });
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('current-time').textContent = now.toUTCString().replace('GMT', 'UTC');
+    }
+
+    // Sidebar Toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    // Toast Notification Manager
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast glass-console p-4 rounded-xl shadow-lg flex items-center gap-3 border pointer-events-auto min-w-[280px] max-w-sm`;
+      
+      let icon = 'info';
+      let borderClass = 'border-neonCyan/30 text-neonCyan';
+      if (type === 'success') {
+        icon = 'check-circle';
+        borderClass = 'border-neonGreen/30 text-neonGreen';
+      } else if (type === 'error') {
+        icon = 'alert-triangle';
+        borderClass = 'border-red-500/30 text-red-400';
+      }
+      
+      toast.className += ` ${borderClass}`;
+      toast.innerHTML = `
+        <i data-lucide="${icon}" class="w-5 h-5 flex-shrink-0"></i>
+        <div class="text-xs font-semibold text-white">${message}</div>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+        setTimeout(() => toast.remove(), 500);
+      }, 3500);
+    }
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      if (activeTab === tabId) return;
+      
+      // Update buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = btn.className.replace('text-neonCyan bg-white/5 border border-neonCyan/20', 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent');
+      });
+      
+      const activeBtn = document.getElementById(`btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = activeBtn.className.replace('text-gray-400 hover:text-white hover:bg-white/5 border border-transparent', 'text-neonCyan bg-white/5 border border-neonCyan/20');
+      }
+
+      // Update Views
+      document.querySelectorAll('.tab-view').forEach(view => {
+        view.classList.add('hidden');
+      });
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+      // Update header
+      let title = "Dashboard Console";
+      if (tabId === 'products') title = "Product Inventory Manager";
+      if (tabId === 'orders') title = "Fulfillment & Orders Centre";
+      if (tabId === 'users') title = "Customer Directory & Status";
+      if (tabId === 'system') title = "TiDB Engine & Controls";
+      if (tabId === 'revenue') title = "Revenue Performance & Analysis";
+      if (tabId === 'sales-trends') title = "Interactive Trend Visualizations";
+      if (tabId === 'business-reports') title = "Business Reports Ledger";
+      if (tabId === 'export-data') title = "Database Export Center";
+      document.getElementById('view-title').textContent = title;
+
+      activeTab = tabId;
+
+      // Lazy loads
+      if (tabId === 'dashboard') initDashboard();
+      if (tabId === 'products') loadProducts(1);
+      if (tabId === 'orders') loadOrders(1);
+      if (tabId === 'users') loadUsers(1);
+      if (tabId === 'system') loadSystemHealth();
+      if (tabId === 'revenue') initRevenueDashboard();
+      if (tabId === 'sales-trends') initTrendsDashboard();
+      if (tabId === 'business-reports') initBusinessReports();
+    }
+
+    // ─── A. DASHBOARD CONTROLS ──────────────────────────────────────────
+    function initDashboard() {
+      fetch('/api/admin/stats')
+        .then(res => res.json())
+        .then(data => {
+          // Update counters
+          document.getElementById('metric-revenue').textContent = `$${data.metrics.total_revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('metric-orders').textContent = data.metrics.total_orders;
+          document.getElementById('metric-aov').textContent = `$${data.metrics.aov.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('metric-conversion').textContent = `${data.metrics.conversion_rate}%`;
+
+          // Activity Feed
+          const feed = document.getElementById('activity-feed');
+          feed.innerHTML = '';
+          
+          const events = [];
+          data.recent_orders.forEach(o => {
+            events.push({
+              time: new Date(o.created_at),
+              type: 'order',
+              content: `<span class="text-neonCyan font-bold font-mono">ORDER #${o.id}</span> placed by <span class="text-white">${o.user_name}</span> for <span class="text-neonGreen font-mono font-bold">$${o.total.toFixed(2)}</span>`
+            });
+          });
+
+          data.recent_users.forEach(u => {
+            events.push({
+              time: new Date(u.created_at),
+              type: 'user',
+              content: `<span class="text-neonViolet font-bold">REGISTRATION:</span> <span class="text-white">${u.name}</span> (${u.email}) joined ShopEase console`
+            });
+          });
+
+          // Sort events chronologically descending
+          events.sort((a,b) => b.time - a.time);
+
+          if (events.length === 0) {
+            feed.innerHTML = '<div class="text-center py-8 text-xs text-gray-500 font-mono">No recent activity detected.</div>';
+          } else {
+            events.forEach(ev => {
+              const row = document.createElement('div');
+              row.className = 'flex items-start gap-3 border-b border-borderColor/20 pb-3 text-xs';
+              
+              let color = 'text-neonCyan';
+              let icon = 'shopping-bag';
+              if (ev.type === 'user') {
+                color = 'text-neonViolet';
+                icon = 'user-plus';
+              }
+              
+              const localTimeStr = ev.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              row.innerHTML = `
+                <div class="p-1.5 bg-white/5 border border-borderColor rounded-lg ${color} flex-shrink-0">
+                  <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+                </div>
+                <div class="flex-grow leading-relaxed">
+                  <p class="text-gray-300">${ev.content}</p>
+                  <span class="text-[9px] text-gray-500 font-mono uppercase">${localTimeStr}</span>
+                </div>
+              `;
+              feed.appendChild(row);
+            });
+            lucide.createIcons();
+          }
+
+          // Build/Update Chart
+          buildChart(data.daily_sales);
+        })
+        .catch(err => {
+          showToast('Error loading stats telemetry', 'error');
+        });
+    }
+
+    function buildChart(dailySales) {
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      
+      // Destroy old
+      if (salesChart) salesChart.destroy();
+
+      const labels = dailySales.map(s => {
+        const parts = s.date.split('-');
+        return parts.length > 2 ? `${parts[1]}/${parts[2]}` : s.date;
+      });
+      const revenues = dailySales.map(s => s.revenue);
+      const orders = dailySales.map(s => s.orders);
+
+      salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Daily Revenue ($)',
+              data: revenues,
+              borderColor: '#00F0FF',
+              backgroundColor: 'rgba(0, 240, 255, 0.05)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Orders Count',
+              data: orders,
+              borderColor: '#A020F0',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              fill: false,
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#9CA3AF',
+                font: { family: 'Outfit', size: 10 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+            }
+          }
+        }
+      });
+    }
+
+    // ─── B. PRODUCT INVENTORY CRUD ──────────────────────────────────────
+    function loadProducts(page = 1) {
+      const search = document.getElementById('product-search').value;
+      const category = document.getElementById('product-category').value;
+      
+      let url = `/api/admin/products?page=${page}&per_page=12`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (category) url += `&category=${encodeURIComponent(category)}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('products-table-body');
+          tbody.innerHTML = '';
+          
+          productsList = response.data;
+          
+          if (productsList.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="5" class="p-8 text-center text-gray-500 font-mono">No matching products inside TiDB catalog.</td>
+              </tr>
+            `;
+          } else {
+            productsList.forEach(p => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              tr.innerHTML = `
+                <td class="p-4 flex items-center gap-3">
+                  <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-cover rounded-lg border border-borderColor">
+                  <div>
+                    <p class="font-semibold text-white leading-tight">${p.name}</p>
+                    <span class="text-[9px] font-mono text-gray-500 uppercase tracking-widest">${p.slug}</span>
+                  </div>
+                </td>
+                <td class="p-4 text-gray-400 uppercase tracking-wider font-semibold text-[10px]">${p.category}</td>
+                <td class="p-4 font-mono font-bold text-white">$${p.price.toFixed(2)}</td>
+                <td class="p-4 text-cyberYellow font-semibold flex items-center gap-1 mt-3">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <span>${p.rating || '4.5'}</span>
+                </td>
+                <td class="p-4 text-right space-x-2">
+                  <button onclick="editProduct(${p.id})" class="text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-2.5 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1" title="Edit">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    <span>Edit</span>
+                  </button>
+                  <button onclick="deleteProduct(${p.id})" class="text-red-400 border border-red-500/20 bg-red-500/5 hover:bg-red-500/15 px-2.5 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1" title="Delete">
+                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                    <span>Delete</span>
+                  </button>
+                </td>
+              </tr>
+              `;
+              tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+          }
+
+          // Build Pagination links
+          buildPagination('products-pagination', response.meta, loadProducts);
+        })
+        .catch(err => showToast('Error fetching products list', 'error'));
+    }
+
+    function buildPagination(containerId, meta, actionFn) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      if (!meta || meta.total_pages <= 1) return;
+
+      container.className = 'p-4 border-t border-borderColor bg-white/5 flex items-center justify-between font-mono text-[10px] text-gray-400';
+      container.innerHTML = `
+        <span>Page ${meta.page} of ${meta.total_pages} (${meta.total_items} items)</span>
+        <div class="flex gap-2">
+          <button id="btn-prev" class="px-3 py-1.5 rounded bg-white/5 border border-borderColor text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed">PREV</button>
+          <button id="btn-next" class="px-3 py-1.5 rounded bg-white/5 border border-borderColor text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed">NEXT</button>
+        </div>
+      `;
+
+      const prev = container.querySelector('#btn-prev');
+      const next = container.querySelector('#btn-next');
+
+      if (!meta.has_prev) prev.disabled = true;
+      if (!meta.has_next) next.disabled = true;
+
+      prev.onclick = () => actionFn(meta.page - 1);
+      next.onclick = () => actionFn(meta.page + 1);
+    }
+
+    // CRUD Ops
+    function openProductDrawer() {
+      document.getElementById('form-product-id').value = '';
+      document.getElementById('product-form').reset();
+      document.getElementById('drawer-title').textContent = 'Add Product';
+      document.getElementById('form-submit-btn').textContent = 'Create Product';
+      
+      const drawer = document.getElementById('product-drawer');
+      drawer.classList.remove('translate-x-full');
+    }
+
+    function closeProductDrawer() {
+      const drawer = document.getElementById('product-drawer');
+      drawer.classList.add('translate-x-full');
+    }
+
+    function editProduct(productId) {
+      const product = productsList.find(p => p.id === productId);
+      if (!product) return;
+
+      document.getElementById('form-product-id').value = product.id;
+      document.getElementById('form-product-name').value = product.name;
+      document.getElementById('form-product-price').value = product.price;
+      document.getElementById('form-product-category').value = product.category;
+      document.getElementById('form-product-image').value = product.image;
+      document.getElementById('form-product-rating').value = product.rating || '4.5';
+
+      document.getElementById('drawer-title').textContent = 'Edit Product';
+      document.getElementById('form-submit-btn').textContent = 'Update Product Details';
+
+      const drawer = document.getElementById('product-drawer');
+      drawer.classList.remove('translate-x-full');
+    }
+
+    function handleProductSubmit(e) {
+      e.preventDefault();
+      
+      const pid = document.getElementById('form-product-id').value;
+      const name = document.getElementById('form-product-name').value;
+      const price = parseFloat(document.getElementById('form-product-price').value);
+      const category = document.getElementById('form-product-category').value;
+      const image = document.getElementById('form-product-image').value;
+      const rating = parseFloat(document.getElementById('form-product-rating').value || '4.5');
+
+      const payload = { name, price, category, image, rating };
+      
+      const method = pid ? 'PUT' : 'POST';
+      const url = pid ? `/api/admin/products/${pid}` : '/api/admin/products';
+
+      fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Query error');
+        return res.json();
+      })
+      .then(data => {
+        showToast(pid ? 'Product modified successfully' : 'Product created successfully', 'success');
+        closeProductDrawer();
+        loadProducts(1);
+      })
+      .catch(() => showToast('Error saving product records', 'error'));
+    }
+
+    function deleteProduct(productId) {
+      if (!confirm("Are you sure you want to permanently drop this product from inventory?")) return;
+
+      fetch(`/api/admin/products/${productId}`, { method: 'DELETE' })
+        .then(res => {
+          if (!res.ok) throw new Error('Query error');
+          return res.json();
+        })
+        .then(data => {
+          showToast('Product dropped successfully', 'success');
+          loadProducts(1);
+        })
+        .catch(() => showToast('Error deleting inventory record', 'error'));
+    }
+
+    // ─── C. ORDERS QUEUE CONTROLS ───────────────────────────────────────
+    let ordersList = [];
+    function loadOrders(page = 1) {
+      fetch(`/api/admin/orders?page=${page}&per_page=12`)
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('orders-table-body');
+          tbody.innerHTML = '';
+          
+          ordersList = response.data;
+          
+          if (ordersList.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No order transaction streams recorded.</td>
+              </tr>
+            `;
+          } else {
+            ordersList.forEach(o => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              // Date
+              const date = new Date(o.created_at);
+              const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              
+              // Status Badge mapping
+              let badgeColor = 'bg-white/5 border-borderColor text-gray-400';
+              if (o.status === 'Pending') badgeColor = 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400';
+              if (o.status === 'Processing') badgeColor = 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400';
+              if (o.status === 'Shipped') badgeColor = 'bg-violet-500/10 border-violet-500/30 text-violet-400';
+              if (o.status === 'Delivered') badgeColor = 'bg-green-500/10 border-green-500/30 text-green-400';
+              if (o.status === 'Cancelled') badgeColor = 'bg-red-500/10 border-red-500/30 text-red-400';
+
+              tr.innerHTML = `
+                <td class="p-4 font-mono font-bold text-neonCyan">ORDER #${o.id}</td>
+                <td class="p-4">
+                  <p class="font-semibold text-white leading-none">${o.user_name || 'Anonymous'}</p>
+                  <span class="text-[9px] font-mono text-gray-500">${o.user_email || 'unknown@guest.com'}</span>
+                </td>
+                <td class="p-4 font-mono font-bold text-white">$${o.total.toFixed(2)}</td>
+                <td class="p-4">
+                  <select onchange="updateOrderStatus(${o.id}, this.value)" class="bg-[#0E1321] border border-borderColor rounded-lg px-2.5 py-1 text-[10px] font-semibold tracking-wide ${badgeColor} focus:outline-none focus:border-neonCyan transition-all">
+                    <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                    <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                    <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                    <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                  </select>
+                </td>
+                <td class="p-4 text-gray-400 font-mono text-[10px]">${dateStr}</td>
+                <td class="p-4 text-right">
+                  <button onclick="inspectOrder(${o.id})" class="text-neonCyan border border-neonCyan/20 bg-neonCyan/5 hover:bg-neonCyan/15 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    <span>Inspect</span>
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+          }
+
+          buildPagination('orders-pagination', response.meta, loadOrders);
+        })
+        .catch(() => showToast('Error loading orders queue', 'error'));
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+      fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        showToast(`Order #${orderId} marked as ${newStatus}`, 'success');
+        loadOrders(1);
+      })
+      .catch(() => showToast('Failed to transition order status', 'error'));
+    }
+
+    function inspectOrder(orderId) {
+      const o = ordersList.find(ord => ord.id === orderId);
+      if (!o) return;
+
+      document.getElementById('modal-order-title').textContent = `Inspect Order #${o.id}`;
+      
+      const date = new Date(o.created_at);
+      document.getElementById('modal-order-date').textContent = `Placed on: ${date.toLocaleString()}`;
+      
+      document.getElementById('modal-customer-name').textContent = o.user_name || 'Anonymous client';
+      document.getElementById('modal-customer-email').textContent = o.user_email || 'No email record';
+      
+      document.getElementById('modal-shipping-name').textContent = o.shipping_name || 'N/A';
+      document.getElementById('modal-shipping-address').textContent = o.shipping_address || 'No shipping address provided';
+      document.getElementById('modal-shipping-phone').textContent = o.shipping_phone || 'No phone number';
+      document.getElementById('modal-shipping-method').textContent = o.shipping_method || 'Standard Delivery';
+      
+      document.getElementById('modal-order-total').textContent = `$${o.total.toFixed(2)}`;
+
+      const listContainer = document.getElementById('modal-items-list');
+      listContainer.innerHTML = '';
+      
+      if (o.items && o.items.length > 0) {
+        o.items.forEach(i => {
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between border-b border-borderColor/10 pb-2.5';
+          div.innerHTML = `
+            <div class="flex items-center gap-2.5">
+              <img src="${i.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100'}" class="w-8 h-8 rounded object-cover border border-borderColor">
+              <div>
+                <p class="font-semibold text-white">${i.name || 'Unnamed Product'}</p>
+                <span class="text-[9px] text-gray-500 font-mono uppercase">Qty: ${i.quantity} @ $${i.unit_price.toFixed(2)}</span>
+              </div>
+            </div>
+            <span class="font-mono font-bold text-white">$${i.subtotal.toFixed(2)}</span>
+          `;
+          listContainer.appendChild(div);
+        });
+      } else {
+        listContainer.innerHTML = '<div class="text-center py-4 text-gray-500 font-mono text-[10px]">No line items recorded for this order.</div>';
+      }
+
+      document.getElementById('order-modal').classList.remove('hidden');
+    }
+
+    function closeOrderModal() {
+      document.getElementById('order-modal').classList.add('hidden');
+    }
+
+    // ─── D. USERS REGISTRY CONTROLS ──────────────────────────────────────
+    function loadUsers(page = 1) {
+      fetch(`/api/admin/users?page=${page}&per_page=12`)
+        .then(res => res.json())
+        .then(response => {
+          const tbody = document.getElementById('users-table-body');
+          tbody.innerHTML = '';
+          
+          if (response.data.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 font-mono">No customers registered inside SQLite/TiDB catalog.</td>
+              </tr>
+            `;
+          } else {
+            response.data.forEach(u => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              
+              const isMe = currentAdmin && currentAdmin.id === u.id;
+              const date = new Date(u.created_at).toLocaleDateString();
+
+              let roleBadge = 'bg-white/5 border-borderColor text-gray-400';
+              if (u.is_admin) roleBadge = 'bg-neonCyan/10 border-neonCyan/30 text-neonCyan font-bold';
+
+              tr.innerHTML = `
+                <td class="p-4 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center font-bold text-gray-300 border border-borderColor text-[10px] uppercase">
+                    ${u.name.slice(0,2)}
+                  </div>
+                  <div>
+                    <p class="font-semibold text-white leading-none">${u.name}</p>
+                    <span class="text-[9px] font-mono text-gray-500">UID: ${u.id} | Joined ${date}</span>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span class="px-2 py-0.5 rounded border text-[9px] uppercase tracking-wider ${roleBadge}">
+                    ${u.is_admin ? 'Admin' : 'Customer'}
+                  </span>
+                </td>
+                <td class="p-4">
+                  <p class="leading-none text-white">${u.email}</p>
+                  <span class="text-[9px] font-mono text-gray-500">${u.phone || 'No phone linked'}</span>
+                </td>
+                <td class="p-4 font-mono font-semibold text-white text-center">${u.order_count}</td>
+                <td class="p-4 font-mono font-bold text-neonGreen">$${(u.total_spent || 0).toFixed(2)}</td>
+                <td class="p-4 text-right">
+                  <button onclick="toggleUserAdmin(${u.id})" ${isMe ? 'disabled' : ''} class="text-neonViolet border border-neonViolet/20 bg-neonViolet/5 hover:bg-neonViolet/15 px-2.5 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>${u.is_admin ? 'Revoke Admin' : 'Make Admin'}</span>
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+          }
+
+          buildPagination('users-pagination', response.meta, loadUsers);
+        })
+        .catch(() => showToast('Error loading users records', 'error'));
+    }
+
+    function toggleUserAdmin(userId) {
+      fetch(`/api/admin/users/${userId}/toggle-admin`, { method: 'PUT' })
+        .then(res => {
+          if (!res.ok) throw new Error();
+          return res.json();
+        })
+        .then(data => {
+          showToast('User authorization privileges changed', 'success');
+          loadUsers(1);
+        })
+        .catch(() => showToast('Could not modify administrator credentials', 'error'));
+    }
+
+    // ─── E. SYSTEM TOOLS CONTROLS ───────────────────────────────────────
+    function loadSystemHealth() {
+      const latencyLabel = document.getElementById('telemetry-latency');
+      const latencyBar = document.getElementById('telemetry-latency-bar');
+      const engineLabel = document.getElementById('telemetry-engine');
+      
+      latencyLabel.textContent = 'Measuring...';
+      latencyBar.style.width = '0%';
+
+      fetch('/api/admin/system/health')
+        .then(res => res.json())
+        .then(data => {
+          const lat = data.database.latency_ms;
+          latencyLabel.textContent = `${lat} ms`;
+          engineLabel.textContent = data.database.engine || 'SQLite';
+
+          // Latency bar scaling (0ms to 1000ms)
+          const pct = Math.min(100, (lat / 1000) * 100);
+          latencyBar.style.width = `${pct}%`;
+          
+          if (lat < 150) {
+            latencyBar.className = "bg-neonGreen h-full transition-all duration-500";
+          } else if (lat < 400) {
+            latencyBar.className = "bg-cyberYellow h-full transition-all duration-500";
+          } else {
+            latencyBar.className = "bg-red-500 h-full transition-all duration-500";
+          }
+
+          // Table counts
+          document.getElementById('rowcount-products').textContent = data.table_counts.products;
+          document.getElementById('rowcount-users').textContent = data.table_counts.users;
+          document.getElementById('rowcount-orders').textContent = data.table_counts.orders;
+          document.getElementById('rowcount-items').textContent = data.table_counts.order_items;
+
+          document.getElementById('db-status-label').textContent = data.database.engine;
+        })
+        .catch(() => {
+          showToast('Error polling telemetry engine', 'error');
+          latencyLabel.textContent = 'TIMEOUT';
+          latencyBar.className = "bg-red-500 h-full w-full";
+        });
+    }
+
+    function triggerSeeding() {
+      if (!confirm("⚠️ WARNING: This operation will DELETE all products and replace them with standard ShopEase demonstration products. Continue?")) return;
+
+      showToast('Wiping catalog & inserting seed seeds...', 'info');
+      
+      fetch('/api/admin/system/seed', { method: 'POST' })
+        .then(res => {
+          if (!res.ok) throw new Error();
+          return res.json();
+        })
+        .then(data => {
+          showToast('Product catalog wiped and seeded successfully!', 'success');
+          loadSystemHealth();
+        })
+        .catch(() => showToast('Error during data seeding', 'error'));
+    }
+
+    function triggerWipeOrders() {
+      if (!confirm("⚠️ CAUTION: You are about to purge ALL order records and transaction records. This cannot be undone. Proceed?")) return;
+
+      fetch('/api/admin/system/wipe-orders', { method: 'POST' })
+        .then(res => {
+          if (!res.ok) throw new Error();
+          return res.json();
+        })
+        .then(data => {
+          showToast('All order transaction records purged successfully!', 'success');
+          loadSystemHealth();
+        })
+        .catch(() => showToast('Failed to wipe orders history', 'error'));
+    }
+
+    // ─── ANALYTICS TELEMETRY CONTROLLERS ────────────────────────────────
+    function initRevenueDashboard() {
+      fetch('/api/admin/stats')
+        .then(res => res.json())
+        .then(data => {
+          const gross = data.metrics.total_revenue;
+          const profit = gross * 0.70;
+          const aov = data.metrics.aov;
+          
+          document.getElementById('revenue-gross').textContent = `$${gross.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('revenue-profit').textContent = `$${profit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('revenue-aov').textContent = `$${aov.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          
+          // Monthly goal of $10,000
+          const milestoneGoal = 10000.0;
+          const milestonePct = Math.min(100, Math.round((gross / milestoneGoal) * 100));
+          document.getElementById('revenue-milestone-label').textContent = `$${gross.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('revenue-milestone-pct').textContent = `(${milestonePct}%)`;
+          document.getElementById('revenue-milestone-bar').style.width = `${milestonePct}%`;
+          
+          // Populate Categories list
+          const catList = document.getElementById('revenue-category-list');
+          catList.innerHTML = '';
+          
+          if (data.category_performance && data.category_performance.length > 0) {
+            // Sort by revenue desc
+            const sortedCats = [...data.category_performance].sort((a,b) => b.revenue - a.revenue);
+            const maxRev = sortedCats[0].revenue || 1;
+            
+            sortedCats.forEach(c => {
+              const pct = Math.round((c.revenue / maxRev) * 100);
+              const div = document.createElement('div');
+              div.className = 'space-y-1.5 font-mono text-xs';
+              div.innerHTML = `
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300 font-semibold uppercase tracking-wider">${c.category}</span>
+                  <div class="space-x-2">
+                    <span class="text-gray-400 font-normal">(${c.sales} sales)</span>
+                    <span class="text-neonCyan font-bold">$${c.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                  </div>
+                </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-borderColor">
+                  <div class="bg-gradient-to-r from-neonCyan to-neonViolet h-full transition-all duration-500" style="width: ${pct}%"></div>
+                </div>
+              `;
+              catList.appendChild(div);
+            });
+          } else {
+            catList.innerHTML = '<div class="text-center py-8 text-gray-500 font-mono">No category revenue streams captured yet.</div>';
+          }
+        })
+        .catch(err => showToast('Error compiling revenue telemetry', 'error'));
+    }
+
+    let trendsChartObj = null;
+    let categoryChartObj = null;
+    let topProductsChartObj = null;
+
+    function initTrendsDashboard() {
+      fetch('/api/admin/stats')
+        .then(res => res.json())
+        .then(data => {
+          renderTrendsChart(data.daily_sales);
+          renderCategoryChart(data.category_performance);
+          renderTopProductsChart();
+        })
+        .catch(() => showToast('Error initializing visualization dashboards', 'error'));
+    }
+
+    function renderTrendsChart(dailySales) {
+      const ctx = document.getElementById('trendsChart').getContext('2d');
+      if (trendsChartObj) trendsChartObj.destroy();
+      
+      const days = parseInt(document.getElementById('trend-timeframe').value) || 30;
+      const type = document.getElementById('trend-chart-type').value || 'line';
+      
+      const filteredSales = dailySales.slice(-days);
+      const labels = filteredSales.map(s => {
+        const parts = s.date.split('-');
+        return parts.length > 2 ? `${parts[1]}/${parts[2]}` : s.date;
+      });
+      const revenues = filteredSales.map(s => s.revenue);
+      const orders = filteredSales.map(s => s.orders);
+      
+      trendsChartObj = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Daily Revenue ($)',
+              data: revenues,
+              borderColor: '#00F0FF',
+              backgroundColor: type === 'line' ? 'rgba(0, 240, 255, 0.05)' : '#00F0FF',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Orders Count',
+              data: orders,
+              borderColor: '#A020F0',
+              backgroundColor: type === 'line' ? 'transparent' : '#A020F0',
+              borderWidth: 2,
+              borderDash: type === 'line' ? [5, 5] : undefined,
+              fill: false,
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#9CA3AF', font: { family: 'Outfit', size: 10 } }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTrendsChart() {
+      fetch('/api/admin/stats')
+        .then(res => res.json())
+        .then(data => {
+          renderTrendsChart(data.daily_sales);
+        });
+    }
+
+    function renderCategoryChart(catPerf) {
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      if (categoryChartObj) categoryChartObj.destroy();
+      
+      const labels = catPerf.map(c => c.category.toUpperCase());
+      const revenues = catPerf.map(c => c.revenue);
+      const colors = ['#00F0FF', '#A020F0', '#39FF14', '#FFEA00', '#FF3366', '#FF9900', '#33CC66', '#0099FF'];
+      
+      categoryChartObj = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: revenues,
+            backgroundColor: colors.slice(0, labels.length),
+            borderColor: 'rgba(8, 12, 20, 0.8)',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#9CA3AF', font: { family: 'Outfit', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTopProductsChart() {
+      const ctx = document.getElementById('topProductsChart').getContext('2d');
+      if (topProductsChartObj) topProductsChartObj.destroy();
+      
+      fetch('/api/admin/products?per_page=6')
+        .then(res => res.json())
+        .then(response => {
+          const products = response.data || [];
+          const labels = products.map(p => p.name.length > 15 ? p.name.slice(0, 15) + '...' : p.name);
+          const ratings = products.map(p => p.rating || 4.5);
+          const prices = products.map(p => p.price);
+          
+          topProductsChartObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Product Rating (1-5)',
+                data: ratings,
+                backgroundColor: 'rgba(160, 32, 240, 0.7)',
+                borderColor: '#A020F0',
+                borderWidth: 1.5
+              }, {
+                label: 'Price ($)',
+                data: prices,
+                backgroundColor: 'rgba(0, 240, 255, 0.4)',
+                borderColor: '#00F0FF',
+                borderWidth: 1.5
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              indexAxis: 'y',
+              plugins: {
+                legend: {
+                  labels: { color: '#9CA3AF', font: { family: 'Outfit', size: 10 } }
+                }
+              },
+              scales: {
+                x: {
+                  grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                  ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+                },
+                y: {
+                  grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                  ticks: { color: '#9CA3AF', font: { family: 'Outfit', size: 9 } }
+                }
+              }
+            }
+          });
+        });
+    }
+
+    function initBusinessReports() {
+      fetch('/api/admin/stats')
+        .then(res => res.json())
+        .then(data => {
+          let totalTax = 0.0;
+          let totalShipping = 0.0;
+          
+          const salesBody = document.getElementById('report-sales-body');
+          salesBody.innerHTML = '';
+          
+          if (data.daily_sales && data.daily_sales.length > 0) {
+            data.daily_sales.forEach(s => {
+              const tax = s.revenue * 0.18;
+              const shipping = s.revenue * 0.05;
+              const net = s.revenue - tax - shipping;
+              const aov = s.orders > 0 ? (s.revenue / s.orders) : 0.0;
+              
+              totalTax += tax;
+              totalShipping += shipping;
+              
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.02] transition-colors';
+              tr.innerHTML = `
+                <td class="p-4 text-white font-semibold">${s.date}</td>
+                <td class="p-4 text-center text-gray-300 font-bold">${s.orders}</td>
+                <td class="p-4 text-neonGreen font-bold">$${s.revenue.toFixed(2)}</td>
+                <td class="p-4 text-gray-300">$${aov.toFixed(2)}</td>
+                <td class="p-4 text-cyberYellow">$${tax.toFixed(2)}</td>
+                <td class="p-4 text-neonCyan font-bold">$${net.toFixed(2)}</td>
+              `;
+              salesBody.appendChild(tr);
+            });
+          } else {
+            salesBody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-500">No sales transactions available to aggregate reports.</td></tr>';
+          }
+          
+          document.getElementById('report-stat-tax').textContent = `$${totalTax.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('report-stat-shipping').textContent = `$${totalShipping.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          
+          const cats = data.category_performance || [];
+          document.getElementById('report-stat-categories').textContent = cats.length;
+          
+          if (cats.length > 0) {
+            const sortedCats = [...cats].sort((a,b) => b.revenue - a.revenue);
+            document.getElementById('report-stat-top-cat').textContent = sortedCats[0].category;
+          } else {
+            document.getElementById('report-stat-top-cat').textContent = 'None';
+          }
+        })
+        .catch(() => showToast('Error compiling reports matrix', 'error'));
+        
+      fetch('/api/admin/users?per_page=12')
+        .then(res => res.json())
+        .then(response => {
+          const spendersBody = document.getElementById('report-users-body');
+          spendersBody.innerHTML = '';
+          
+          const users = response.data || [];
+          const sortedUsers = [...users].sort((a,b) => b.total_spent - a.total_spent).slice(0, 5);
+          
+          if (sortedUsers.length > 0) {
+            sortedUsers.forEach(u => {
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.01] transition-colors';
+              tr.innerHTML = `
+                <td class="p-3">
+                  <p class="font-semibold text-white leading-none">${u.name}</p>
+                  <span class="text-[9px] text-gray-500 font-mono">${u.email}</span>
+                </td>
+                <td class="p-3 text-center text-gray-300 font-bold">${u.order_count}</td>
+                <td class="p-3 text-right text-neonGreen font-bold font-mono">$${u.total_spent.toFixed(2)}</td>
+              `;
+              spendersBody.appendChild(tr);
+            });
+          } else {
+            spendersBody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-500">No spenders registered in active db.</td></tr>';
+          }
+        });
+        
+      fetch('/api/admin/products?per_page=5')
+        .then(res => res.json())
+        .then(response => {
+          const invBody = document.getElementById('report-inventory-body');
+          invBody.innerHTML = '';
+          
+          const products = response.data || [];
+          if (products.length > 0) {
+            products.forEach((p, idx) => {
+              const stockStatus = idx % 2 === 0 ? 'CRITICAL (2 LEFT)' : 'LOW STOCK (5 LEFT)';
+              const badgeClass = idx % 2 === 0 ? 'border-red-500/30 text-red-400 bg-red-500/5' : 'border-cyberYellow/30 text-cyberYellow bg-cyberYellow/5';
+              
+              const tr = document.createElement('tr');
+              tr.className = 'border-b border-borderColor/20 hover:bg-white/[0.01] transition-colors';
+              tr.innerHTML = `
+                <td class="p-3 font-semibold text-white">${p.name}</td>
+                <td class="p-3 text-gray-400 uppercase tracking-wider font-bold text-[9px]">${p.category}</td>
+                <td class="p-3 text-center font-mono font-bold text-neonCyan">${p.rating || '4.5'}</td>
+                <td class="p-3 text-right">
+                  <span class="px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${badgeClass}">${stockStatus}</span>
+                </td>
+              `;
+              invBody.appendChild(tr);
+            });
+          } else {
+            invBody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-500">Catalog is empty.</td></tr>';
+          }
+        });
+    }
+
+    function downloadCSV(type) {
+      showToast(`Generating ${type} dataset archive...`, 'info');
+      window.location.href = `/api/admin/export/${type}`;
+    }
+
+    // ─── AUTHENTICATION SECURITY EXIT ──────────────────────────────────
+    function handleLogout() {
+      fetch('/api/logout', { method: 'POST' })
+        .then(() => {
+          showToast('Secure session closed. Redirecting...', 'info');
+          setTimeout(() => {
+            window.location.replace('/index.html');
+          }, 800);
+        })
+        .catch(() => {
+          window.location.replace('/index.html');
+        });
+    }
+  </script>
+</body>
+</html>

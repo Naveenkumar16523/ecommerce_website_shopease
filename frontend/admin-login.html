@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopEase — Admin Portal Login</title>
+  <meta name="description" content="Secure administrative gateway for ShopEase Control Centre.">
+  
+  <!-- Font preconnect & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Lucide Icons CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            consoleBg: '#080C14',
+            sidebarBg: '#0D1321',
+            cardBg: 'rgba(17, 24, 39, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            neonCyan: '#00F0FF',
+            neonViolet: '#A020F0',
+            neonGreen: '#39FF14',
+            cyberYellow: '#FFEA00'
+          },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Syne', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #080C14;
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Ambient background grid */
+    .bg-grid {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+    
+    /* Glowing orb effects */
+    .orb-cyan {
+      filter: blur(150px);
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+    }
+
+    .orb-violet {
+      filter: blur(150px);
+      background: radial-gradient(circle, rgba(160, 32, 240, 0.15) 0%, transparent 70%);
+    }
+
+    /* Glassmorphism Console */
+    .glass-console {
+      background: rgba(13, 19, 33, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* Glowing Text */
+    .glow-cyan {
+      text-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+    }
+
+    /* Custom Input Glowing on Focus */
+    .neon-input {
+      background: rgba(8, 12, 20, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .neon-input:focus {
+      border-color: #00F0FF;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+      background: rgba(8, 12, 20, 0.8);
+    }
+
+    /* Neon Border Glow Animation */
+    @keyframes pulse-cyan {
+      0%, 100% { border-color: rgba(0, 240, 255, 0.2); }
+      50% { border-color: rgba(0, 240, 255, 0.6); }
+    }
+    .glow-border-cyan {
+      animation: pulse-cyan 3s infinite;
+    }
+  </style>
+</head>
+<body class="text-gray-100 min-h-screen flex items-center justify-center relative">
+
+  <!-- BACKGROUND GRAPHICS -->
+  <div class="absolute inset-0 bg-grid pointer-events-none"></div>
+  <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] orb-cyan pointer-events-none"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] orb-violet pointer-events-none"></div>
+
+  <!-- MAIN CARD CONTAINER -->
+  <div class="w-full max-w-md mx-4 z-10">
+    
+    <!-- BRAND LOGO -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-neonViolet to-neonCyan p-[1px] flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+        <div class="w-full h-full bg-[#0D1321] rounded-xl flex items-center justify-center">
+          <i data-lucide="shield" class="w-5 h-5 text-neonCyan"></i>
+        </div>
+      </div>
+      <h1 class="font-display font-bold text-lg tracking-widest text-white leading-none uppercase">SHOPEASE</h1>
+      <span class="text-[9px] font-mono text-neonCyan uppercase tracking-[0.25em] mt-1.5 glow-cyan">Secure Admin Gateway</span>
+    </div>
+
+    <!-- GLASS LOGIN BOX -->
+    <div class="glass-console rounded-2xl p-8 shadow-2xl glow-border-cyan relative overflow-hidden">
+      <!-- Top Cyber decoration lines -->
+      <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-neonCyan to-transparent"></div>
+      
+      <div class="mb-6">
+        <h2 class="font-display font-bold text-white text-base uppercase tracking-wider">Console Authentication</h2>
+        <p class="text-[10px] text-gray-400 mt-1">Please enter administrative credentials to establish console session.</p>
+      </div>
+
+      <!-- GLOWING ERROR DISPLAY -->
+      <div id="error-banner" class="hidden mb-5 bg-red-950/20 border border-red-500/30 text-red-400 p-3 rounded-lg flex items-center gap-3 text-xs">
+        <i data-lucide="alert-triangle" class="w-4 h-4 flex-shrink-0"></i>
+        <span id="error-message">Invalid console access token.</span>
+      </div>
+
+      <!-- FORM -->
+      <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="space-y-4 text-xs">
+        <!-- Email Input -->
+        <div class="space-y-1.5">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Admin Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-500"></i>
+            <input type="email" id="admin-email" required placeholder="admin@shopease.com" class="w-full neon-input rounded-lg pl-11 pr-4 py-3.5 text-white placeholder-gray-600 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="space-y-1.5">
+          <label class="text-gray-400 uppercase tracking-widest text-[9px] font-mono">Security Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-500"></i>
+            <input type="password" id="admin-password" required placeholder="••••••••••••" class="w-full neon-input rounded-lg pl-11 pr-4 py-3.5 text-white placeholder-gray-600 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-neonCyan to-neonViolet text-white font-semibold text-xs py-3.5 rounded-lg hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 mt-6">
+          <i data-lucide="key" class="w-4 h-4"></i>
+          <span>Establish Terminal Connection</span>
+        </button>
+      </form>
+
+      <!-- Back to Shop -->
+      <div class="mt-6 text-center border-t border-borderColor/50 pt-4">
+        <a href="/index.html" class="inline-flex items-center gap-1.5 text-gray-500 hover:text-neonCyan transition-colors">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+          <span>Return to Front Storefront</span>
+        </a>
+      </div>
+    </div>
+    
+    <!-- FOOTER TELEMETRY -->
+    <div class="mt-6 text-center text-[9px] font-mono text-gray-600 tracking-wider">
+      SYS PORTAL v1.2.0 // TLS SECURED // SHOP EASE CONTROL CENTRE
+    </div>
+  </div>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Check if user is ALREADY authenticated as an admin
+    fetch('/api/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated && data.is_admin) {
+          window.location.replace('/admin.html');
+        }
+      })
+      .catch(() => {});
+
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+      const errorBanner = document.getElementById('error-banner');
+      const errorMessage = document.getElementById('error-message');
+      const submitBtn = document.getElementById('submit-btn');
+
+      // Update button state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        <span>Authenticating Node...</span>
+      `;
+      errorBanner.classList.add('hidden');
+
+      fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(err => {
+            throw new Error(err.message || err.error || 'Authentication rejected by security token.');
+          });
+        }
+        return res.json();
+      })
+      .then(() => {
+        // Fetch session data to verify admin rights
+        return fetch('/api/me');
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Verification failed. Unable to retrieve admin session.');
+        }
+        return res.json();
+      })
+      .then(meData => {
+        if (meData.authenticated && meData.is_admin) {
+          window.location.replace('/admin.html');
+        } else {
+          // Clean the unauthorized cookie by logging out
+          fetch('/api/logout', { method: 'POST' }).catch(() => {});
+          throw new Error('Access Denied: Administrative privileges required.');
+        }
+      })
+      .catch(err => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <i data-lucide="key" class="w-4 h-4"></i>
+          <span>Establish Terminal Connection</span>
+        `;
+        errorBanner.classList.remove('hidden');
+        errorMessage.textContent = err.message || 'Authentication rejected.';
+        lucide.createIcons();
+      });
+    }
+  </script>
+</body>
+</html>

@@ -81,6 +81,7 @@ def init_db():
                     password VARCHAR(255),
                     address TEXT,
                     phone VARCHAR(20),
+                    is_admin INT DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX ix_users_email (email),
@@ -171,6 +172,27 @@ def init_db():
     except Exception as e:
         logger.error(f"ERROR during database initialization: {e}")
 
+    # Backward compatibility column addition
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("ALTER TABLE users ADD COLUMN is_admin INT DEFAULT 0")
+    except Exception as e:
+        pass
+
+    # Seed default administrator if not present
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT id FROM users WHERE email = %s", ("admin@shopease.com",))
+            if not cursor.fetchone():
+                admin_pass_hash = bcrypt.generate_password_hash("Admin123!").decode('utf-8')
+                cursor.execute("""
+                    INSERT INTO users (name, email, password, is_admin)
+                    VALUES (%s, %s, %s, 1)
+                """, ("System Administrator", "admin@shopease.com", admin_pass_hash))
+                logger.info("Default admin user (admin@shopease.com / Admin123!) seeded.")
+    except Exception as e:
+        logger.error(f"Error seeding default admin: {e}")
+
 _db_initialized = False
 
 @app.before_request
@@ -236,6 +258,16 @@ def token_required(f):
             return jsonify({'message': f'Authentication error: {str(e)}'}), 401
         
         return f(user, *args, **kwargs)
+    return decorated
+
+# Administrator Authorization Decorator
+def admin_required(f):
+    @wraps(f)
+    @token_required
+    def decorated(current_user, *args, **kwargs):
+        if not current_user.get('is_admin'):
+            return jsonify({'message': 'Admin privileges required!'}), 403
+        return f(current_user, *args, **kwargs)
     return decorated
 
 @app.before_request
@@ -374,13 +406,22 @@ def login(data):
             cursor.execute("SELECT attempts, locked_until FROM login_attempts WHERE email = %s", (email,))
             row = format_row(cursor, cursor.fetchone())
             
-            if row and row['locked_until'] and row['locked_until'] > datetime.datetime.utcnow():
-                wait_seconds = int((row['locked_until'] - datetime.datetime.utcnow()).total_seconds())
-                return jsonify({
-                    "error": "Account Locked",
-                    "message": f"Too many failed attempts. Account locked for {wait_seconds // 60} minutes.",
-                    "retry_after": wait_seconds
-                }), 423 # 423 Locked
+            if row and row['locked_until']:
+                locked_until_val = row['locked_until']
+                if isinstance(locked_until_val, str):
+                    locked_until_val = locked_until_val.replace('T', ' ')
+                    try:
+                        locked_until_val = datetime.datetime.strptime(locked_until_val.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    except Exception:
+                        pass
+                
+                if isinstance(locked_until_val, datetime.datetime) and locked_until_val > datetime.datetime.utcnow():
+                    wait_seconds = int((locked_until_val - datetime.datetime.utcnow()).total_seconds())
+                    return jsonify({
+                        "error": "Account Locked",
+                        "message": f"Too many failed attempts. Account locked for {wait_seconds // 60} minutes.",
+                        "retry_after": wait_seconds
+                    }), 423 # 423 Locked
             
             # Check credentials
             cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
@@ -388,7 +429,11 @@ def login(data):
             
             if user and bcrypt.check_password_hash(user['password'], data.get('password')):
                 # Success: Reset attempts
-                cursor.execute("INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 0, CURRENT_TIMESTAMP, NULL) ON DUPLICATE KEY UPDATE attempts = 0, locked_until = NULL", (email,))
+                cursor.execute("SELECT attempts FROM login_attempts WHERE email = %s", (email,))
+                if cursor.fetchone():
+                    cursor.execute("UPDATE login_attempts SET attempts = 0, locked_until = NULL WHERE email = %s", (email,))
+                else:
+                    cursor.execute("INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 0, CURRENT_TIMESTAMP, NULL)", (email,))
                 
                 token = jwt.encode({
                     'user_id': user['id'],
@@ -408,14 +453,18 @@ def login(data):
                 return resp
             else:
                 # Failure: Increment attempts
-                cursor.execute("""
-                    INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) 
-                    VALUES (%s, 1, CURRENT_TIMESTAMP, NULL) 
-                    ON DUPLICATE KEY UPDATE 
-                        attempts = attempts + 1, 
-                        last_attempt = CURRENT_TIMESTAMP,
-                        locked_until = IF(attempts + 1 >= 10, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE), NULL)
-                """, (email,))
+                cursor.execute("SELECT attempts FROM login_attempts WHERE email = %s", (email,))
+                attempt_row = format_row(cursor, cursor.fetchone())
+                if attempt_row:
+                    new_attempts = int(attempt_row['attempts']) + 1
+                    if new_attempts >= 10:
+                        # Lock for 30 minutes
+                        locked_until = (datetime.datetime.utcnow() + datetime.timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        locked_until = None
+                    cursor.execute("UPDATE login_attempts SET attempts = %s, last_attempt = CURRENT_TIMESTAMP, locked_until = %s WHERE email = %s", (new_attempts, locked_until, email))
+                else:
+                    cursor.execute("INSERT INTO login_attempts (email, attempts, last_attempt, locked_until) VALUES (%s, 1, CURRENT_TIMESTAMP, NULL)", (email,))
                 return jsonify({"message": "Invalid credentials"}), 401
                 
     except Exception as e:
@@ -701,6 +750,567 @@ def handle_exception(e):
         return jsonify({"message": str(e)}), e.code
     return jsonify({"message": str(e)}), 500
 
+# --- ADMINISTRATOR ROUTES ---
+
+@app.route("/admin.html")
+def admin_page():
+    token = request.cookies.get('auth_token')
+    is_admin = False
+    if token:
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            with get_db() as (conn, cursor):
+                cursor.execute("SELECT is_admin FROM users WHERE id = %s", (data['user_id'],))
+                res = cursor.fetchone()
+                if res and res[0]:
+                    is_admin = True
+        except:
+            pass
+            
+    if not is_admin:
+        return make_response("Unauthorized. Admin access required.", 302, {"Location": "/index.html"})
+        
+    return send_from_directory('../frontend', 'admin.html')
+
+@app.route("/api/admin/stats", methods=["GET"])
+@admin_required
+def get_admin_stats(current_user):
+    try:
+        with get_db() as (conn, cursor):
+            # 1. Basic metrics
+            cursor.execute("SELECT SUM(total) FROM orders WHERE status != 'Cancelled'")
+            total_revenue = cursor.fetchone()[0] or 0.0
+            
+            cursor.execute("SELECT COUNT(*) FROM orders")
+            total_orders = cursor.fetchone()[0] or 0
+            
+            cursor.execute("SELECT AVG(total) FROM orders WHERE status != 'Cancelled'")
+            aov = cursor.fetchone()[0] or 0.0
+            
+            cursor.execute("SELECT COUNT(*) FROM users")
+            total_users = cursor.fetchone()[0] or 0
+            
+            # Conversion rate logic
+            conversion_rate = 0.0
+            if total_users > 0:
+                conversion_rate = min(100.0, round((total_orders / total_users) * 100, 2))
+            else:
+                conversion_rate = 5.4
+
+            # 2. Daily Sales Performance (standard DATE function works in both SQLite and TiDB)
+            cursor.execute("""
+                SELECT DATE(created_at) as order_date, SUM(total) as revenue, COUNT(*) as count 
+                FROM orders 
+                WHERE status != 'Cancelled'
+                GROUP BY DATE(created_at) 
+                ORDER BY order_date ASC 
+                LIMIT 30
+            """)
+            daily_sales_raw = cursor.fetchall()
+            daily_sales = []
+            for row in daily_sales_raw:
+                daily_sales.append({
+                    "date": str(row[0]),
+                    "revenue": float(row[1]) if row[1] is not None else 0.0,
+                    "orders": int(row[2])
+                })
+
+            # 3. Category performance
+            cursor.execute("""
+                SELECT p.category, SUM(oi.quantity) as sales_qty, SUM(oi.quantity * oi.unit_price) as revenue
+                FROM order_items oi
+                JOIN products p ON oi.product_id = p.id
+                JOIN orders o ON oi.order_id = o.id
+                WHERE o.status != 'Cancelled'
+                GROUP BY p.category
+            """)
+            category_perf_raw = cursor.fetchall()
+            category_perf = []
+            for row in category_perf_raw:
+                category_perf.append({
+                    "category": row[0],
+                    "sales": int(row[1]) if row[1] is not None else 0,
+                    "revenue": float(row[2]) if row[2] is not None else 0.0
+                })
+
+            # 4. Recent activity
+            cursor.execute("""
+                SELECT o.id, o.total, o.status, o.created_at, u.name as user_name
+                FROM orders o
+                JOIN users u ON o.user_id = u.id
+                ORDER BY o.created_at DESC
+                LIMIT 5
+            """)
+            recent_orders_raw = cursor.fetchall()
+            recent_orders = []
+            for row in recent_orders_raw:
+                recent_orders.append({
+                    "id": row[0],
+                    "total": float(row[1]),
+                    "status": row[2],
+                    "created_at": row[3].isoformat() if hasattr(row[3], 'isoformat') else str(row[3]),
+                    "user_name": row[4]
+                })
+
+            cursor.execute("""
+                SELECT id, name, email, created_at
+                FROM users
+                ORDER BY created_at DESC
+                LIMIT 5
+            """)
+            recent_users_raw = cursor.fetchall()
+            recent_users = []
+            for row in recent_users_raw:
+                recent_users.append({
+                    "id": row[0],
+                    "name": row[1],
+                    "email": row[2],
+                    "created_at": row[3].isoformat() if hasattr(row[3], 'isoformat') else str(row[3])
+                })
+
+        return jsonify({
+            "metrics": {
+                "total_revenue": float(total_revenue),
+                "total_orders": int(total_orders),
+                "aov": float(aov),
+                "conversion_rate": float(conversion_rate),
+                "total_users": int(total_users)
+            },
+            "daily_sales": daily_sales,
+            "category_performance": category_perf,
+            "recent_orders": recent_orders,
+            "recent_users": recent_users
+        })
+    except Exception as e:
+        logger.error(f"Error loading admin stats: {e}")
+        return jsonify({"message": f"Error loading admin stats: {str(e)}"}), 500
+
+@app.route("/api/admin/products", methods=["GET"])
+@admin_required
+def admin_get_products(current_user):
+    category = request.args.get("category")
+    search = request.args.get("search")
+    
+    query = "SELECT * FROM products WHERE 1=1"
+    params = []
+    if category:
+        query += " AND category = %s"
+        params.append(category)
+    if search:
+        query += " AND (name LIKE %s OR category LIKE %s)"
+        params.append(f"%{search}%")
+        params.append(f"%{search}%")
+        
+    return paginate_collection(
+        base_query=query,
+        count_query=f"SELECT COUNT(*) FROM ({query}) AS q",
+        params=tuple(params),
+        order_by="id DESC"
+    )
+
+@app.route("/api/admin/products", methods=["POST"])
+@admin_required
+def admin_create_product(current_user):
+    data = request.json or {}
+    name = data.get("name")
+    price = data.get("price")
+    category = data.get("category")
+    image = data.get("image")
+    rating = data.get("rating", 4.5)
+    
+    if not name or price is None or not category or not image:
+        return jsonify({"message": "Name, price, category, and image are required"}), 400
+        
+    try:
+        slug = slugify(name)
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT id FROM products WHERE slug = %s", (slug,))
+            if cursor.fetchone():
+                slug = f"{slug}-{int(time.time())}"
+            
+            cursor.execute("""
+                INSERT INTO products (name, price, category, image, rating, slug)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (name, price, category, image, rating, slug))
+            product_id = cursor.lastrowid
+        return jsonify({"message": "Product created successfully", "product_id": product_id}), 201
+    except Exception as e:
+        return jsonify({"message": f"Error creating product: {str(e)}"}), 500
+
+@app.route("/api/admin/products/<int:product_id>", methods=["PUT"])
+@admin_required
+def admin_update_product(current_user, product_id):
+    data = request.json or {}
+    name = data.get("name")
+    price = data.get("price")
+    category = data.get("category")
+    image = data.get("image")
+    rating = data.get("rating", 4.5)
+    
+    if not name or price is None or not category or not image:
+        return jsonify({"message": "Name, price, category, and image are required"}), 400
+        
+    try:
+        slug = slugify(name)
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT id FROM products WHERE id = %s", (product_id,))
+            if not cursor.fetchone():
+                return jsonify({"message": "Product not found"}), 404
+                
+            cursor.execute("SELECT id FROM products WHERE slug = %s AND id != %s", (slug, product_id))
+            if cursor.fetchone():
+                slug = f"{slug}-{product_id}"
+                
+            cursor.execute("""
+                UPDATE products 
+                SET name = %s, price = %s, category = %s, image = %s, rating = %s, slug = %s
+                WHERE id = %s
+            """, (name, price, category, image, rating, slug, product_id))
+        return jsonify({"message": "Product updated successfully"})
+    except Exception as e:
+        return jsonify({"message": f"Error updating product: {str(e)}"}), 500
+
+@app.route("/api/admin/products/<int:product_id>", methods=["DELETE"])
+@admin_required
+def admin_delete_product(current_user, product_id):
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT id FROM products WHERE id = %s", (product_id,))
+            if not cursor.fetchone():
+                return jsonify({"message": "Product not found"}), 404
+            
+            cursor.execute("DELETE FROM products WHERE id = %s", (product_id,))
+        return jsonify({"message": "Product deleted successfully"})
+    except Exception as e:
+        return jsonify({"message": f"Error deleting product: {str(e)}"}), 500
+
+@app.route("/api/admin/orders", methods=["GET"])
+@admin_required
+def admin_get_orders(current_user):
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = min(int(request.args.get('per_page', 20)), 100)
+        offset = (page - 1) * per_page
+    except:
+        return jsonify({"message": "Invalid pagination params"}), 400
+
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT COUNT(*) FROM orders")
+            total_items = cursor.fetchone()[0]
+            
+            cursor.execute("""
+                SELECT o.*, u.name as user_name, u.email as user_email
+                FROM orders o
+                LEFT JOIN users u ON o.user_id = u.id
+                ORDER BY o.created_at DESC
+                LIMIT %s OFFSET %s
+            """, (per_page, offset))
+            orders = format_rows(cursor, cursor.fetchall())
+            
+            if orders:
+                order_ids = [o['id'] for o in orders]
+                format_strings = ','.join(['%s'] * len(order_ids))
+                cursor.execute(f"""
+                    SELECT oi.*, p.name, p.image 
+                    FROM order_items oi
+                    LEFT JOIN products p ON oi.product_id = p.id
+                    WHERE oi.order_id IN ({format_strings})
+                """, tuple(order_ids))
+                all_items = format_rows(cursor, cursor.fetchall())
+                
+                for o in orders:
+                    o['items'] = [i for i in all_items if i['order_id'] == o['id']]
+                    for i in o['items']:
+                        i['subtotal'] = float(i['quantity'] * i['unit_price'])
+            
+        total_pages = (total_items + per_page - 1) // per_page
+        return jsonify({
+            "data": orders,
+            "meta": {
+                "page": page,
+                "per_page": per_page,
+                "total_items": total_items,
+                "total_pages": total_pages,
+                "has_next": page < total_pages,
+                "has_prev": page > 1
+            }
+        })
+    except Exception as e:
+        return jsonify({"message": f"Error loading orders: {str(e)}"}), 500
+
+@app.route("/api/admin/orders/<int:order_id>/status", methods=["PUT"])
+@admin_required
+def admin_update_order_status(current_user, order_id):
+    data = request.json or {}
+    status = data.get("status")
+    
+    valid_statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
+    if status not in valid_statuses:
+        return jsonify({"message": f"Invalid status. Must be one of {valid_statuses}"}), 400
+        
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT id FROM orders WHERE id = %s", (order_id,))
+            if not cursor.fetchone():
+                return jsonify({"message": "Order not found"}), 404
+                
+            cursor.execute("UPDATE orders SET status = %s WHERE id = %s", (status, order_id))
+        return jsonify({"message": "Order status updated successfully", "status": status})
+    except Exception as e:
+        return jsonify({"message": f"Error updating order status: {str(e)}"}), 500
+
+@app.route("/api/admin/users", methods=["GET"])
+@admin_required
+def admin_get_users(current_user):
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = min(int(request.args.get('per_page', 20)), 100)
+        offset = (page - 1) * per_page
+    except:
+        return jsonify({"message": "Invalid pagination params"}), 400
+
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT COUNT(*) FROM users")
+            total_items = cursor.fetchone()[0]
+            
+            cursor.execute("""
+                SELECT u.id, u.name, u.email, u.address, u.phone, u.is_admin, u.created_at,
+                       COUNT(o.id) as order_count, SUM(o.total) as total_spent
+                FROM users u
+                LEFT JOIN orders o ON u.id = o.user_id AND o.status != 'Cancelled'
+                GROUP BY u.id
+                ORDER BY u.created_at DESC
+                LIMIT %s OFFSET %s
+            """, (per_page, offset))
+            users = format_rows(cursor, cursor.fetchall())
+            
+        total_pages = (total_items + per_page - 1) // per_page
+        return jsonify({
+            "data": users,
+            "meta": {
+                "page": page,
+                "per_page": per_page,
+                "total_items": total_items,
+                "total_pages": total_pages,
+                "has_next": page < total_pages,
+                "has_prev": page > 1
+            }
+        })
+    except Exception as e:
+        return jsonify({"message": f"Error loading users: {str(e)}"}), 500
+
+@app.route("/api/admin/users/<int:user_id>/toggle-admin", methods=["PUT"])
+@admin_required
+def admin_toggle_user_admin(current_user, user_id):
+    if current_user['id'] == user_id:
+        return jsonify({"message": "You cannot toggle your own admin status"}), 400
+        
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT is_admin FROM users WHERE id = %s", (user_id,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({"message": "User not found"}), 404
+            new_val = 0 if row[0] else 1
+            cursor.execute("UPDATE users SET is_admin = %s WHERE id = %s", (new_val, user_id))
+        return jsonify({"message": "User admin status updated successfully", "is_admin": bool(new_val)})
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+@app.route("/api/admin/system/health", methods=["GET"])
+@admin_required
+def admin_system_health(current_user):
+    from db_config import get_pool_stats
+    start_time = time.time()
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+            
+            counts = {}
+            for table in ['users', 'products', 'wishlist', 'orders', 'order_items']:
+                try:
+                    cursor.execute(f"SELECT COUNT(*) FROM {table}")
+                    counts[table] = cursor.fetchone()[0]
+                except:
+                    counts[table] = -1
+                      
+        latency = round((time.time() - start_time) * 1000, 2)
+        stats = get_pool_stats()
+        
+        return jsonify({
+            "database": {
+                "status": "Healthy",
+                "latency_ms": latency,
+                "engine": stats.get("engine", "Unknown"),
+                "details": stats
+            },
+            "table_counts": counts,
+            "environment": {
+                "flask_env": os.getenv("FLASK_ENV", "production"),
+                "uptime": round(time.time() - start_time, 2)
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            "database": {
+                "status": "Unhealthy",
+                "error": str(e)
+            }
+        }), 500
+
+@app.route("/api/admin/system/seed", methods=["POST"])
+@admin_required
+def admin_system_seed(current_user):
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("DELETE FROM products")
+            for p in INITIAL_PRODUCTS:
+                slug = slugify(p['name'])
+                cursor.execute("SELECT id FROM products WHERE slug = %s", (slug,))
+                if cursor.fetchone():
+                    slug = f"{slug}-{int(time.time())}"
+                
+                cursor.execute("""
+                    INSERT INTO products (name, price, category, image, rating, slug)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (p['name'], p['price'], p['category'], p['image'], p.get('rating', 4.5), slug))
+        return jsonify({"message": "Database wiped and re-seeded successfully!"})
+    except Exception as e:
+        return jsonify({"message": f"Seeding error: {str(e)}"}), 500
+
+@app.route("/api/admin/system/wipe-orders", methods=["POST"])
+@admin_required
+def admin_system_wipe_orders(current_user):
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("DELETE FROM order_items")
+            cursor.execute("DELETE FROM orders")
+        return jsonify({"message": "All orders and transaction history wiped successfully!"})
+    except Exception as e:
+        return jsonify({"message": f"Wipe error: {str(e)}"}), 500
+
+@app.route("/api/admin/export/revenue", methods=["GET"])
+@admin_required
+def admin_export_revenue(current_user):
+    import io
+    import csv
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("""
+                SELECT DATE(created_at) as order_date, SUM(total) as revenue, COUNT(*) as count 
+                FROM orders 
+                WHERE status != 'Cancelled'
+                GROUP BY DATE(created_at) 
+                ORDER BY order_date ASC
+            """)
+            rows = cursor.fetchall()
+            
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["Date", "Gross Revenue ($)", "Orders Count"])
+            for row in rows:
+                writer.writerow([str(row[0]), float(row[1]) if row[1] is not None else 0.0, int(row[2])])
+                
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=shopease_revenue_report.csv"
+            response.headers["Content-type"] = "text/csv"
+            return response
+    except Exception as e:
+        return jsonify({"message": f"Export error: {str(e)}"}), 500
+
+@app.route("/api/admin/export/products", methods=["GET"])
+@admin_required
+def admin_export_products(current_user):
+    import io
+    import csv
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT id, name, price, category, rating, slug, created_at FROM products ORDER BY id ASC")
+            rows = cursor.fetchall()
+            
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["ID", "Name", "Price ($)", "Category", "Rating", "Slug", "Created At"])
+            for row in rows:
+                writer.writerow([row[0], row[1], float(row[2]), row[3], float(row[4]), row[5], str(row[6])])
+                
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=shopease_products_catalog.csv"
+            response.headers["Content-type"] = "text/csv"
+            return response
+    except Exception as e:
+        return jsonify({"message": f"Export error: {str(e)}"}), 500
+
+@app.route("/api/admin/export/orders", methods=["GET"])
+@admin_required
+def admin_export_orders(current_user):
+    import io
+    import csv
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("""
+                SELECT o.id, o.total, o.status, o.shipping_name, o.shipping_address, 
+                       o.shipping_phone, o.shipping_method, o.created_at, u.name, u.email
+                FROM orders o
+                LEFT JOIN users u ON o.user_id = u.id
+                ORDER BY o.created_at DESC
+            """)
+            rows = cursor.fetchall()
+            
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow([
+                "Order ID", "Total Amount ($)", "Fulfillment Status", "Shipping Name", 
+                "Shipping Address", "Shipping Phone", "Shipping Method", "Date Placed", 
+                "Customer Name", "Customer Email"
+            ])
+            for r in rows:
+                writer.writerow([
+                    r[0], float(r[1]), r[2], r[3], r[4], r[5], r[6], str(r[7]), r[8] or "Anonymous", r[9] or "N/A"
+                ])
+                
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=shopease_orders_queue.csv"
+            response.headers["Content-type"] = "text/csv"
+            return response
+    except Exception as e:
+        return jsonify({"message": f"Export error: {str(e)}"}), 500
+
+@app.route("/api/admin/export/users", methods=["GET"])
+@admin_required
+def admin_export_users(current_user):
+    import io
+    import csv
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("""
+                SELECT u.id, u.name, u.email, u.address, u.phone, u.is_admin, u.created_at,
+                       COUNT(o.id) as order_count, SUM(o.total) as total_spent
+                FROM users u
+                LEFT JOIN orders o ON u.id = o.user_id AND o.status != 'Cancelled'
+                GROUP BY u.id
+                ORDER BY u.created_at DESC
+            """)
+            rows = cursor.fetchall()
+            
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["User ID", "Name", "Email", "Address", "Phone", "Is Admin", "Date Joined", "Orders Placed", "Total Spent ($)"])
+            for r in rows:
+                writer.writerow([
+                    r[0], r[1], r[2], r[3] or "N/A", r[4] or "N/A", "Yes" if r[5] else "No", str(r[6]), r[7], float(r[8]) if r[8] is not None else 0.0
+                ])
+                
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=shopease_users_registry.csv"
+            response.headers["Content-type"] = "text/csv"
+            return response
+    except Exception as e:
+        return jsonify({"message": f"Export error: {str(e)}"}), 500
+
 @app.route("/api/sync", methods=["GET"])
 def sync_data():
     """Incremental sync endpoint for products"""
@@ -725,6 +1335,10 @@ def sync_data():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/api/health", methods=["GET"])
+def api_health():
+    return jsonify({"status": "healthy", "service": "ShopEase API Control Centre"}), 200
 
 @app.route("/health/db")
 def health_db():
