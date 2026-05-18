@@ -1,5 +1,10 @@
-var isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '';
-var API_BASE = isLocalhost ? 'http://127.0.0.1:5000/api' : '/api';
+var currentPort = window.location.port;
+var currentProto = window.location.protocol;
+var currentHost = window.location.hostname || '127.0.0.1';
+
+var API_BASE = (currentPort && currentPort !== '5000') 
+               ? `${currentProto}//${currentHost}:5000/api` 
+               : (currentProto === 'file:' ? 'http://127.0.0.1:5000/api' : '/api');
 
 // --- Theme System ---
 function initTheme() {
