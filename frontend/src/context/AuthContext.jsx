@@ -80,13 +80,8 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        setUser({
-          id: data.user.id,
-          name: data.user.name,
-          email: data.user.email,
-          is_admin: data.user.is_admin,
-        });
-        return { success: true };
+        // Automatically log in the user after successful registration
+        return await login(email, password);
       } else {
         setError(data.message || "Signup failed");
         return { success: false, message: data.message || "Signup failed" };
