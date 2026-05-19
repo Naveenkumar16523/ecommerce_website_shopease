@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function ImageReveal() {
   const [img, setImg] = useState({
-    src: '',
+    src: null,
     alt: '',
     opacity: 0,
   });
@@ -90,7 +90,7 @@ export default function ImageReveal() {
 
       <motion.img
         ref={imageRef}
-        src={img.src}
+        src={img.src || null}
         alt={img.alt}
         className="w-[300px] h-[220px] rounded-2xl object-cover absolute top-0 left-0 transition-opacity duration-300 ease-in-out pointer-events-none shadow-[0_15px_50px_rgba(0,0,0,0.5)] border border-white/10 z-30"
         style={{
