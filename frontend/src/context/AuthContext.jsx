@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
             address: data.address,
             phone: data.phone,
             is_admin: data.is_admin,
+            avatar: data.avatar,
           });
           setWishlistIds(data.wishlist_ids || []);
         } else {
