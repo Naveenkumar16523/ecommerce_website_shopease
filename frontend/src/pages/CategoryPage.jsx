@@ -96,7 +96,7 @@ export default function CategoryPage() {
     const fetchCategoryProducts = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/products');
+        const res = await fetch('/api/products?per_page=1000');
         if (res.ok) {
           const data = await res.json();
           const list = data.data || data;
