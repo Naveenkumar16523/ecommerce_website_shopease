@@ -268,6 +268,8 @@ def token_required(f):
                 return jsonify({'authenticated': False}), 200
             return jsonify({'message': 'Session expired or invalid.'}), 401
         except Exception as e:
+            if request.path == "/api/me":
+                return jsonify({'authenticated': False}), 200
             return jsonify({'message': f'Authentication error: {str(e)}'}), 401
         
         return f(user, *args, **kwargs)
