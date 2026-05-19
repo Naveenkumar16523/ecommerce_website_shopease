@@ -15,9 +15,11 @@ export const AuthProvider = ({ children }) => {
         const data = await res.json();
         if (data.authenticated) {
           setUser({
-            id: data.user_id,
+            id: data.id || data.user_id,
             name: data.name,
             email: data.email,
+            address: data.address,
+            phone: data.phone,
             is_admin: data.is_admin,
           });
           setWishlistIds(data.wishlist_ids || []);
