@@ -20,9 +20,72 @@ export default function Navbar() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return;
+
+    // 1. Direct subcategory routing map (check these first for precise routing)
+    const subcategoryKeywords = {
+      'indian-kurtas': ['kurta', 'kurtas', 'suits', 'suit'],
+      'indian-sarees': ['saree', 'sarees'],
+      'indian-lehengas': ['lehenga', 'lehengas'],
+      'indian-anarkalis': ['anarkali', 'anarkalis'],
+      'western-tops': ['tops', 'top', 'tees', 'tee'],
+      'western-jeans': ['jeans', 'denim'],
+      'western-dresses': ['dresses', 'dress'],
+      'western-shirts': ['shirts', 'shirt', 'blazer', 'blazers'],
+      'footwear-sneakers': ['sneaker', 'sneakers'],
+      'footwear-heels': ['heels', 'heel', 'flats', 'flat'],
+      'footwear-casual': ['casual shoes', 'casual footwear'],
+      'footwear-formal': ['formal shoes', 'formal footwear'],
+      'lingerie-sleepwear': ['sleepwear', 'nightwear'],
+      'lingerie-shapewear': ['shapewear'],
+      'lingerie-loungewear': ['loungewear'],
+      'bags-handbags': ['handbag', 'handbags', 'purse', 'purses'],
+      'bags-backpacks': ['backpack', 'backpacks'],
+      'bags-wallets': ['wallet', 'wallets', 'clutch', 'clutches'],
+      'bags-travel': ['travel bag', 'travel bags', 'suitcase', 'suitcases'],
+      'jewellery-necklaces': ['necklace', 'necklaces'],
+      'jewellery-earrings': ['earring', 'earrings'],
+      'jewellery-rings': ['ring', 'rings', 'bracelet', 'bracelets'],
+      'jewellery-fine': ['fine jewellery', 'fine jewelry'],
+    };
+
+    // 2. Main category routing map (fallback parent category routing)
+    const categoryKeywords = {
+      'indian-wear': ['indian wear', 'indian', 'traditional', 'ethnic'],
+      'western-wear': ['western wear', 'western', 'casualwear', 'formalwear'],
+      'footwear': ['footwear', 'shoes', 'shoe', 'sandal', 'sandals', 'boot', 'boots'],
+      'lingerie': ['lingerie', 'undergarments', 'innerwear'],
+      'bags': ['bags', 'bag'],
+      'jewellery': ['jewellery', 'jewelry', 'jewel', 'jewels'],
+      'active-wear': ['active wear', 'activewear', 'sports', 'gym', 'active & sports', 'sports wear', 'sportswear', 'active'],
+      'watches': ['watches', 'watch', 'analog watches', 'smartwatches', 'chronographs', 'smartwatch'],
+      'tech-accessories': ['tech', 'tech acc', 'tech accessories', 'phone cases', 'wireless earbuds', 'earbuds', 'smart gadgets', 'gadget', 'gadgets'],
+      'mens': ['men', 'mens', 'men wear', 'menswear', 'boy', 'boys'],
+      'womens': ['women', 'womens', 'women wear', 'womenswear', 'girl', 'girls'],
+      'kids': ['kids', 'kidswear', 'baby boys', 'baby girls', 'toddlers', 'toddler', 'baby']
+    };
+
+    // First check precise subcategories
+    for (const [subPath, keywords] of Object.entries(subcategoryKeywords)) {
+      if (keywords.some(keyword => query === keyword || query.includes(keyword))) {
+        navigate(`/category/${subPath}`);
+        setSearchQuery('');
+        return;
+      }
     }
+
+    // Then check main categories
+    for (const [categoryPath, keywords] of Object.entries(categoryKeywords)) {
+      if (keywords.some(keyword => query === keyword || query.includes(keyword))) {
+        navigate(`/category/${categoryPath}`);
+        setSearchQuery('');
+        return;
+      }
+    }
+
+    // Default fallback search page routing
+    navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
   };
 
   return (
