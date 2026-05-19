@@ -116,7 +116,79 @@ export default function CategoryPage() {
 
     let result = [...products];
 
-    // Filter by category slug (exact or prefix match)
+    // Helper mapping function to map URL category slugs to SQLite database category tags
+    const getDatabaseCategories = (term) => {
+      const t = term.toLowerCase().replace(/_/, '-');
+
+      // 1. Indian Wear parent & subcategories
+      if (t === 'indian-wear') return ['kurtas', 'sarees', 'lehengas', 'anarkalis'];
+      if (t.includes('kurtas')) return ['kurtas'];
+      if (t.includes('sarees')) return ['sarees'];
+      if (t.includes('lehengas')) return ['lehengas'];
+      if (t.includes('anarkalis')) return ['anarkalis'];
+
+      // 2. Western Wear parent & subcategories
+      if (t === 'western-wear') return ['tops', 'dresses', 'jeans', 'shirts'];
+      if (t.includes('tops')) return ['tops', 'T-Shirts', 'tshirts'];
+      if (t.includes('dresses')) return ['dresses', 'Dresses'];
+      if (t.includes('jeans')) return ['jeans', 'Jeans'];
+      if (t.includes('shirts')) return ['shirts', 'Shirts'];
+
+      // 3. Footwear parent & subcategories
+      if (t === 'footwear') return ['heels', 'sneakers', 'formal_shoes', 'casual_shoes'];
+      if (t.includes('sneakers')) return ['sneakers'];
+      if (t.includes('heels')) return ['heels'];
+      if (t.includes('casual')) return ['casual_shoes', 'casual'];
+      if (t.includes('formal')) return ['formal_shoes', 'formal'];
+
+      // 4. Lingerie parent & subcategories
+      if (t === 'lingerie') return ['sleepwear', 'shapewear', 'loungewear'];
+      if (t.includes('sleepwear')) return ['sleepwear'];
+      if (t.includes('shapewear')) return ['shapewear'];
+      if (t.includes('loungewear')) return ['loungewear'];
+
+      // 5. Bags parent & subcategories
+      if (t === 'bags') return ['handbags', 'backpacks', 'travel_bags', 'wallets'];
+      if (t.includes('handbags')) return ['handbags'];
+      if (t.includes('backpacks')) return ['backpacks'];
+      if (t.includes('wallets')) return ['wallets'];
+      if (t.includes('travel')) return ['travel_bags'];
+
+      // 6. Jewellery parent & subcategories
+      if (t === 'jewellery') return ['earrings', 'necklaces', 'rings_bracelets', 'fine_jewellery'];
+      if (t.includes('earrings')) return ['earrings'];
+      if (t.includes('necklaces')) return ['necklaces'];
+      if (t.includes('rings')) return ['rings_bracelets'];
+      if (t.includes('fine')) return ['fine_jewellery'];
+
+      // 7. Active Wear / Sports parent & subcategories
+      if (t === 'active-wear' || t === 'active-sports' || t === 'sports') return ['sports_tees', 'sports_tights', 'sports_jackets', 'gym'];
+      if (t.includes('tees')) return ['sports_tees'];
+      if (t.includes('tights')) return ['sports_tights'];
+      if (t.includes('jackets')) return ['sports_jackets', 'Jackets'];
+
+      // 8. Watches parent & subcategories
+      if (t === 'watches') return ['analog_watches', 'smartwatches', 'chronographs'];
+      if (t.includes('analog')) return ['analog_watches'];
+      if (t.includes('smartwatch')) return ['smartwatches'];
+      if (t.includes('chrono')) return ['chronographs'];
+
+      // 9. Tech Accessories / Acc parent & subcategories
+      if (t === 'tech-accessories' || t === 'tech-acc' || t === 'tech') return ['phone_cases', 'wireless_earbuds', 'smart_gadgets'];
+      if (t.includes('cases')) return ['phone_cases'];
+      if (t.includes('earbuds')) return ['wireless_earbuds'];
+      if (t.includes('gadgets')) return ['smart_gadgets'];
+
+      // 10. Mens, Womens, Kids parent & subcategories
+      if (t === 'mens' || t === 'men') return ['Men', 'casual', 'formal', 'gym', 'T-Shirts', 'Shirts', 'Jeans', 'Shorts', 'Jackets', 'Hoodies'];
+      if (t === 'womens' || t === 'women') return ['Women', 'Dresses', 'Jeans', 'Shorts', 'Hoodies', 'T-Shirts', 'sarees', 'kurtas', 'lehengas', 'anarkalis'];
+      if (t === 'kids') return ['Kids', 'kids', 'Baby Boys', 'Baby Girls', 'Toddlers'];
+
+      // Default fallback
+      return [term, term.toLowerCase(), term.replace(/-/g, '_'), term.replace(/-/g, ' ')];
+    };
+
+    // Filter by category slug using mapped database categories
     if (categoryId && categoryId !== 'all') {
       const term = categoryId.toLowerCase();
       result = result.filter(p => {
@@ -125,8 +197,9 @@ export default function CategoryPage() {
         if (term === 'top-selling') return p.rating >= 4.5;
         if (term === 'on-sale') return p.discount_price ? true : false;
         
-        // Match prefix, like if categorId is "mens", matches "mens-shirts" or "mens-tshirts"
-        return pCat === term || pCat.startsWith(term + '-');
+        // Match against our mapped list of category tags
+        const matchedCats = getDatabaseCategories(term).map(c => c.toLowerCase());
+        return matchedCats.includes(pCat);
       });
     }
 
