@@ -95,7 +95,7 @@ export default function ProductDetail() {
         {/* Left Side: Product Image */}
         <div className="rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-800/60 bg-gray-50 dark:bg-[#0A0D15] aspect-[3/4]">
           <img 
-            src={product.image} 
+            src={product.image || null} 
             alt={product.name} 
             className="w-full h-full object-cover object-top"
           />

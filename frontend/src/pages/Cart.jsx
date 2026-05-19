@@ -38,7 +38,7 @@ export default function Cart() {
               {/* Product Thumbnail */}
               <div className="w-20 h-24 bg-gray-50 dark:bg-[#0E1321] rounded-2xl overflow-hidden flex-shrink-0">
                 <img 
-                  src={item.image} 
+                  src={item.image || null} 
                   alt={item.name} 
                   className="w-full h-full object-cover object-top"
                 />

@@ -58,7 +58,7 @@ export default function ProductCard({ product }) {
       {/* Product Image Wrapper */}
       <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-[#080B12]">
         <img 
-          src={product.image} 
+          src={product.image || null} 
           alt={product.name} 
           className="w-full h-full object-cover object-top transition duration-700 group-hover:scale-105"
           onError={(e) => {

@@ -257,7 +257,7 @@ export default function Profile() {
                   >
                     <div className="rounded-2xl overflow-hidden aspect-[4/5] mb-3 bg-white dark:bg-[#070A11]">
                       <img 
-                        src={item.image} 
+                        src={item.image || null} 
                         alt={item.name} 
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                       />

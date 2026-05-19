@@ -143,7 +143,7 @@ export default function Orders() {
                   {Array.isArray(items) && items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-4">
                       <div className="w-12 h-16 bg-gray-50 dark:bg-gray-900 border dark:border-gray-800 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover object-top" />
+                        <img src={item.image || null} alt={item.name} className="w-full h-full object-cover object-top" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-xs dark:text-white truncate">{item.name}</h4>
