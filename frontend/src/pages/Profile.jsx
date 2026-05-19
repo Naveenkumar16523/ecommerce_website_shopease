@@ -120,6 +120,42 @@ export default function Profile() {
     }
   };
 
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be smaller than 2MB.");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64String = event.target.result;
+      try {
+        const res = await fetch('/api/profile/avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatar: base64String })
+        });
+        if (res.ok) {
+          await checkAuth(); // Refresh profile state to fetch new avatar URL
+        } else {
+          alert("Could not save new avatar.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network error.");
+      } finally {
+        setUploadingAvatar(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleLanguageChange = (e) => {
     changeLanguage(e.target.value);
   };
@@ -143,19 +179,32 @@ export default function Profile() {
           <div className="relative z-10 flex flex-col items-center text-center">
             {/* User Avatar */}
             <div className="relative group mb-6">
-              <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-md">
+              <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-md relative bg-gray-150 dark:bg-gray-900">
                 <img 
-                  src="https://i.pravatar.cc/150?img=3" 
+                  src={user?.avatar || "https://i.pravatar.cc/150?img=3"} 
                   alt="Avatar" 
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${uploadingAvatar ? 'opacity-30' : ''}`}
                 />
+                {uploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-6 h-6 border-2 border-neonCyan border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
               </div>
               <button 
-                onClick={() => setIsEditing(true)} 
-                className="absolute bottom-1 right-1 bg-purple-600 dark:bg-neonCyan text-white dark:text-black p-2 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all"
+                onClick={() => document.getElementById('avatar-upload-input').click()} 
+                className="absolute bottom-1 right-1 bg-purple-600 dark:bg-neonCyan text-white dark:text-black p-2 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all cursor-pointer z-10"
+                title="Change Profile Picture"
               >
                 <Edit3 className="w-3.5 h-3.5" />
               </button>
+              <input 
+                type="file" 
+                id="avatar-upload-input" 
+                className="hidden" 
+                accept="image/*" 
+                onChange={handleAvatarChange}
+              />
             </div>
 
             <h2 className="text-2xl font-bold dark:text-white font-syne">{user?.name || 'Loading...'}</h2>

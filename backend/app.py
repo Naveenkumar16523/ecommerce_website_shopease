@@ -89,12 +89,17 @@ def init_db():
                     address TEXT,
                     phone VARCHAR(20),
                     is_admin INT DEFAULT 0,
+                    avatar LONGTEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX ix_users_email (email),
                     INDEX ix_users_updated (updated_at)
                 )
             """)
+            try:
+                cursor.execute("ALTER TABLE users ADD COLUMN avatar LONGTEXT")
+            except Exception:
+                pass
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS products (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -536,6 +541,21 @@ def update_profile(data, current_user):
         return jsonify({"message": "Profile updated successfully"})
     except Exception as e:
         return jsonify({"message": f"Error updating profile: {str(e)}"}), 500
+
+@app.route("/api/profile/avatar", methods=["POST"])
+@token_required
+def update_avatar(current_user):
+    try:
+        data = request.get_json() or {}
+        avatar = data.get('avatar')
+        if not avatar:
+            return jsonify({"message": "No avatar data provided"}), 400
+        
+        with get_db() as (conn, cursor):
+            cursor.execute("UPDATE users SET avatar = %s WHERE id = %s", (avatar, current_user['id']))
+        return jsonify({"message": "Profile picture updated successfully", "avatar": avatar})
+    except Exception as e:
+        return jsonify({"message": f"Error updating avatar: {str(e)}"}), 500
 
 def generate_product_slug(product_id, name):
     return f"{slugify(name)}-{product_id}"
