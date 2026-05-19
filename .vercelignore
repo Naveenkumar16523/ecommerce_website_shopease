@@ -6,3 +6,4 @@ Procfile
 test_backend.py
 __pycache__/
 .venv/
+backend/
