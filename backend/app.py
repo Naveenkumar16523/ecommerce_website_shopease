@@ -178,6 +178,17 @@ def init_db():
                     INDEX ix_login_email_locked (email, locked_until)
                 )
             """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS support_messages (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255),
+                    email VARCHAR(255),
+                    order_number VARCHAR(100),
+                    message TEXT,
+                    is_admin_reply INT DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
             conn.commit()
             cursor.close()
         logger.info("Database initialization successful.")
@@ -464,7 +475,8 @@ def login(data):
                     "user": {
                         "id": user['id'],
                         "name": user['name'],
-                        "email": user['email']
+                        "email": user['email'],
+                        "is_admin": user.get('is_admin', 0)
                     }
                 }))
                 
@@ -740,6 +752,36 @@ def cancel_order(current_user, order_id):
     except Exception as e:
         return jsonify({"message": f"Error cancelling order: {str(e)}"}), 500
 
+@app.route("/api/support/message", methods=["POST"])
+@limiter.limit("5 per minute")
+def submit_support_message():
+    try:
+        data = request.get_json()
+        with get_db() as (conn, cursor):
+            cursor.execute("""
+                INSERT INTO support_messages (name, email, order_number, message)
+                VALUES (%s, %s, %s, %s)
+            """, (
+                data.get('name'),
+                data.get('email'),
+                data.get('orderNumber'),
+                data.get('message')
+            ))
+        return jsonify({"message": "Message sent successfully"}), 201
+    except Exception as e:
+        return jsonify({"message": f"Error saving message: {str(e)}"}), 500
+
+@app.route("/api/user/messages", methods=["GET"])
+@token_required
+def get_user_support_messages(current_user):
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT * FROM support_messages WHERE email = %s ORDER BY created_at DESC", (current_user['email'],))
+            messages = format_rows(cursor, cursor.fetchall())
+        return jsonify(messages), 200
+    except Exception as e:
+        return jsonify({"message": f"Error fetching support messages: {str(e)}"}), 500
+
 # --- CLI COMMANDS (Server Side Only) ---
 @app.cli.command("seed-db")
 @click.option('--force', is_flag=True, help="Skip confirmation prompt")
@@ -806,6 +848,71 @@ def admin_page():
         return make_response("Unauthorized. Admin access required.", 302, {"Location": "/index.html"})
         
     return send_from_directory('../frontend', 'admin.html')
+
+@app.route("/api/admin/messages", methods=["GET"])
+@admin_required
+def get_admin_messages(current_user):
+    try:
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT * FROM support_messages ORDER BY created_at ASC")
+            messages = format_rows(cursor, cursor.fetchall())
+            
+        conversations_dict = {}
+        for msg in messages:
+            email = msg.get('email')
+            if not email: continue
+            if email not in conversations_dict:
+                conversations_dict[email] = {
+                    "user_id": email,
+                    "user_name": msg.get('name') or "Customer",
+                    "user_email": email,
+                    "avatar_color": "#A020F0",
+                    "messages": []
+                }
+            
+            sender = "admin" if msg.get('is_admin_reply') else "user"
+            
+            time_str = msg.get('created_at', '')
+            if time_str and 'T' in time_str:
+                try:
+                    time_str = datetime.datetime.fromisoformat(time_str.split('.')[0]).strftime("%I:%M %p")
+                except:
+                    pass
+            
+            conversations_dict[email]["messages"].append({
+                "sender": sender,
+                "text": msg.get('message', ''),
+                "time": time_str
+            })
+            
+        conversations = list(conversations_dict.values())
+        return jsonify({"conversations": conversations})
+    except Exception as e:
+        return jsonify({"message": f"Error loading messages: {str(e)}"}), 500
+
+@app.route("/api/admin/messages/reply", methods=["POST"])
+@admin_required
+def reply_admin_message(current_user):
+    try:
+        data = request.get_json()
+        user_email = data.get('user_id') 
+        reply_text = data.get('message')
+        
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT name FROM support_messages WHERE email = %s LIMIT 1", (user_email,))
+            name_row = cursor.fetchone()
+            name = name_row[0] if name_row else "Customer"
+            
+            cursor.execute("""
+                INSERT INTO support_messages (name, email, message, is_admin_reply)
+                VALUES (%s, %s, %s, 1)
+            """, (name, user_email, reply_text))
+            
+            logger.info(f"\\n========== EMAIL SIMULATION ==========\\nTo: {user_email}\\nSubject: Re: Support Request\\n\\n{reply_text}\\n======================================\\n")
+            
+        return jsonify({"message": "Reply sent successfully"})
+    except Exception as e:
+        return jsonify({"message": f"Error sending reply: {str(e)}"}), 500
 
 @app.route("/api/admin/stats", methods=["GET"])
 @admin_required

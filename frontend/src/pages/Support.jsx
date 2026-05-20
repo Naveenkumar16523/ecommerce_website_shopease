@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
+import ChatBot from '../components/ChatBot';
 
 export default function Support() {
   const [formData, setFormData] = useState({ name: '', email: '', orderNumber: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/support/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', orderNumber: '', message: '' });
+      } else {
+        alert("Failed to send message. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error. Please try again later.");
+    } finally {
       setSubmitting(false);
-      setSubmitted(true);
-      setFormData({ name: '', email: '', orderNumber: '', message: '' });
-    }, 1200);
+    }
   };
 
   return (
@@ -60,7 +75,10 @@ export default function Support() {
             <div className="text-4xl mb-6">💬</div>
             <h3 className="text-xl font-bold mb-2">Live Chat</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm font-light">Instant support on our site</p>
-            <button className="text-purple-600 dark:text-neonCyan font-bold hover:underline">
+            <button 
+              onClick={() => setIsChatOpen(true)}
+              className="text-purple-600 dark:text-neonCyan font-bold hover:underline"
+            >
               Start Chat
             </button>
           </div>
@@ -145,6 +163,8 @@ export default function Support() {
           )}
         </div>
       </main>
+      
+      <ChatBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }

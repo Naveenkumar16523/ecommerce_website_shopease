@@ -114,7 +114,7 @@ export default function Brands() {
 
                   <Link
                     to={brand.link}
-                    className="w-full text-center py-3.5 rounded-2xl text-xs font-bold uppercase tracking-wider bg-black dark:bg-white text-white dark:text-black hover:opacity-90 active:scale-95 transition-all duration-300"
+                    className={`w-full text-center py-3.5 rounded-2xl text-xs font-bold uppercase tracking-wider ${isDark ? 'bg-white text-black' : 'bg-black text-white'} hover:opacity-90 active:scale-95 transition-all duration-300`}
                   >
                     View Collection
                   </Link>

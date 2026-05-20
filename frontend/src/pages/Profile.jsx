@@ -15,7 +15,8 @@ import {
   ChevronRight, 
   Trash2,
   Lock,
-  DollarSign
+  DollarSign,
+  MessageSquare
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -34,6 +35,9 @@ export default function Profile() {
   const [phone, setPhone] = useState(user?.phone || '');
   const [savingProfile, setSavingProfile] = useState(false);
   const [showPayments, setShowPayments] = useState(false);
+  
+  const [supportMessages, setSupportMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
 
   // Load orders and wishlist on mount
   useEffect(() => {
@@ -45,6 +49,7 @@ export default function Profile() {
     setPhone(user.phone || '');
     fetchOrders();
     fetchWishlist();
+    fetchMessages();
   }, [user]);
 
   const fetchOrders = async () => {
@@ -74,6 +79,21 @@ export default function Profile() {
       console.error("Failed to load wishlist:", err);
     } finally {
       setLoadingWishlist(false);
+    }
+  };
+
+  const fetchMessages = async () => {
+    setLoadingMessages(true);
+    try {
+      const res = await fetch('/api/user/messages');
+      if (res.ok) {
+        const data = await res.json();
+        setSupportMessages(data || []);
+      }
+    } catch (err) {
+      console.error("Failed to load messages:", err);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -370,6 +390,55 @@ export default function Profile() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+
+          {/* Support Tickets */}
+          <div className="bg-gray-50/30 dark:bg-[#0A0D14]/50 border border-gray-150/80 dark:border-gray-800/80 rounded-[2.5rem] p-6 md:p-8 shadow-sm">
+            <div className="flex justify-between items-end mb-6">
+              <h3 className="text-xl font-bold font-syne dark:text-white uppercase tracking-wider flex items-center gap-3">
+                <MessageSquare className="w-5 h-5 text-purple-500" />
+                Support Tickets
+              </h3>
+            </div>
+
+            {loadingMessages ? (
+              <p className="text-sm italic text-gray-400">Loading your support tickets...</p>
+            ) : supportMessages.length === 0 ? (
+              <p className="text-sm italic text-gray-400">You haven't submitted any support requests.</p>
+            ) : (
+              <div className="space-y-4">
+                {supportMessages.map((msg) => (
+                  <div 
+                    key={msg.id} 
+                    className="border border-gray-100 dark:border-gray-900 rounded-2xl overflow-hidden bg-white dark:bg-[#0A0E17]"
+                  >
+                    <div className="p-4 border-b border-gray-100 dark:border-gray-900 flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-sm dark:text-white">Order #{msg.order_number || 'N/A'}</p>
+                        <p className="text-xs text-gray-400 mt-1">{new Date(msg.created_at).toLocaleString()}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold tracking-wider uppercase ${msg.admin_reply ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                        {msg.admin_reply ? 'Replied' : 'Pending'}
+                      </span>
+                    </div>
+                    
+                    <div className="p-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1">Your Message:</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-pre-wrap">{msg.message}</p>
+                    </div>
+
+                    {msg.admin_reply && (
+                      <div className="p-4 bg-purple-50 dark:bg-[#0f1423] border-t border-purple-100 dark:border-white/5">
+                        <p className="text-sm font-bold text-purple-700 dark:text-neonCyan mb-1 flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4" /> Admin Reply:
+                        </p>
+                        <p className="text-xs text-purple-900 dark:text-gray-300 whitespace-pre-wrap">{msg.admin_reply}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>

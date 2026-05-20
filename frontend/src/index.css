@@ -4,6 +4,19 @@
 @theme {
   --animate-marquee: marquee 25s linear infinite;
   --color-neonCyan: #00f2fe;
+  
+  /* Admin Modern Blue Theme */
+  --color-admin-50: #EDF8FF;
+  --color-admin-100: #D7EFFF;
+  --color-admin-200: #B8E4FF;
+  --color-admin-300: #88D5FF;
+  --color-admin-400: #50BDFF;
+  --color-admin-500: #279FFF;
+  --color-admin-600: #1085FF;
+  --color-admin-700: #096CEB;
+  --color-admin-800: #0F57BE;
+  --color-admin-900: #124B96;
+  --color-admin-950: #102E5B;
 
   @keyframes marquee {
     0% { transform: translateX(0%); }
@@ -69,20 +82,6 @@ body {
   font-family: 'Outfit', sans-serif;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
 
 /* Hide orbs in dark mode */
 [data-theme="dark"] .blur-3xl { opacity: 0.1; }
