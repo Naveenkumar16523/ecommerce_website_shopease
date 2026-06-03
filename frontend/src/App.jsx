@@ -62,7 +62,7 @@ export default function App() {
               <Route path="*" element={
                 <div className="min-h-screen flex flex-col justify-between bg-white dark:bg-[#070A11]">
                   <Navbar />
-                  <main className="flex-grow">
+                  <main className="grow">
                     <Routes>
                       {/* Public Storefront Routes */}
                       <Route path="/" element={<Home />} />

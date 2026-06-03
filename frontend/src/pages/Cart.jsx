@@ -61,7 +61,7 @@ export default function Cart() {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="font-mono font-black text-sm dark:text-white">${parseFloat(item.price).toFixed(2)}</span>
+                  <span className="font-mono font-black text-sm dark:text-white">₹{parseFloat(item.price).toFixed(2)}</span>
                   
                   {/* Quantity Controls */}
                   <div className="flex items-center bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-full py-1 px-3 gap-3">

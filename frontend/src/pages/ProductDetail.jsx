@@ -115,11 +115,11 @@ export default function ProductDetail() {
 
           <div className="flex items-baseline gap-3 border-b border-gray-100 dark:border-gray-800 pb-6">
             <span className="text-3xl font-black text-gray-900 dark:text-white font-mono">
-              ${parseFloat(product.price).toFixed(2)}
+              ₹{parseFloat(product.price).toFixed(2)}
             </span>
             {product.discount_price && (
               <span className="text-lg text-gray-400 line-through font-mono">
-                ${parseFloat(product.discount_price).toFixed(2)}
+                ₹{parseFloat(product.discount_price).toFixed(2)}
               </span>
             )}
           </div>

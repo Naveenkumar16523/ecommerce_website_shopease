@@ -104,11 +104,11 @@ export default function ProductCard({ product }) {
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-2">
             <span className="text-base font-black text-gray-900 dark:text-white font-mono">
-              ${parseFloat(product.price).toFixed(2)}
+              ₹{parseFloat(product.price).toFixed(2)}
             </span>
             {product.discount_price && (
               <span className="text-xs text-gray-400 line-through font-mono">
-                ${parseFloat(product.discount_price).toFixed(2)}
+                ₹{parseFloat(product.discount_price).toFixed(2)}
               </span>
             )}
           </div>

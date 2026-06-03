@@ -322,7 +322,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-4 text-xs font-mono">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#1085FF]"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-admin-600"></span>
                 <span className="text-slate-600">Daily Revenue</span>
               </div>
             </div>
@@ -396,9 +396,9 @@ export default function AdminDashboard() {
                   cx={p.x} 
                   cy={p.y} 
                   r="3.5" 
-                  className="fill-white stroke-[#1085FF] stroke-[2px] hover:fill-[#D7EFFF] hover:r-[5px] transition-all" 
+                  className="fill-white stroke-admin-600 stroke-[2px] hover:fill-admin-100 hover:r-[5px] transition-all" 
                 />
-                <title>{`${p.date}: $${p.revenue.toFixed(2)} (${p.orders} orders)`}</title>
+                <title>{`${p.date}: ₹${p.revenue.toFixed(2)} (${p.orders} orders)`}</title>
               </g>
             ))}
           </svg>
@@ -588,9 +588,9 @@ export default function AdminDashboard() {
                 cx={p.x} 
                 cy={p.y} 
                 r="3" 
-                className="fill-white stroke-[#1085FF] stroke-[1.5px] hover:fill-[#D7EFFF] hover:r-[4px] transition-all" 
+                className="fill-white stroke-admin-600 stroke-[1.5px] hover:fill-admin-100 hover:r-[4px] transition-all" 
               />
-              <title>{`${p.date}: $${p.revenue.toFixed(2)} (${p.orders} orders)`}</title>
+              <title>{`${p.date}: ₹${p.revenue.toFixed(2)} (${p.orders} orders)`}</title>
             </g>
           ))}
         </svg>
@@ -795,7 +795,7 @@ export default function AdminDashboard() {
                 <tr class="total-row">
                   <td colspan="2"></td>
                   <td>Grand Total:</td>
-                  <td>$${parseFloat(order.total || 0).toFixed(2)}</td>
+                  <td>₹${parseFloat(order.total || 0).toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
@@ -1022,8 +1022,8 @@ export default function AdminDashboard() {
       ...prev,
       [orderId]: true
     }));
-    addLog('FIN', `Credit Refund of $${total} processed for Order #${orderId} (${clientName}).`);
-    alert(`Refund of $${total} successfully credited to ${clientName}!`);
+    addLog('FIN', `Credit Refund of ₹${total} processed for Order #${orderId} (${clientName}).`);
+    alert(`Refund of ₹${total} successfully credited to ${clientName}!`);
   };
 
   // Computations
@@ -1085,15 +1085,15 @@ export default function AdminDashboard() {
 
       {/* SIDEBAR */}
       <aside 
-        className={`fixed inset-y-0 left-0 lg:static bg-white flex flex-col h-screen transition-all duration-300 z-50 overflow-hidden flex-shrink-0 ${
+        className={`fixed inset-y-0 left-0 lg:static bg-white flex flex-col h-screen transition-all duration-300 z-50 overflow-hidden shrink-0 ${
           sidebarOpen 
             ? 'w-64 translate-x-0 border-r border-slate-200 opacity-100' 
             : 'w-64 -translate-x-full border-r-0 opacity-0 pointer-events-none lg:w-0 lg:translate-x-0 lg:opacity-0'
         }`}
       >
-        <div className="w-64 flex flex-col h-full flex-shrink-0">
+        <div className="w-64 flex flex-col h-full shrink-0">
         {/* Sidebar Header */}
-        <div className="h-20 flex-shrink-0 flex items-center px-6 gap-3 border-b border-slate-200">
+        <div className="h-20 shrink-0 flex items-center px-6 gap-3 border-b border-slate-200">
           <div className="w-8 h-8 rounded-lg bg-admin-600 flex items-center justify-center shadow-sm">
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.003 9.003 0 008.354-5.646z" />
@@ -1106,7 +1106,7 @@ export default function AdminDashboard() {
 
 
         {/* Sidebar Nav */}
-        <div className="flex-grow overflow-y-auto py-4 px-3 space-y-3 custom-scrollbar text-left">
+        <div className="grow overflow-y-auto py-4 px-3 space-y-3 custom-scrollbar text-left">
           {renderSidebarButton('dashboard', 'Dashboard Console', <Shield className="w-4 h-4 text-admin-600" />)}
 
           {/* Product Management */}
@@ -1191,7 +1191,7 @@ export default function AdminDashboard() {
 
         {/* Upgrade Pro Widget */}
         <div className="p-3 mt-auto">
-          <div className="relative bg-gradient-to-br from-admin-600 to-admin-800 rounded-2xl p-4 text-left overflow-hidden shadow-lg">
+          <div className="relative bg-linear-to-br from-admin-600 to-admin-800 rounded-2xl p-4 text-left overflow-hidden shadow-lg">
             <div className="absolute right-0 bottom-0 w-20 h-20 bg-white/10 rounded-full filter blur-xl"></div>
             <div className="flex items-center gap-2 mb-2">
               <svg className="w-4 h-4 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1204,7 +1204,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-slate-200 flex-shrink-0 bg-white">
+        <div className="p-3 border-t border-slate-200 shrink-0 bg-white">
           <div className="flex items-center justify-between gap-2 bg-slate-50 rounded-xl p-3">
             <div className="flex items-center gap-2 overflow-hidden">
               <div className="w-8 h-8 rounded-full bg-admin-600 flex items-center justify-center text-white font-bold text-xs uppercase">
@@ -1236,7 +1236,7 @@ export default function AdminDashboard() {
       )}
 
       {/* MAIN VIEWPORT CONTAINER */}
-      <div className="flex-grow flex flex-col min-w-0 z-10 relative">
+      <div className="grow flex flex-col min-w-0 z-10 relative">
         
         {/* HEADER */}
         <header className="h-16 border-b border-slate-200 px-6 flex items-center justify-between bg-white sticky top-0 z-40 shadow-sm">
@@ -1305,10 +1305,10 @@ export default function AdminDashboard() {
         </header>
 
         {/* CONTENT PANELS */}
-        <main className="p-8 flex-grow overflow-y-auto text-left">
+        <main className="p-8 grow overflow-y-auto text-left">
           
           {loading ? (
-            <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
+            <div className="min-h-100 flex flex-col items-center justify-center space-y-4">
               <div className="w-12 h-12 border-4 border-admin-600 border-t-transparent rounded-full animate-spin"></div>
               <p className="text-xs font-mono text-admin-600 uppercase tracking-widest animate-pulse">Syncing catalog parameters...</p>
             </div>
@@ -1337,7 +1337,7 @@ export default function AdminDashboard() {
                   {/* Metrics Row (4 Cards) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Gross Revenue Card */}
-                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[140px] group hover:border-blue-500/30 transition-all duration-300">
+                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-35 group hover:border-blue-500/30 transition-all duration-300">
                       <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-blue-500/5 rounded-full filter blur-2xl group-hover:bg-blue-500/10 transition-all"></div>
                       <div className="flex items-center justify-between z-10">
                         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Gross Revenue</span>
@@ -1346,7 +1346,7 @@ export default function AdminDashboard() {
                         </span>
                       </div>
                       <div className="text-left mt-4 z-10">
-                        <h2 className="text-3xl font-semibold font-mono tracking-tight text-slate-900">${(stats?.metrics?.total_revenue || totalSales).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                        <h2 className="text-3xl font-semibold font-mono tracking-tight text-slate-900">₹{(stats?.metrics?.total_revenue || totalSales).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                         <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 mt-1">
                           <span>↑ 18.4% vs last week</span>
                         </p>
@@ -1354,7 +1354,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Total Orders Card */}
-                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[140px] group hover:border-emerald-500/30 transition-all duration-300">
+                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-35 group hover:border-emerald-500/30 transition-all duration-300">
                       <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-emerald-500/5 rounded-full filter blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
                       <div className="flex items-center justify-between z-10">
                         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Processed Orders</span>
@@ -1373,7 +1373,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Average Order Value Card */}
-                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[140px] group hover:border-purple-500/30 transition-all duration-300">
+                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-35 group hover:border-purple-500/30 transition-all duration-300">
                       <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-purple-500/5 rounded-full filter blur-2xl group-hover:bg-purple-500/10 transition-all"></div>
                       <div className="flex items-center justify-between z-10">
                         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Avg Order Value</span>
@@ -1390,7 +1390,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Conversion Rate Card */}
-                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[140px] group hover:border-amber-500/30 transition-all duration-300">
+                    <div className="relative bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-35 group hover:border-amber-500/30 transition-all duration-300">
                       <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-amber-500/5 rounded-full filter blur-2xl group-hover:bg-amber-500/10 transition-all"></div>
                       <div className="flex items-center justify-between z-10">
                         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Conversion Rate</span>
@@ -1410,7 +1410,7 @@ export default function AdminDashboard() {
                   {/* Main Grid: Visual Analytics Chart & Low Stock Alerts */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Time Series Monitor (2/3 width) */}
-                    <div className="lg:col-span-2 bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[380px]">
+                    <div className="lg:col-span-2 bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-95">
                       <div className="flex items-center justify-between mb-4 border-b border-admin-200 pb-4">
                         <div className="text-left">
                           <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900">SALES & UPTIME MONITOR</h4>
@@ -1422,13 +1422,13 @@ export default function AdminDashboard() {
                       </div>
                       
                       {/* Real dynamic interactive chart */}
-                      <div className="flex-grow flex items-center justify-center min-h-[220px]">
+                      <div className="grow flex items-center justify-center min-h-55">
                         {renderDashboardChart()}
                       </div>
                     </div>
 
                     {/* Low Stock Restock Checklist (1/3 width) */}
-                    <div className="bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[380px]">
+                    <div className="bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-95">
                       <div className="flex items-center justify-between mb-4 border-b border-admin-200 pb-4">
                         <div className="text-left">
                           <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900">LOW STOCK CHECKLIST</h4>
@@ -1440,7 +1440,7 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Low Stock Items List */}
-                      <div className="flex-grow overflow-y-auto max-h-[280px] space-y-3 custom-scrollbar text-left pr-1">
+                      <div className="grow overflow-y-auto max-h-70 space-y-3 custom-scrollbar text-left pr-1">
                         {products.filter(p => p.stock < 15).length === 0 ? (
                           <div className="h-full flex flex-col items-center justify-center text-center text-slate-500 font-mono text-xs py-12">
                             <Check className="w-8 h-8 text-emerald-500 mb-2" />
@@ -1453,7 +1453,7 @@ export default function AdminDashboard() {
                               <div key={prod.id} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col gap-2 hover:bg-slate-100/50 transition-colors font-sans">
                                 <div className="flex items-center justify-between gap-2">
                                   <div className="flex items-center gap-2 overflow-hidden">
-                                    <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 text-xs">
+                                    <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-xs">
                                       📦
                                     </div>
                                     <div className="overflow-hidden">
@@ -1461,7 +1461,7 @@ export default function AdminDashboard() {
                                       <span className="text-[9px] text-slate-500 font-mono block">{prod.category}</span>
                                     </div>
                                   </div>
-                                  <span className="text-xs font-bold font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg flex-shrink-0">
+                                  <span className="text-xs font-bold font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg shrink-0">
                                     {prod.stock} units
                                   </span>
                                 </div>
@@ -1489,7 +1489,7 @@ export default function AdminDashboard() {
                   {/* Main Grid: Recent Orders & Activity Log */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Recent Orders List (2/3 width) */}
-                    <div className="lg:col-span-2 bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[400px]">
+                    <div className="lg:col-span-2 bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-100">
                       <div className="flex items-center justify-between mb-4 border-b border-admin-200 pb-4">
                         <div className="text-left">
                           <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900">RECENT ORDERS REGISTRY</h4>
@@ -1504,7 +1504,7 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Orders Entries list */}
-                      <div className="space-y-3 flex-grow overflow-y-auto max-h-[300px] custom-scrollbar pr-1">
+                      <div className="space-y-3 grow overflow-y-auto max-h-75 custom-scrollbar pr-1">
                         {orders.length === 0 ? (
                           <div className="h-48 flex items-center justify-center text-slate-500 font-mono text-xs">
                             NO CAPTURED TRANSACTIONS REGISTERED IN DATABASE
@@ -1521,7 +1521,7 @@ export default function AdminDashboard() {
                               >
                                 <div className="flex items-center gap-3">
                                   {/* Thumbnail representation */}
-                                  <div className="w-8 h-8 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-sm flex-shrink-0 text-blue-400 font-semibold font-mono">
+                                  <div className="w-8 h-8 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-sm shrink-0 text-blue-400 font-semibold font-mono">
                                     {order.user_name ? order.user_name.slice(0, 2).toUpperCase() : 'US'}
                                   </div>
                                   <div className="text-left overflow-hidden">
@@ -1552,7 +1552,7 @@ export default function AdminDashboard() {
                                   {/* Amount & Inspect */}
                                   <div className="flex items-center gap-3">
                                     <span className="font-mono text-xs font-bold text-slate-900 text-right w-16">
-                                      ${parseFloat(order.total || 0).toFixed(2)}
+                                      ₹{parseFloat(order.total || 0).toFixed(2)}
                                     </span>
                                     <button 
                                       onClick={() => setSelectedOrder(order)}
@@ -1671,7 +1671,7 @@ export default function AdminDashboard() {
                               </td>
                               <td className="p-4 font-bold text-slate-900">{prod.name}</td>
                               <td className="p-4 capitalize text-slate-800 font-medium">{prod.category}</td>
-                              <td className="p-4 font-mono font-bold text-slate-900">${prod.price}</td>
+                              <td className="p-4 font-mono font-bold text-slate-900">₹{prod.price}</td>
                               <td className="p-4 font-mono text-slate-800 font-medium">{prod.stock || 50} units</td>
                               <td className="p-4 text-center">
                                 <button 
@@ -1719,7 +1719,7 @@ export default function AdminDashboard() {
                             className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-admin-600 outline-none transition-colors"
                           >
                             {products.map(p => (
-                              <option key={p.id} value={p.id}>{p.name} (${p.price})</option>
+                              <option key={p.id} value={p.id}>{p.name} (₹{p.price})</option>
                             ))}
                           </select>
                         </div>
@@ -1919,7 +1919,7 @@ export default function AdminDashboard() {
                               <tr key={idx} className="hover:bg-slate-50">
                                 <td className="p-2.5 font-bold text-slate-900">{p.name}</td>
                                 <td className="p-2.5 capitalize">{p.category}</td>
-                                <td className="p-2.5 font-mono">${p.price}</td>
+                                <td className="p-2.5 font-mono">₹{p.price}</td>
                                 <td className="p-2.5 font-mono">{p.stock} units</td>
                                 <td className="p-2.5 font-mono">{p.rating}★</td>
                               </tr>
@@ -1993,7 +1993,7 @@ export default function AdminDashboard() {
                                 <div className="text-[10px] text-slate-500 mt-0.5">{order.shipping_phone}</div>
                               </td>
                               <td className="p-4 max-w-xs truncate">{order.shipping_address}</td>
-                              <td className="p-4 font-mono font-bold text-slate-900">${order.total}</td>
+                              <td className="p-4 font-mono font-bold text-slate-900">₹{order.total}</td>
                               <td className="p-4">
                                 <select
                                   value={order.status || 'Processing'}
@@ -2159,7 +2159,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-5">
                       <span className="text-[11px] font-mono text-slate-500 uppercase tracking-widest block mb-1">Total Refund Value</span>
-                      <h4 className="text-2xl font-bold font-mono text-slate-900">${totalRefundValue.toFixed(2)}</h4>
+                      <h4 className="text-2xl font-bold font-mono text-slate-900">₹{totalRefundValue.toFixed(2)}</h4>
                     </div>
                     <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-5">
                       <span className="text-[11px] font-mono text-slate-500 uppercase tracking-widest block mb-1">Refund Return Coefficient</span>
@@ -2198,7 +2198,7 @@ export default function AdminDashboard() {
                                 <div className="font-bold text-slate-900">{order.shipping_name || 'Customer'}</div>
                                 <div className="text-xs text-slate-500 mt-0.5">{order.shipping_phone}</div>
                               </td>
-                              <td className="p-4 font-mono font-bold text-red-600">${order.total}</td>
+                              <td className="p-4 font-mono font-bold text-red-600">₹{order.total}</td>
                               <td className="p-4">
                                 <span className="px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded text-[10px] font-bold uppercase tracking-wider font-mono">
                                   Cancelled
@@ -2685,7 +2685,7 @@ export default function AdminDashboard() {
                       <div>
                         <span className="text-[10px] sm:text-xs font-mono text-slate-500 uppercase tracking-widest block">Gross Revenue</span>
                         <span className="text-xl font-mono font-black text-emerald-600 mt-1 block">
-                          ${stats?.metrics?.total_revenue?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || '0.00'}
+                          ₹{stats?.metrics?.total_revenue?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || '0.00'}
                         </span>
                       </div>
                       <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-600">
@@ -2750,7 +2750,7 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                                   <span>{cat.sales} items sold</span>
-                                  <span>${cat.revenue.toLocaleString()}</span>
+                                  <span>₹{cat.revenue.toLocaleString()}</span>
                                 </div>
                               </div>
                             );
@@ -2778,7 +2778,7 @@ export default function AdminDashboard() {
                               <tr key={order.id} className="hover:bg-slate-50/50 transition-all border-b border-slate-100">
                                 <td className="p-3 font-mono font-bold text-slate-900">#{order.id}</td>
                                 <td className="p-3 font-semibold text-slate-900">{order.user_name}</td>
-                                <td className="p-3 font-mono text-admin-600">${order.total}</td>
+                                <td className="p-3 font-mono text-admin-600">₹{order.total}</td>
                                 <td className="p-3">
                                   <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-mono border ${
                                     order.status === 'Delivered' 
@@ -2862,9 +2862,9 @@ export default function AdminDashboard() {
                             <tr key={idx} className="hover:bg-slate-50/50 transition-all border-b border-slate-100">
                               <td className="p-4 font-bold text-slate-900 capitalize">{cat.category?.replace('-', ' ')}</td>
                               <td className="p-4 font-mono">{cat.sales} units</td>
-                              <td className="p-4 font-mono text-emerald-600">${cat.revenue?.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                              <td className="p-4 font-mono text-emerald-600">₹{cat.revenue?.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                               <td className="p-4 font-mono text-slate-500">
-                                ${(cat.revenue / (cat.sales || 1)).toFixed(2)}
+                                ₹{(cat.revenue / (cat.sales || 1)).toFixed(2)}
                               </td>
                             </tr>
                           ))}
@@ -3544,7 +3544,7 @@ export default function AdminDashboard() {
               </div>
               <div className="text-right">
                 <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">Grand Total</span>
-                <span className="text-lg font-mono font-black text-admin-600">${selectedOrder.total}</span>
+                <span className="text-lg font-mono font-black text-admin-600">₹{selectedOrder.total}</span>
               </div>
             </div>
 

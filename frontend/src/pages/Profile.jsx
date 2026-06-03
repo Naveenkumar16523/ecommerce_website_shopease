@@ -332,7 +332,7 @@ export default function Profile() {
                       />
                     </div>
                     <div className="font-bold text-[10px] sm:text-xs truncate dark:text-white mb-0.5">{item.name}</div>
-                    <div className="font-black text-xs sm:text-sm dark:text-white">${item.price}</div>
+                    <div className="font-black text-xs sm:text-sm dark:text-white">₹{item.price}</div>
                   </Link>
                 ))}
               </div>
@@ -371,7 +371,7 @@ export default function Profile() {
                       <div className="mb-3 sm:mb-0">
                         <p className="font-bold text-sm dark:text-white">Order #{order.id}</p>
                         <p className="text-xs text-gray-400 mt-1">
-                          {itemCount} Items • <span className="font-bold text-gray-700 dark:text-gray-200">${order.total}</span> • {orderDate}
+                          {itemCount} Items • <span className="font-bold text-gray-700 dark:text-gray-200">₹{order.total}</span> • {orderDate}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

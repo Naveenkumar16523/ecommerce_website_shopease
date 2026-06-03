@@ -62,7 +62,7 @@ window.Products = {
 
                     <div class="product-info">
                         <h3 class="product-title" onclick="window.viewProduct(this.closest('.product-card'))">${window.escapeHtml(p.name)}</h3>
-                        <p class="product-price">$${parseFloat(p.price).toFixed(2)}</p>
+                        <p class="product-price">₹${parseFloat(p.price).toFixed(2)}</p>
                         
                         <div class="product-actions">
                             <div class="qty-control">

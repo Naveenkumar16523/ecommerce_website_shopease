@@ -81,15 +81,15 @@
       <div class="space-y-3 text-sm mb-5">
         <div class="flex justify-between text-gray-500">
           <span>Subtotal</span>
-          <span id="summary-subtotal">$0</span>
+          <span id="summary-subtotal">₹0</span>
         </div>
         <div class="flex justify-between text-red-500">
           <span>Discount (-20%)</span>
-          <span id="summary-discount">-$0</span>
+          <span id="summary-discount">-₹0</span>
         </div>
         <div class="flex justify-between text-gray-500">
           <span>Delivery Fee</span>
-          <span id="summary-delivery">$15</span>
+          <span id="summary-delivery">₹15</span>
         </div>
       </div>
 
@@ -97,10 +97,10 @@
 
       <div class="flex justify-between font-bold text-lg mb-6">
         <span>Total</span>
-        <span id="summary-total">$0</span>
+        <span id="summary-total">₹0</span>
       </div>
 
-      <button onclick="submitOrder()" class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-4 rounded-full font-bold hover:bg-gray-800 transition flex items-center justify-center gap-2">
+      <button onclick="submitOrder()" class="w-full bg-linear-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-4 rounded-full font-bold hover:bg-gray-800 flex items-center justify-center gap-2">
         Place Order <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M3 12h18"/></svg>
       </button>
     </div>
@@ -111,7 +111,7 @@
 
 
 <!-- QR Modal -->
-<div id="qrModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-6">
+<div id="qrModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-100 hidden items-center justify-center p-6">
   <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform transition-all">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold">Scan to Pay</h3>
@@ -129,7 +129,7 @@
       Please scan the QR code above with any UPI app to complete your payment. Once done, click the button below.
     </p>
     
-    <button onclick="hideQRModal()" class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold hover:bg-gray-800 transition">
+    <button onclick="hideQRModal()" class="w-full bg-linear-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3.5 rounded-full font-bold hover:bg-gray-800">
       I've Paid
     </button>
   </div>
@@ -150,7 +150,7 @@
     
     let subtotal = 0;
     cart.forEach(item => {
-      // Robust price parsing to handle "$120", "120.00", etc.
+      // Robust price parsing to handle "₹120", "120.00", etc.
       let priceStr = String(item.price).replace(/[^0-9.]/g, '');
       const price = parseFloat(priceStr) || 0;
       const qty = parseInt(item.qty) || 1;
@@ -161,10 +161,10 @@
     const delivery = 15;
     const total = subtotal - discount + delivery;
 
-    document.getElementById('summary-subtotal').innerText = '$' + subtotal.toFixed(2);
-    document.getElementById('summary-discount').innerText = '-$' + discount.toFixed(2);
-    document.getElementById('summary-delivery').innerText = '$' + delivery.toFixed(2);
-    document.getElementById('summary-total').innerText = '$' + total.toFixed(2);
+    document.getElementById('summary-subtotal').innerText = '₹' + subtotal.toFixed(2);
+    document.getElementById('summary-discount').innerText = '-₹' + discount.toFixed(2);
+    document.getElementById('summary-delivery').innerText = '₹' + delivery.toFixed(2);
+    document.getElementById('summary-total').innerText = '₹' + total.toFixed(2);
   }
 
   async function submitOrder() {

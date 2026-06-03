@@ -134,7 +134,7 @@ export default function Orders() {
 
                   <div className="space-y-1">
                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Total Receipt</span>
-                    <p className="text-sm font-mono font-black dark:text-white">${parseFloat(order.total).toFixed(2)}</p>
+                    <p className="text-sm font-mono font-black dark:text-white">₹{parseFloat(order.total).toFixed(2)}</p>
                   </div>
                 </div>
 
@@ -147,7 +147,7 @@ export default function Orders() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-xs dark:text-white truncate">{item.name}</h4>
-                        <p className="text-[10px] text-gray-400 font-semibold font-mono mt-0.5">${parseFloat(item.price).toFixed(2)} x {item.qty}</p>
+                        <p className="text-[10px] text-gray-400 font-semibold font-mono mt-0.5">₹{parseFloat(item.price).toFixed(2)} x {item.qty}</p>
                       </div>
                     </div>
                   ))}

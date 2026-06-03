@@ -27,22 +27,22 @@
       </div>
     </div>
   
-    <div class="w-full lg:w-[380px] flex-shrink-0">
+    <div class="w-full lg:w-95 shrink-0">
       <div class="border border-gray-200 rounded-2xl p-6 space-y-4">
         <h2 class="font-bold text-lg">Order Summary</h2>
  
         <div class="space-y-3">
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-500">Subtotal</span>
-            <span class="font-semibold" id="subtotal">$565</span>
+            <span class="font-semibold" id="subtotal">₹565</span>
           </div>
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-500">Discount (-20%)</span>
-            <span class="font-semibold text-red-500" id="discount">-$113</span>
+            <span class="font-semibold text-red-500" id="discount">-₹113</span>
           </div>
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-500">Delivery Fee</span>
-            <span class="font-semibold" id="delivery-fee">$15</span>
+            <span class="font-semibold" id="delivery-fee">₹15</span>
           </div>
         </div>
  
@@ -50,18 +50,18 @@
  
         <div class="flex items-center justify-between">
           <span class="font-bold text-base">Total</span>
-          <span class="font-bold text-xl" id="total">$467</span>
+          <span class="font-bold text-xl" id="total">₹467</span>
         </div>
  
         
         <div class="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2 mt-1">
-          <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M3 12l9 9 9-9-9-9-9 9z"/></svg>
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M3 12l9 9 9-9-9-9-9 9z"/></svg>
           <input type="text" placeholder="Add promo code" class="promo-input flex-1 text-sm bg-transparent placeholder-gray-400 outline-none"/>
-          <button class="bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-gray-800 transition">Apply</button>
+          <button class="bg-linear-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-gray-800">Apply</button>
         </div>
 
         <a href="checkout.html">
-  <button class="w-full bg-gradient-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3 rounded-full mt-4 hover:bg-gray-800 transition">
+  <button class="w-full bg-linear-to-r from-slate-900 to-black text-white hover:scale-105 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 py-3 rounded-full mt-4 hover:bg-gray-800">
     Go to Checkout →
   </button>
 </a>
@@ -118,7 +118,7 @@ function renderCart() {
           </div>
 
           <div class="flex justify-between items-center mt-2 md:mt-4">
-            <p class="font-bold text-lg">$${item.price}</p>
+            <p class="font-bold text-lg">₹${item.price}</p>
             <div class="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-4">
               <button onclick="changeQty(${pid}, -1)" class="text-lg font-medium hover:text-red-500">−</button>
               <span class="text-sm font-bold min-w-[20px] text-center">${item.qty}</span>
@@ -156,10 +156,10 @@ function updateSummary() {
   const delivery = subtotal > 0 ? 15 : 0;
   const total = subtotal - discount + delivery;
 
-  document.getElementById('subtotal').innerText = '$' + subtotal;
-  document.getElementById('discount').innerText = '-$' + discount;
-  document.getElementById('delivery-fee').innerText = '$' + delivery;
-  document.getElementById('total').innerText = '$' + total;
+  document.getElementById('subtotal').innerText = '₹' + subtotal;
+  document.getElementById('discount').innerText = '-₹' + discount;
+  document.getElementById('delivery-fee').innerText = '₹' + delivery;
+  document.getElementById('total').innerText = '₹' + total;
 }
 
 // Listen for global cart updates

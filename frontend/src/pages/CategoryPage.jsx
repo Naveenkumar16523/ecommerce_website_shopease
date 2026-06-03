@@ -260,7 +260,7 @@ export default function CategoryPage() {
           <div className="space-y-3 border-t border-gray-100 dark:border-gray-800 pt-6">
             <div className="flex justify-between items-center">
               <h4 className="text-xs uppercase font-extrabold tracking-wider text-gray-400">Max Price</h4>
-              <span className="text-xs font-mono font-bold">${priceRange}</span>
+              <span className="text-xs font-mono font-bold">₹{priceRange}</span>
             </div>
             <input 
               type="range" 

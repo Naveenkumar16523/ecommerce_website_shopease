@@ -37,7 +37,7 @@ export default function ChatBot({ isOpen, onClose }) {
     const text = input.toLowerCase();
     
     if (text.includes('shipping') || text.includes('delivery')) {
-      return "We offer standard (3-5 days) and express (1-2 days) shipping. You get free shipping on orders over $50!";
+      return "We offer standard (3-5 days) and express (1-2 days) shipping. You get free shipping on orders over ₹50!";
     }
     if (text.includes('return') || text.includes('refund')) {
       return "You can return items within 30 days of receipt. Refunds are usually processed within 5-7 business days.";
@@ -73,13 +73,13 @@ export default function ChatBot({ isOpen, onClose }) {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 p-4 overflow-y-auto min-h-[300px] max-h-[400px] bg-gray-50 dark:bg-transparent space-y-4">
+      <div className="flex-1 p-4 overflow-y-auto min-h-75 max-h-100 bg-gray-50 dark:bg-transparent space-y-4">
         {messages.map((msg, idx) => (
           <div 
             key={idx} 
             className={`flex items-start gap-2 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.sender === 'user' ? 'bg-purple-600' : 'bg-gray-200 dark:bg-[#1A2235]'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.sender === 'user' ? 'bg-purple-600' : 'bg-gray-200 dark:bg-[#1A2235]'}`}>
               {msg.sender === 'user' ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-gray-700 dark:text-neonCyan" />}
             </div>
             <div 

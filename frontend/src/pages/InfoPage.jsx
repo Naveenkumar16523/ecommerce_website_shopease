@@ -73,11 +73,11 @@ const INFO_PAGES_CONTENT = {
     sections: [
       {
         heading: 'Standard Shipping',
-        content: 'Takes 3-5 business days. Free for all orders exceeding $150. Fully insured and trackable.'
+        content: 'Takes 3-5 business days. Free for all orders exceeding ₹150. Fully insured and trackable.'
       },
       {
         heading: 'Cosmic Express Delivery',
-        content: 'Next-day delivery available in major metropolitan regions. Flat rate of $15 applies.'
+        content: 'Next-day delivery available in major metropolitan regions. Flat rate of ₹15 applies.'
       }
     ]
   },

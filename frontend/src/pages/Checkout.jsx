@@ -323,7 +323,7 @@ export default function Checkout() {
             {cart.map((item, index) => (
               <div key={index} className="flex justify-between items-center gap-4">
                 <span className="truncate max-w-[150px]">{item.name} <span className="font-mono text-gray-400">x{item.qty}</span></span>
-                <span className="font-mono text-gray-900 dark:text-white">${(item.price * item.qty).toFixed(2)}</span>
+                <span className="font-mono text-gray-900 dark:text-white">₹{(item.price * item.qty).toFixed(2)}</span>
               </div>
             ))}
           </div>
@@ -331,19 +331,19 @@ export default function Checkout() {
           <div className="border-t border-gray-100 dark:border-gray-800/80 pt-4 space-y-3 text-xs font-semibold">
             <div className="flex justify-between text-gray-500 dark:text-gray-400">
               <span>Subtotal</span>
-              <span className="font-mono">${subtotal.toFixed(2)}</span>
+              <span className="font-mono">₹{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-red-500">
               <span>Discount</span>
-              <span className="font-mono">-${discount.toFixed(2)}</span>
+              <span className="font-mono">-₹{discount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-gray-500 dark:text-gray-400">
               <span>Delivery Fee</span>
-              <span className="font-mono">${shippingFee.toFixed(2)}</span>
+              <span className="font-mono">₹{shippingFee.toFixed(2)}</span>
             </div>
             <div className="border-t border-gray-100 dark:border-gray-800/80 pt-3 flex justify-between text-sm font-black dark:text-white">
               <span>Total Payment</span>
-              <span className="font-mono">${grandTotal.toFixed(2)}</span>
+              <span className="font-mono">₹{grandTotal.toFixed(2)}</span>
             </div>
           </div>
 
