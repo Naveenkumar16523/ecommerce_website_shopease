@@ -1189,20 +1189,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Upgrade Pro Widget */}
-        <div className="p-3 mt-auto">
-          <div className="relative bg-linear-to-br from-admin-600 to-admin-800 rounded-2xl p-4 text-left overflow-hidden shadow-lg">
-            <div className="absolute right-0 bottom-0 w-20 h-20 bg-white/10 rounded-full filter blur-xl"></div>
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-4 h-4 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white">Activate ShopEase Pro</span>
-            </div>
-            <p className="text-[9px] text-blue-100 font-medium mb-3 leading-relaxed">Elevate finances with AI insights.</p>
-          </div>
-        </div>
-
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-slate-200 shrink-0 bg-white">
           <div className="flex items-center justify-between gap-2 bg-slate-50 rounded-xl p-3">

@@ -125,11 +125,11 @@ export default function AdminLogin() {
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Signing in...</span>
+                  <span>Login...</span>
                 </>
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Login</span>
                   <ArrowLeft className="w-4 h-4 rotate-180" />
                 </>
               )}
