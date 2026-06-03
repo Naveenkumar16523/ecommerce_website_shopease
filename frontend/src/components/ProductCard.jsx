@@ -56,7 +56,7 @@ export default function ProductCard({ product }) {
         className="group bg-white dark:bg-[#0E1321]/50 border border-gray-100 dark:border-gray-800/40 rounded-3xl overflow-hidden flex flex-col h-full shadow-sm hover:border-purple-500/50 dark:hover:border-neonCyan/50 hover:shadow-[0_20px_40px_rgba(168,85,247,0.06)] dark:hover:shadow-[0_20px_40px_rgba(0,240,255,0.04)] transition-colors duration-300"
       >
       {/* Product Image Wrapper */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-[#080B12]">
+      <div className="relative aspect-3/4 overflow-hidden bg-gray-50 dark:bg-[#080B12]">
         <img 
           src={product.image || null} 
           alt={product.name} 

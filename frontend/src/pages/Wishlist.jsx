@@ -30,14 +30,14 @@ export default function Wishlist() {
 
   if (loading) {
     return (
-      <div className="min-h-[500px] flex items-center justify-center">
+      <div className="min-h-125 flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left space-y-8 animate-fadeIn">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left space-y-8 animate-fadeIn">
       <h1 className="text-3xl md:text-5xl font-black font-syne dark:text-white uppercase">Your Wishlist</h1>
 
       {wishlistItems.length === 0 ? (

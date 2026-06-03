@@ -33,7 +33,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-[600px] flex items-center justify-center px-6 py-12 bg-gradient-to-tr from-[#05070C] via-[#0A0E17] to-indigo-950/20">
+    <div className="min-h-150 flex items-center justify-center px-6 py-12 bg-linear-to-tr from-[#05070C] via-[#0A0E17] to-indigo-950/20">
       <div className="w-full max-w-md bg-white dark:bg-[#0A0D14] border border-gray-150 dark:border-gray-800/80 p-8 rounded-[2.5rem] shadow-2xl space-y-6 text-left relative overflow-hidden">
         
         {/* Glow Element */}

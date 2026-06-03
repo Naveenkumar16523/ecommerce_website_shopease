@@ -42,7 +42,7 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-[500px] flex items-center justify-center">
+      <div className="min-h-125 flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -80,7 +80,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left space-y-16">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left space-y-16">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
         <Link to="/" className="hover:text-purple-600">Home</Link>
@@ -93,7 +93,7 @@ export default function ProductDetail() {
       {/* Main product display */}
       <div className="grid md:grid-cols-2 gap-12 items-start">
         {/* Left Side: Product Image */}
-        <div className="rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-800/60 bg-gray-50 dark:bg-[#0A0D15] aspect-[3/4]">
+        <div className="rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-800/60 bg-gray-50 dark:bg-[#0A0D15] aspect-3/4">
           <img 
             src={product.image || null} 
             alt={product.name} 

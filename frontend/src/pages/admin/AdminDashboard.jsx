@@ -1571,7 +1571,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Operational Activity Logs (1/3 width) */}
-                    <div className="bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-[400px]">
+                    <div className="bg-white border border-admin-200 rounded-3xl p-6 flex flex-col justify-between overflow-hidden shadow-2xl min-h-100">
                       <div className="flex items-center justify-between mb-4 border-b border-admin-200 pb-4">
                         <div className="text-left">
                           <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900">SYSTEM TELEMETRY</h4>
@@ -1584,7 +1584,7 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Log Screen */}
-                      <div className="flex-grow bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-[9px] text-emerald-400 text-left overflow-y-auto max-h-[300px] space-y-2.5 custom-scrollbar">
+                      <div className="grow bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-[9px] text-emerald-400 text-left overflow-y-auto max-h-75 space-y-2.5 custom-scrollbar">
                         {logs.map((log) => (
                           <div key={log.id} className="leading-relaxed hover:bg-white/2 p-1 rounded transition-colors">
                             <span className="text-slate-500">[{log.time}]</span>{' '}
@@ -1633,7 +1633,7 @@ export default function AdminDashboard() {
 
                     <button 
                       onClick={() => setShowAddModal(true)}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-admin-600 hover:bg-admin-700 text-white font-semibold shadow-sm transition-all font-semibold text-xs px-5 py-3 rounded-lg hover:shadow-md transition-all cursor-pointer"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-admin-600 hover:bg-admin-700 text-white font-semibold shadow-sm transition-all text-xs px-5 py-3 rounded-lg hover:shadow-md cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add New Product</span>
@@ -1641,7 +1641,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Product Grid Table */}
-                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs text-left border-collapse">
                         <thead>
@@ -1745,15 +1745,15 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
-                    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col justify-between min-h-[350px]">
+                    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col justify-between min-h-87.5">
                       <div className="border-b border-slate-200 pb-4 mb-4">
                         <h4 className="font-syne font-bold text-xs tracking-wider uppercase text-slate-900">Live Media Preview</h4>
                         <p className="text-[10px] text-slate-500">Preview selected asset coordinates before server upload</p>
                       </div>
 
-                      <div className="flex-grow flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl overflow-hidden p-4 min-h-[200px] relative">
+                      <div className="grow flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl overflow-hidden p-4 min-h-50 relative">
                         {uploadPreview ? (
-                          <img src={uploadPreview} className="max-h-[180px] max-w-full object-contain rounded-lg shadow-lg" alt="Upload preview" />
+                          <img src={uploadPreview} className="max-h-45 max-w-full object-contain rounded-lg shadow-lg" alt="Upload preview" />
                         ) : (
                           <div className="text-center text-xs text-slate-500 font-mono">
                             <Eye className="w-6 h-6 mx-auto text-gray-600 mb-2" />
@@ -1772,7 +1772,7 @@ export default function AdminDashboard() {
                         <button 
                           onClick={handleMediaUpload} 
                           disabled={uploadingMedia || !uploadFile}
-                          className="bg-admin-600 hover:bg-admin-700 text-white font-semibold shadow-sm transition-all font-semibold text-xs px-5 py-2.5 rounded-lg hover:shadow-md transition-all cursor-pointer disabled:opacity-50"
+                          className="bg-admin-600 hover:bg-admin-700 text-white font-semibold shadow-sm transition-all text-xs px-5 py-2.5 rounded-lg hover:shadow-md cursor-pointer disabled:opacity-50"
                         >
                           {uploadingMedia ? 'Uploading...' : 'Save Media Association'}
                         </button>
@@ -1805,7 +1805,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
                     <div className="p-6 border-b border-slate-200 bg-slate-50">
                       <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900 font-syne">Active Alert Feed</h4>
                       <p className="text-[10px] text-slate-500">Immediate operations needed for out-of-stock or low-capacity products.</p>
@@ -1897,13 +1897,13 @@ export default function AdminDashboard() {
                       </button>
                     </div>
 
-                    <div className="lg:col-span-2 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col justify-between min-h-[300px]">
+                    <div className="lg:col-span-2 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col justify-between min-h-75">
                       <div className="border-b border-slate-200 pb-4 mb-4">
                         <h4 className="font-syne font-bold text-xs tracking-wider uppercase text-slate-900">Validated Products Preview</h4>
                         <p className="text-[10px] text-slate-500">Ingested entries validated and parsed from CSV inputs</p>
                       </div>
 
-                      <div className="flex-grow overflow-auto max-h-[220px] border border-slate-200 rounded-xl bg-slate-50">
+                      <div className="grow overflow-auto max-h-55 border border-slate-200 rounded-xl bg-slate-50">
                         <table className="w-full text-left border-collapse text-[10px]">
                           <thead>
                             <tr className="border-b border-slate-200 bg-slate-50 font-mono text-slate-600 font-semibold text-[11px] uppercase">
@@ -1945,7 +1945,7 @@ export default function AdminDashboard() {
                         <button 
                           onClick={handleBulkUploadSubmit} 
                           disabled={submittingBulk || bulkProducts.length === 0}
-                          className="bg-admin-600 hover:bg-admin-700 text-white font-semibold shadow-sm transition-all font-semibold text-xs px-5 py-2.5 rounded-lg hover:shadow-md transition-all cursor-pointer disabled:opacity-50"
+                          className="bg-admin-600 hover:bg-admin-700 text-white font-semibold shadow-sm transition-all text-xs px-5 py-2.5 rounded-lg hover:shadow-md cursor-pointer disabled:opacity-50"
                         >
                           {submittingBulk ? 'Processing Ingestion...' : 'Process Bulk Ingestion'}
                         </button>
@@ -1971,7 +1971,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs text-left border-collapse">
                         <thead>
@@ -2076,7 +2076,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Active dispatches table */}
-                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
                     <div className="p-6 border-b border-slate-200 bg-slate-50">
                       <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900 font-syne">Active Fulfillment Dispatch List</h4>
                       <p className="text-xs text-slate-500">Orders marked as 'Processing' or 'Shipped' awaiting delivery dispatch updates.</p>
@@ -2172,7 +2172,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Refunds Table */}
-                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
                     <div className="p-6 border-b border-slate-200 bg-slate-50">
                       <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900 font-syne">Refunds Queue</h4>
                       <p className="text-xs text-slate-500">Transactions eligible for manual or automated credit refunds.</p>
@@ -2369,7 +2369,7 @@ export default function AdminDashboard() {
 
               {/* E. CUSTOMER MESSAGING Tab */}
               {activeTab === 'messages' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px] font-sans animate-[fadeIn_0.3s_ease-out]">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-150 font-sans animate-[fadeIn_0.3s_ease-out]">
                   {/* Left Column: Conversations List */}
                   <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-5 flex flex-col h-full overflow-hidden">
                     <div className="pb-4 border-b border-slate-200 mb-4">
@@ -2377,7 +2377,7 @@ export default function AdminDashboard() {
                       <p className="text-xs text-slate-500 mt-1 text-left">Live customer support nodes in this terminal session.</p>
                     </div>
 
-                    <div className="flex-grow overflow-y-auto space-y-2 pr-1">
+                    <div className="grow overflow-y-auto space-y-2 pr-1">
                       {conversations.map((conv) => {
                         const lastMsg = conv.messages[conv.messages.length - 1];
                         const isSelected = selectedConvId === conv.user_id;
@@ -2393,16 +2393,16 @@ export default function AdminDashboard() {
                           >
                             {/* Avatar */}
                             <div 
-                              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 text-white"
+                              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 text-white"
                               style={{ backgroundColor: conv.avatar_color || '#A020F0' }}
                             >
                               {conv.user_name?.charAt(0).toUpperCase()}
                             </div>
                             
                             {/* Details */}
-                            <div className="min-w-0 flex-grow">
+                            <div className="min-w-0 grow">
                               <div className="flex justify-between items-baseline">
-                                <span className="font-bold text-slate-900 text-xs truncate max-w-[120px]">
+                                <span className="font-bold text-slate-900 text-xs truncate max-w-30">
                                   {conv.user_name}
                                 </span>
                                 <span className="text-[10px] font-mono text-slate-400">
@@ -2548,7 +2548,7 @@ export default function AdminDashboard() {
                 <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
                   {/* Reviews Stats Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex items-center justify-between shadow-lg">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-lg">
                       <div>
                         <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">Total Reviews</span>
                         <span className="text-2xl font-mono font-black text-slate-900 mt-1 block">{reviews.length}</span>
@@ -2557,7 +2557,7 @@ export default function AdminDashboard() {
                         <MessageSquare className="w-5 h-5" />
                       </div>
                     </div>
-                    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex items-center justify-between shadow-lg">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-lg">
                       <div>
                         <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">Average Rating</span>
                         <span className="text-2xl font-mono font-black text-emerald-600 mt-1 block">
@@ -2568,7 +2568,7 @@ export default function AdminDashboard() {
                         <Star className="w-5 h-5 fill-emerald-50 text-emerald-600" />
                       </div>
                     </div>
-                    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex items-center justify-between shadow-lg">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-lg">
                       <div>
                         <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">Pending Review</span>
                         <span className="text-2xl font-mono font-black text-amber-600 mt-1 block">
@@ -2582,7 +2582,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Reviews Moderation Table */}
-                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
                     <div className="p-6 border-b border-slate-200 bg-slate-50">
                       <h4 className="font-syne font-bold text-sm tracking-wider uppercase text-slate-900 font-syne">Reviews Moderation</h4>
                       <p className="text-xs text-slate-500">Approve or delete user reviews on products.</p>
@@ -2604,7 +2604,7 @@ export default function AdminDashboard() {
                           {reviews.map((rev) => (
                             <tr key={rev.id} className="hover:bg-slate-50/50 transition-all border-b border-slate-100">
                               <td className="p-4 flex items-center gap-3">
-                                <div className="w-8 h-10 bg-slate-50 border border-slate-200 rounded overflow-hidden flex-shrink-0">
+                                <div className="w-8 h-10 bg-slate-50 border border-slate-200 rounded overflow-hidden shrink-0">
                                   <img 
                                     src={rev.product_image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80'} 
                                     alt={rev.product_name} 
@@ -2614,7 +2614,7 @@ export default function AdminDashboard() {
                                     }}
                                   />
                                 </div>
-                                <span className="font-bold text-slate-900 max-w-[120px] truncate block text-left" title={rev.product_name}>
+                                <span className="font-bold text-slate-900 max-w-30 truncate block text-left" title={rev.product_name}>
                                   {rev.product_name}
                                 </span>
                               </td>
@@ -2744,7 +2744,7 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className="w-full bg-admin-50 rounded-full h-1.5 overflow-hidden border border-admin-200">
                                   <div 
-                                    className="bg-gradient-to-r from-indigo-500 to-admin-600 h-full rounded-full" 
+                                    className="bg-linear-to-r from-indigo-500 to-admin-600 h-full rounded-full" 
                                     style={{ width: `${share}%` }}
                                   />
                                 </div>
@@ -2810,7 +2810,7 @@ export default function AdminDashboard() {
 
                   {/* Additional charts / info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 shadow-lg">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-lg">
                       <h4 className="font-syne font-bold text-xs uppercase tracking-wider text-slate-900 pb-3 border-b border-slate-200 mb-4">Volume Frequency Distribution</h4>
                       <p className="text-xs text-slate-500 leading-relaxed font-mono">
                         Daily transactional frequency aggregates. Peak volumes indicate high traffic concurrency on main clothing category catalogs.

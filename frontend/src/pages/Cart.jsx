@@ -24,7 +24,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left space-y-8">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left space-y-8">
       <h1 className="text-3xl md:text-5xl font-black font-syne dark:text-white uppercase">Your Cart</h1>
 
       <div className="grid lg:grid-cols-3 gap-10 items-start">
@@ -36,7 +36,7 @@ export default function Cart() {
               className="flex items-center gap-5 p-4 bg-white dark:bg-[#0A0D14] border border-gray-150 dark:border-gray-800 rounded-3xl"
             >
               {/* Product Thumbnail */}
-              <div className="w-20 h-24 bg-gray-50 dark:bg-[#0E1321] rounded-2xl overflow-hidden flex-shrink-0">
+              <div className="w-20 h-24 bg-gray-50 dark:bg-[#0E1321] rounded-2xl overflow-hidden shrink-0">
                 <img 
                   src={item.image || null} 
                   alt={item.name} 
@@ -48,7 +48,7 @@ export default function Cart() {
               <div className="flex-1 min-w-0 flex flex-col justify-between h-24 py-1">
                 <div className="flex justify-between items-start gap-4">
                   <div>
-                    <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate max-w-[200px] md:max-w-sm">
+                    <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate max-w-50 md:max-w-sm">
                       {item.name}
                     </h3>
                   </div>

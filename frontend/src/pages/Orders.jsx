@@ -55,14 +55,14 @@ export default function Orders() {
 
   if (loading) {
     return (
-      <div className="min-h-[500px] flex items-center justify-center">
+      <div className="min-h-125 flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left space-y-8 animate-fadeIn">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left space-y-8 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl md:text-5xl font-black font-syne dark:text-white uppercase">Your Orders</h1>
         <button 
@@ -142,7 +142,7 @@ export default function Orders() {
                 <div className="space-y-4">
                   {Array.isArray(items) && items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-4">
-                      <div className="w-12 h-16 bg-gray-50 dark:bg-gray-900 border dark:border-gray-800 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-12 h-16 bg-gray-50 dark:bg-gray-900 border dark:border-gray-800 rounded-lg overflow-hidden shrink-0">
                         <img src={item.image || null} alt={item.name} className="w-full h-full object-cover object-top" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -166,7 +166,7 @@ export default function Orders() {
                     {order.status !== 'Cancelled' && (
                       <button 
                         onClick={() => setSelectedTrackingOrder(order)}
-                        className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-[10px] uppercase tracking-widest font-mono font-extrabold rounded-full transition cursor-pointer shadow-lg shadow-purple-500/10 hover:shadow-purple-500/25"
+                        className="px-5 py-2.5 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-[10px] uppercase tracking-widest font-mono font-extrabold rounded-full transition cursor-pointer shadow-lg shadow-purple-500/10 hover:shadow-purple-500/25"
                       >
                         Track Order
                       </button>
@@ -208,7 +208,7 @@ export default function Orders() {
         const progressPercentage = (currentStep / 3) * 100;
 
         return (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
             <div onClick={() => setSelectedTrackingOrder(null)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
             <div className="absolute bg-[#090D16] border border-white/10 w-full max-w-md p-6 rounded-[2.5rem] shadow-2xl space-y-6 animate-[scaleUp_0.2s_ease-out_forwards] text-left overflow-hidden">
               {/* Blur Light Backdrop */}
@@ -238,7 +238,7 @@ export default function Orders() {
               <div className="relative pl-8 space-y-6 before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/10">
                 {/* Progress Fill bar in vertical timeline */}
                 <div 
-                  className="absolute left-3.5 top-2 w-0.5 bg-gradient-to-b from-purple-500 via-indigo-500 to-cyan-400 transition-all duration-700 -translate-x-1/2"
+                  className="absolute left-3.5 top-2 w-0.5 bg-linear-to-b from-purple-500 via-indigo-500 to-cyan-400 transition-all duration-700 -translate-x-1/2"
                   style={{ height: `${(currentStep / 3) * 100}%` }}
                 />
 
@@ -323,7 +323,7 @@ export default function Orders() {
                 </div>
                 <div className="flex justify-between items-center text-[#82889A]">
                   <span>Shipping Address</span>
-                  <span className="text-white font-bold truncate max-w-[150px]" title={selectedTrackingOrder.shipping_address}>
+                  <span className="text-white font-bold truncate max-w-37.5" title={selectedTrackingOrder.shipping_address}>
                     {selectedTrackingOrder.shipping_address ? selectedTrackingOrder.shipping_address.split(',')[0] : 'Standard'}
                   </span>
                 </div>
@@ -336,7 +336,7 @@ export default function Orders() {
               {/* Close Action */}
               <button 
                 onClick={() => setSelectedTrackingOrder(null)}
-                className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] text-center"
+                className="w-full py-2.5 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] text-center"
               >
                 Close Transit Console
               </button>

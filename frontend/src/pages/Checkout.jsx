@@ -168,7 +168,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left space-y-8">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left space-y-8">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate('/cart')} className="p-2 border dark:border-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-white/5">
           <ArrowLeft className="w-4 h-4 dark:text-white" />
@@ -322,7 +322,7 @@ export default function Checkout() {
           <div className="space-y-3 font-semibold text-xs text-gray-500 dark:text-gray-400">
             {cart.map((item, index) => (
               <div key={index} className="flex justify-between items-center gap-4">
-                <span className="truncate max-w-[150px]">{item.name} <span className="font-mono text-gray-400">x{item.qty}</span></span>
+                <span className="truncate max-w-37.5">{item.name} <span className="font-mono text-gray-400">x{item.qty}</span></span>
                 <span className="font-mono text-gray-900 dark:text-white">₹{(item.price * item.qty).toFixed(2)}</span>
               </div>
             ))}

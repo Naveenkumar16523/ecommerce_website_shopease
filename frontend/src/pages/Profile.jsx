@@ -185,15 +185,15 @@ export default function Profile() {
     : 'Unknown';
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left transition-colors duration-300">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left transition-colors duration-300">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
         
         {/* Left Side: Brand Panel Card */}
         <div className="md:col-span-2 bg-gray-50/50 dark:bg-[#0A0E17] border border-gray-150 dark:border-gray-800/80 rounded-[2.5rem] p-8 space-y-8 relative overflow-hidden shadow-sm">
           {/* Floating cosmic orbs background effect */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <div className="absolute -top-[10%] -left-[10%] w-[150px] h-[150px] bg-purple-500/5 rounded-full filter blur-2xl animate-pulse" />
-            <div className="absolute -bottom-[10%] -right-[10%] w-[120px] h-[120px] bg-blue-500/5 rounded-full filter blur-2xl" />
+            <div className="absolute top-[-10%] left-[-10%] w-37.5 h-37.5 bg-purple-500/5 rounded-full filter blur-2xl animate-pulse" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-30 h-30 bg-blue-500/5 rounded-full filter blur-2xl" />
           </div>
 
           <div className="relative z-10 flex flex-col items-center text-center">
@@ -324,7 +324,7 @@ export default function Profile() {
                     to={`/product/${item.slug}`} 
                     className="group cursor-pointer block text-left"
                   >
-                    <div className="rounded-2xl overflow-hidden aspect-[4/5] mb-3 bg-white dark:bg-[#070A11]">
+                    <div className="rounded-2xl overflow-hidden aspect-4/5 mb-3 bg-white dark:bg-[#070A11]">
                       <img 
                         src={item.image || null} 
                         alt={item.name} 

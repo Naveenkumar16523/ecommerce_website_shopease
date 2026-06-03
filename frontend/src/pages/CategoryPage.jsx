@@ -223,7 +223,7 @@ export default function CategoryPage() {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 text-left">
+    <div className="max-w-360 mx-auto px-6 md:px-12 py-10 text-left">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold mb-6">
         <Link to="/" className="hover:text-purple-600">Home</Link>
@@ -309,7 +309,7 @@ export default function CategoryPage() {
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="aspect-[3/4] rounded-3xl bg-gray-100 dark:bg-gray-900 animate-pulse" />
+                <div key={i} className="aspect-3/4 rounded-3xl bg-gray-100 dark:bg-gray-900 animate-pulse" />
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
